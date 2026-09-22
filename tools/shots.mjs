@@ -165,7 +165,7 @@ ok('1 screenshots', true, `${ROUTES.length * 2} files in .check/shots/`);
     await page.keyboard.press(k);
     await sleep(700);
   }
-  await sleep(4600);
+  await sleep(8200);
   const cables = await page.locator('#cables .cable').count();
   const wired = await page.evaluate(() => new Set([...document.querySelectorAll('#cables .cable')].map(c => c.dataset.fn)).size);
   const notes = await page.locator('#rows .note').count();
@@ -233,7 +233,7 @@ ok('1 screenshots', true, `${ROUTES.length * 2} files in .check/shots/`);
     `-> ${a.url} "${a.title}" alive=${a.alive} shown=${a.vis}`);
   ok('7b back', b.url === '/' && b.alive === 1 && b.vis === '/', `back to ${b.url} shown=${b.vis} alive=${b.alive}`);
 
-  for (const [route, name] of [['/workshop/', 'IA sin cortina de humo'], ['/learn-more/', 'El truco, con respaldo.']]) {
+  for (const [route, name] of [['/workshop/', 'Inteligencia Artificial sin humo'], ['/learn-more/', 'El truco, y de dónde lo sacamos.']]) {
     await page.goto(BASE + route, { waitUntil: 'load' });
     await sleep(400);
     const r = await page.evaluate(() => ({ vis: document.querySelector('.route:not([hidden])').dataset.route, h2: document.querySelector('.route:not([hidden]) h2').textContent.trim(), title: document.title }));

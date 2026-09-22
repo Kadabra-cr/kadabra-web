@@ -19,7 +19,7 @@ await page.goto('http://127.0.0.1:4173/', { waitUntil: 'load' });
 await page.evaluate(() => document.getElementById('swipe').scrollIntoView({ block: 'center' }));
 await sleep(300);
 await page.click('#bSkip');
-await sleep(6000);
+await sleep(9000);
 
 // --- 5 cable groups ---
 const cableCount = await page.evaluate(() => document.querySelectorAll('#cables .cable').length);

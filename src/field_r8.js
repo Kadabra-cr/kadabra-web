@@ -7,7 +7,7 @@ function makeField(svg, opt) {
   var W = opt.w, H = opt.h;
   var wide = innerWidth > 860;
   var COUNT = wide ? opt.n : Math.min(opt.n, opt.nm);
-  var EXTRA = wide ? Math.round(COUNT * .6) : Math.round(COUNT * .2);   /* density near the pointer */
+  var EXTRA = wide ? Math.round(COUNT * .35) : Math.round(COUNT * .2);  /* density near the pointer */
   var BASE = opt.base, PEAK = opt.peak;
   var R = opt.r;
   /* shape is immediate (most of the way at 100 ms); the opacity ramp is slow
@@ -15,7 +15,8 @@ function makeField(svg, opt) {
   var WAKE_D = 160, FADE_UP = 700, HOLD = 1300, BACK = 520, FADE_DN = 900;
   var SPAWN = 620, BORN = 900;
   var CAP = 40;                              /* marks in a full heart: 100% */
-  var REBIRTH = 10000;                       /* ms of reading after a defeat */
+  var REBIRTH = 20000;                       /* ms of reading after a defeat */
+  var LIVES = 3;                             /* three hits and it is over, whatever the size */
   var marks = [], frag = document.createDocumentFragment();
   var host = svg.parentNode;
 
@@ -89,17 +90,33 @@ function makeField(svg, opt) {
      fills, and follows the hand: never glued to it, never left behind. */
   var heart = { g: document.createElementNS(NS, 'g'), p: document.createElementNS(NS, 'path'),
                 mass: 0, held: [], x: W / 2, y: H / 2, vx: 0, vy: 0, sc: 0, o: 0, relAt: 0, eatAt: 0,
-                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '' };
+                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '', safeTil: 0 };
   heart.p.setAttribute('fill', '#FFFFFF'); heart.p.setAttribute('d', mix('smooth-heart', 1));
   heart.g.setAttribute('class', 'glow heartmark'); heart.g.setAttribute('opacity', '0');
   heart.g.appendChild(heart.p); svg.appendChild(heart.g);
+  var lifeG = document.createElementNS(NS, 'g'), pips = [];
+  lifeG.setAttribute('opacity', '0'); svg.appendChild(lifeG);
+  for (var lv = 0; lv < LIVES; lv++) {
+    var pp = document.createElementNS(NS, 'path');
+    pp.setAttribute('d', 'M0 -9 L7 0 L0 9 L-7 0 Z'); pp.setAttribute('fill', '#FFFFFF');
+    pp.setAttribute('transform', 'translate(' + ((lv - 1) * 22) + ' 0)');
+    lifeG.appendChild(pp); pips.push(pp);
+  }
+  var lifeO = 0;
+  function showLives() {
+    pips.forEach(function (pp, k) {
+      var lost = k >= LIVES - game.hits;
+      pp.setAttribute('fill', lost ? 'none' : '#FFFFFF');
+      pp.setAttribute('stroke', lost ? '#C9A227' : 'none'); pp.setAttribute('stroke-width', '2');
+    });
+  }
 
   /* the war layer: fuel and sparks under the letters, letters over everything */
   var war = document.createElementNS(NS, 'g'); war.setAttribute('class', 'war'); svg.appendChild(war);
   var fuelG = document.createElementNS(NS, 'g'); war.appendChild(fuelG);
   var ltrG = document.createElementNS(NS, 'g'); war.appendChild(ltrG);
   var dots = [];
-  for (var d = 0; d < 110; d++) {
+  for (var d = 0; d < 64; d++) {
     var c = document.createElementNS(NS, 'circle');
     c.setAttribute('r', '0'); c.setAttribute('opacity', '0'); fuelG.appendChild(c);
     dots.push({ el: c, on: false, x: 0, y: 0, vx: 0, vy: 0, t: 0, ttl: 1, r: 4, o: .5, fill: '' });
@@ -119,10 +136,9 @@ function makeField(svg, opt) {
     }
   }
 
-  var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0 };
+  var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0, hits: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = ['wrong invoice', 'fake numbers', 'bad advice', 'breach', 'wrong price',
-               'data leak', 'made-up quote', 'client data', 'leaked contract', 'lawsuit'];
+  var WORDS = '@@t.game.words@@'.split(', ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -131,8 +147,8 @@ function makeField(svg, opt) {
      one word before it comes apart */
   function layout(text) {
     var lines = text.indexOf(' ') > 0 && text.length > 9 ? text.split(' ') : [text];
-    var fs = lines.length > 1 ? 74 : (text.length <= 8 ? 92 : Math.max(64, 92 * 8 / text.length));
-    var maxW = W * (lines.length > 1 ? .24 : .28), widest = 0;
+    var fs = lines.length > 1 ? 50 : (text.length <= 8 ? 62 : Math.max(46, 62 * 8 / text.length));
+    var maxW = W * .2, widest = 0;
     cv.font = '800 ' + fs + 'px Gabarito, sans-serif';
     lines.forEach(function (ln) { widest = Math.max(widest, cv.measureText(ln).width); });
     if (widest > maxW) fs *= maxW / widest;
@@ -155,25 +171,13 @@ function makeField(svg, opt) {
     var lay = layout(text);
     var refX = ptr.on ? ptr.x : heart.x;
     var side = refX < W / 2 ? 1 : -1;                 /* the far side from the hand */
-    var cx = side < 0 ? W * .21 : W * .79;
-    /* never on the copy: try a few spots, corners and centre clear of every
-       quiet zone, before giving up and taking the one farthest from the heart */
-    var halfW = lay.halfW, halfH = lay.halfH;
-    function clampCy(v) { return Math.max(110, Math.min(H - 110, v)); }
-    function fitsCy(y) {
-      var xs = [cx - halfW, cx + halfW], ys = [y - halfH, y + halfH];
-      if (inQuiet(cx, y, 20)) return false;
-      for (var xi = 0; xi < 2; xi++) for (var yi = 0; yi < 2; yi++) if (inQuiet(xs[xi], ys[yi], 20)) return false;
-      return true;
-    }
-    var cands = [clampCy(heart.y + rnd(-120, 120)), clampCy(150), clampCy(H - 150), clampCy(110), clampCy(H - 110)];
-    var cy = null;
-    for (var cci = 0; cci < cands.length; cci++) { if (fitsCy(cands[cci])) { cy = cands[cci]; break; } }
-    if (cy === null) cy = Math.abs(110 - heart.y) > Math.abs((H - 110) - heart.y) ? 110 : H - 110;
-    var w = { side: side, cx: cx, cy: cy, x: cx + side * 300, at: now, letters: [], launched: 0, lastAt: 0,
-              group: game.wave === 0 ? 1 : Math.min(4, game.wave + 1), gap: Math.max(220, 420 - game.wave * 45),
-              mass: 0, gone: 0, doneAt: 0 };
-    w.readAt = now + 620 + Math.max(350, 600 - game.wave * 90) + 85 * lay.letters.length;
+    /* the field is cropped to the screen: place the word in what is seen */
+    var bb = svg.getBoundingClientRect(), vw = bb.width / Math.max(bb.width / W, bb.height / H);
+    var v0 = (W - vw) / 2, v1 = v0 + vw;
+    var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
+    var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], launched: 0, lastAt: 0,
+              gap: Math.max(200, 380 - game.wave * 40), gone: 0, doneAt: 0 };
+    w.readAt = now + 700 + Math.max(300, 650 - game.wave * 90) + 40 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
       t.setAttribute('font-size', lay.fs.toFixed(1)); t.setAttribute('text-anchor', 'middle');
@@ -189,8 +193,8 @@ function makeField(svg, opt) {
     game.word = null;
   }
   function arm(now) {
-    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0;
-    host.classList.add('armed');
+    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0; game.hits = 0;
+    host.classList.add('armed'); showLives();
   }
   function disarm() { game.phase = 'calm'; host.classList.remove('armed'); endWord(); }
   var LIVE = opt.copy ? opt.copy.els.map(function (el) { return el.textContent; }) : null;
@@ -223,7 +227,7 @@ function makeField(svg, opt) {
   function reborn(now) {
     host.classList.remove('dead');
     if (LIVE) setCopy(LIVE);
-    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null;
+    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null; game.hits = 0; showLives();
     heart.mass = 0; heart.held = []; heart.o = 0; heart.sc = 0; heart.burst = 0; heart.debt = 0;
     measure();
     marks.forEach(function (m) { seed(m); });
@@ -345,9 +349,12 @@ function makeField(svg, opt) {
     var wantO = heart.mass && !heart.burst ? .94 : 0;
     heart.o += (wantO - heart.o) * Math.min(1, (wantO ? 2.2 : 3.2) * dt);   /* never a flash */
     if (heart.burst && heart.o < .02) heart.burst = 0;
-    heart.g.setAttribute('opacity', heart.o.toFixed(3));
+    heart.g.setAttribute('opacity', (heart.o * (now < heart.safeTil ? .45 + .55 * (Math.floor(now / 90) % 2) : 1)).toFixed(3));
     heart.g.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + heart.y.toFixed(1) +
       ') scale(' + (heart.sc / 100).toFixed(4) + ') translate(-50 -50)');
+    lifeO += ((armed && heart.mass ? .9 : 0) - lifeO) * Math.min(1, 1.8 * dt);
+    lifeG.setAttribute('opacity', lifeO.toFixed(3));
+    if (lifeO > .01) lifeG.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + (heart.y - hr - 24).toFixed(1) + ')');
     var col = pct < .75 ? lerpC(C_WHITE, C_PINK, pct / .75) : lerpC(C_PINK, C_RED, Math.min(1, (pct - .75) / .25));
     if (heart.hurt > .01) col = lerpC(col, C_GOLD, heart.hurt);
     var fill = css(col);
@@ -359,17 +366,19 @@ function makeField(svg, opt) {
     var w = game.word;
     if (armed && !w && now >= game.nextWord && fontReady()) { newWord(now); w = game.word; }
     if (w) {
-      var slide = Math.min(1, (now - w.at) / 620);
-      w.x = w.cx + w.side * 300 * (1 - easeOut(slide));
-      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length;
+      var slide = Math.min(1, (now - w.at) / 700);
+      w.x = w.cx + w.side * 200 * (1 - easeOut(slide));
+      /* never more than three pairs in the air: the rest wait their turn */
+      var flying = 0;
+      for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly') flying++;
+      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length && flying <= 4;
       if (canLaunch) {
-        var left = w.letters.length - w.launched;
-        var n = game.wave === 0 && left <= 4 ? left : Math.min(w.group, left);
-        if (!w.mass) w.mass = Math.max(heart.mass, CAP);   /* a word always costs half a full heart */
+        var n = Math.min(2, w.letters.length - w.launched);
         for (var q = 0; q < n; q++) {
           var L = w.letters[w.launched++];
           L.st = 'fly'; L.t0 = now; L.x = w.x + L.tx; L.y = w.cy + L.ty;
-          L.vx = -w.side * 40 + rnd(-40, 40); L.vy = rnd(-70, 70);
+          /* the two of a pair split a little, up and down, then close in */
+          L.vx = -w.side * 120; L.vy = (q ? 1 : -1) * rnd(90, 140);
         }
         w.lastAt = now;
       }
@@ -382,48 +391,52 @@ function makeField(svg, opt) {
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ')');
           L2.el.setAttribute('opacity', L2.o.toFixed(3));
         } else if (L2.st === 'fly') {
-          /* slow for the first ~.25s (the steer rate starts low), then it
-             steers hard onto a (slightly) predicted lead of the target */
+          /* homing for a moment only (longer each word), then it keeps its
+             line and speeds up until it leaves the field: dodge at the right
+             time and it is gone */
           var age = (now - L2.t0) / 1000;
-          var boost = 1 + game.wave * .28;   /* wave 2 outruns the heart, always */
-          var vmax = (280 + 620 * Math.min(1, age / 1.2)) * boost;
-          var aimX = target.x + target.vx * .05, aimY = target.y + target.vy * .05;
-          var adx = aimX - L2.x, ady = aimY - L2.y, ad = Math.hypot(adx, ady) || 1;
-          var desVx = adx / ad * vmax, desVy = ady / ad * vmax;
-          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * (1 + game.wave * .22) * dt);
-          L2.vx += (desVx - L2.vx) * steer; L2.vy += (desVy - L2.vy) * steer;
+          var seek = Math.min(2.4, 1.1 + game.wave * .3);
+          var vmax = (540 + 280 * Math.min(1, age / .5)) * (1 + game.wave * .2);
+          if (age < seek) {
+            var adx = target.x - L2.x, ady = target.y - L2.y, ad = Math.hypot(adx, ady) || 1;
+            var steer = Math.min(1, (2.6 + 4.4 * Math.min(1, age / .4)) * (1 + game.wave * .15) * dt);
+            L2.vx += (adx / ad * vmax - L2.vx) * steer; L2.vy += (ady / ad * vmax - L2.vy) * steer;
+          } else {
+            var vs0 = Math.hypot(L2.vx, L2.vy) || 1, acc = 1 + 1.4 * dt;
+            if (vs0 < vmax * 1.6) { L2.vx *= acc; L2.vy *= acc; }
+          }
           var vs = Math.hypot(L2.vx, L2.vy);
           L2.x += L2.vx * dt; L2.y += L2.vy * dt;
           var dd = Math.hypot(target.x - L2.x, target.y - L2.y) || 1;
-          if (now - L2.fuelAt > 26 && vs > 60) {
+          if (now - L2.fuelAt > 55 && vs > 60) {
             L2.fuelAt = now;
-            puff(L2.x - L2.vx / vs * 16, L2.y - L2.vy / vs * 16, -L2.vx * .12 + rnd(-30, 30), -L2.vy * .12 + rnd(-30, 30),
-                 .48, rnd(4, 7), .55, '#E38A3C');
+            puff(L2.x - L2.vx / vs * 14, L2.y - L2.vy / vs * 14, -L2.vx * .1 + rnd(-24, 24), -L2.vy * .1 + rnd(-24, 24),
+                 .4, rnd(3.5, 6), .45, '#E38A3C');
           }
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ') rotate(' +
             (Math.atan2(L2.vy, L2.vx) * 180 / Math.PI).toFixed(1) + ')');
           var hitR = heart.mass ? Math.max(26, hr * .7) : 30;
-          if (dd < hitR || age > 8) {
+          var out = L2.x < -80 || L2.x > W + 80 || L2.y < -80 || L2.y > H + 80;
+          if (dd < hitR || out || age > 3.4) {
             L2.st = 'gone'; L2.t0 = now; w.gone++;
-            if (dd < hitR) {
-              sparks(L2.x, L2.y, 7, heart.mass ? '#C9A227' : '#FFFFFF');
-              if (heart.mass) {
-                heart.hurt = 1;
-                if (opt.lethal) { die(now); break; }
-                heart.debt += w.mass * (game.wave + 1) / w.letters.length;
-                while (heart.debt >= 1 && heart.held.length) { heart.debt--; release(now, 260, 420); }
-                if (heart.mass <= CAP * .25) { die(now); break; }
-              }
+            /* a hit leaves the heart untouchable for a beat: a pair counts once */
+            if (dd < hitR && heart.mass && now < heart.safeTil) sparks(L2.x, L2.y, 4, '#FFFFFF');
+            else if (dd < hitR && heart.mass) {
+              sparks(L2.x, L2.y, 7, '#C9A227');
+              heart.hurt = 1; heart.safeTil = now + 800; game.hits++; showLives();
+              if (game.hits >= LIVES) { die(now); break; }
             }
           }
         } else if (L2.st === 'gone') {
-          L2.o = Math.max(0, 1 - (now - L2.t0) / 450);
+          if (!L2.el.parentNode) continue;
+          L2.o = Math.max(0, 1 - (now - L2.t0) / 350);
           L2.el.setAttribute('opacity', L2.o.toFixed(3));
+          if (!L2.o) ltrG.removeChild(L2.el);
         }
       }
       if (game.word === w && w.gone >= w.letters.length) {
         if (!w.doneAt) w.doneAt = now;
-        else if (now - w.doneAt > Math.max(250, 1300 - game.wave * 300)) { endWord(); game.wave++; game.nextWord = now; }
+        else if (now - w.doneAt > Math.max(400, 1300 - game.wave * 250)) { endWord(); game.wave++; game.nextWord = now; }
       }
     }
     /* the reading time after a defeat, or the moment the hero steps aside */
@@ -552,8 +565,6 @@ function makeField(svg, opt) {
       }
 
       if (m.phase !== 'idle' || m.t > 0) m.p.setAttribute('d', mix(m.suit, m.t));
-      var wantGlow = m.t > .86;
-      if (wantGlow !== m.glow) { m.glow = wantGlow; m.g.classList.toggle('glow', wantGlow); }
       m.hs += Math.max(-2.4 * dt, Math.min(2.4 * dt, hush - m.hs));
       m.g.setAttribute('opacity', (m.o * m.hs * ent).toFixed(3));
       place(m);
@@ -567,14 +578,13 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['On your own, it bites back.',
-                 'The leak, the made-up number, the prompt nobody saw coming: not if, when. Half a day with us and your team sees them first.'] }
+          dead: ['@@t.hero.dead.h1@@', '@@t.hero.dead.sub@@'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
-  makeField(svg, { w: 1600, h: 620, n: 34, nm: 14, base: .16, peak: .8, r: 270, lethal: true,
+  makeField(svg, { w: 1600, h: 620, n: 34, nm: 14, base: .16, peak: .8, r: 270,
     text: [].slice.call(sec.querySelectorAll('.wrap > *')),
     quiet: { x0: 450, x1: 1150, y0: 130, y1: 510 },
     copy: { els: [sec.querySelector('h2'), sec.querySelector('.fine')],
-            dead: ['It bit back. Ready when you are.', 'Half a day, on your files, and your team sees it coming.'] } });
+            dead: ['@@t.close.dead.h2@@', '@@t.close.dead.fine@@'] } });
 });

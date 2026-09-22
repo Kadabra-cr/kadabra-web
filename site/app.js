@@ -87,7 +87,7 @@ var nio = new IntersectionObserver(function (es) {
 }, { threshold: .6 });
 document.querySelectorAll('[data-count]').forEach(function (el) {
   if (reduce) { el.textContent = el.dataset.count + '%'; }
-  else { el.textContent = '0%'; nio.observe(el); }
+  else { el.textContent = '0%'; if (!STAGE) nio.observe(el); }   /* staged: the scroll counts */
 });
 
 /* ==========================================================================
@@ -162,7 +162,7 @@ function makeField(svg, opt) {
   var W = opt.w, H = opt.h;
   var wide = innerWidth > 860;
   var COUNT = wide ? opt.n : Math.min(opt.n, opt.nm);
-  var EXTRA = wide ? Math.round(COUNT * .6) : Math.round(COUNT * .2);   /* density near the pointer */
+  var EXTRA = wide ? Math.round(COUNT * .35) : Math.round(COUNT * .2);  /* density near the pointer */
   var BASE = opt.base, PEAK = opt.peak;
   var R = opt.r;
   /* shape is immediate (most of the way at 100 ms); the opacity ramp is slow
@@ -170,7 +170,8 @@ function makeField(svg, opt) {
   var WAKE_D = 160, FADE_UP = 700, HOLD = 1300, BACK = 520, FADE_DN = 900;
   var SPAWN = 620, BORN = 900;
   var CAP = 40;                              /* marks in a full heart: 100% */
-  var REBIRTH = 10000;                       /* ms of reading after a defeat */
+  var REBIRTH = 20000;                       /* ms of reading after a defeat */
+  var LIVES = 3;                             /* three hits and it is over, whatever the size */
   var marks = [], frag = document.createDocumentFragment();
   var host = svg.parentNode;
 
@@ -244,17 +245,33 @@ function makeField(svg, opt) {
      fills, and follows the hand: never glued to it, never left behind. */
   var heart = { g: document.createElementNS(NS, 'g'), p: document.createElementNS(NS, 'path'),
                 mass: 0, held: [], x: W / 2, y: H / 2, vx: 0, vy: 0, sc: 0, o: 0, relAt: 0, eatAt: 0,
-                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '' };
+                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '', safeTil: 0 };
   heart.p.setAttribute('fill', '#FFFFFF'); heart.p.setAttribute('d', mix('smooth-heart', 1));
   heart.g.setAttribute('class', 'glow heartmark'); heart.g.setAttribute('opacity', '0');
   heart.g.appendChild(heart.p); svg.appendChild(heart.g);
+  var lifeG = document.createElementNS(NS, 'g'), pips = [];
+  lifeG.setAttribute('opacity', '0'); svg.appendChild(lifeG);
+  for (var lv = 0; lv < LIVES; lv++) {
+    var pp = document.createElementNS(NS, 'path');
+    pp.setAttribute('d', 'M0 -9 L7 0 L0 9 L-7 0 Z'); pp.setAttribute('fill', '#FFFFFF');
+    pp.setAttribute('transform', 'translate(' + ((lv - 1) * 22) + ' 0)');
+    lifeG.appendChild(pp); pips.push(pp);
+  }
+  var lifeO = 0;
+  function showLives() {
+    pips.forEach(function (pp, k) {
+      var lost = k >= LIVES - game.hits;
+      pp.setAttribute('fill', lost ? 'none' : '#FFFFFF');
+      pp.setAttribute('stroke', lost ? '#C9A227' : 'none'); pp.setAttribute('stroke-width', '2');
+    });
+  }
 
   /* the war layer: fuel and sparks under the letters, letters over everything */
   var war = document.createElementNS(NS, 'g'); war.setAttribute('class', 'war'); svg.appendChild(war);
   var fuelG = document.createElementNS(NS, 'g'); war.appendChild(fuelG);
   var ltrG = document.createElementNS(NS, 'g'); war.appendChild(ltrG);
   var dots = [];
-  for (var d = 0; d < 110; d++) {
+  for (var d = 0; d < 64; d++) {
     var c = document.createElementNS(NS, 'circle');
     c.setAttribute('r', '0'); c.setAttribute('opacity', '0'); fuelG.appendChild(c);
     dots.push({ el: c, on: false, x: 0, y: 0, vx: 0, vy: 0, t: 0, ttl: 1, r: 4, o: .5, fill: '' });
@@ -274,7 +291,7 @@ function makeField(svg, opt) {
     }
   }
 
-  var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0 };
+  var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0, hits: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
   var WORDS = 'factura equivocada, números inventados, mal consejo, fuga de datos, precio equivocado, cita inventada, datos del cliente, contrato filtrado, demanda, sin política'.split(', ');
   var cv = document.createElement('canvas').getContext('2d');
@@ -285,8 +302,8 @@ function makeField(svg, opt) {
      one word before it comes apart */
   function layout(text) {
     var lines = text.indexOf(' ') > 0 && text.length > 9 ? text.split(' ') : [text];
-    var fs = lines.length > 1 ? 74 : (text.length <= 8 ? 92 : Math.max(64, 92 * 8 / text.length));
-    var maxW = W * (lines.length > 1 ? .24 : .28), widest = 0;
+    var fs = lines.length > 1 ? 50 : (text.length <= 8 ? 62 : Math.max(46, 62 * 8 / text.length));
+    var maxW = W * .2, widest = 0;
     cv.font = '800 ' + fs + 'px Gabarito, sans-serif';
     lines.forEach(function (ln) { widest = Math.max(widest, cv.measureText(ln).width); });
     if (widest > maxW) fs *= maxW / widest;
@@ -309,25 +326,13 @@ function makeField(svg, opt) {
     var lay = layout(text);
     var refX = ptr.on ? ptr.x : heart.x;
     var side = refX < W / 2 ? 1 : -1;                 /* the far side from the hand */
-    var cx = side < 0 ? W * .21 : W * .79;
-    /* never on the copy: try a few spots, corners and centre clear of every
-       quiet zone, before giving up and taking the one farthest from the heart */
-    var halfW = lay.halfW, halfH = lay.halfH;
-    function clampCy(v) { return Math.max(110, Math.min(H - 110, v)); }
-    function fitsCy(y) {
-      var xs = [cx - halfW, cx + halfW], ys = [y - halfH, y + halfH];
-      if (inQuiet(cx, y, 20)) return false;
-      for (var xi = 0; xi < 2; xi++) for (var yi = 0; yi < 2; yi++) if (inQuiet(xs[xi], ys[yi], 20)) return false;
-      return true;
-    }
-    var cands = [clampCy(heart.y + rnd(-120, 120)), clampCy(150), clampCy(H - 150), clampCy(110), clampCy(H - 110)];
-    var cy = null;
-    for (var cci = 0; cci < cands.length; cci++) { if (fitsCy(cands[cci])) { cy = cands[cci]; break; } }
-    if (cy === null) cy = Math.abs(110 - heart.y) > Math.abs((H - 110) - heart.y) ? 110 : H - 110;
-    var w = { side: side, cx: cx, cy: cy, x: cx + side * 300, at: now, letters: [], launched: 0, lastAt: 0,
-              group: game.wave === 0 ? 1 : Math.min(4, game.wave + 1), gap: Math.max(220, 420 - game.wave * 45),
-              mass: 0, gone: 0, doneAt: 0 };
-    w.readAt = now + 620 + Math.max(350, 600 - game.wave * 90) + 85 * lay.letters.length;
+    /* the field is cropped to the screen: place the word in what is seen */
+    var bb = svg.getBoundingClientRect(), vw = bb.width / Math.max(bb.width / W, bb.height / H);
+    var v0 = (W - vw) / 2, v1 = v0 + vw;
+    var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
+    var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], launched: 0, lastAt: 0,
+              gap: Math.max(200, 380 - game.wave * 40), gone: 0, doneAt: 0 };
+    w.readAt = now + 700 + Math.max(300, 650 - game.wave * 90) + 40 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
       t.setAttribute('font-size', lay.fs.toFixed(1)); t.setAttribute('text-anchor', 'middle');
@@ -343,8 +348,8 @@ function makeField(svg, opt) {
     game.word = null;
   }
   function arm(now) {
-    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0;
-    host.classList.add('armed');
+    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0; game.hits = 0;
+    host.classList.add('armed'); showLives();
   }
   function disarm() { game.phase = 'calm'; host.classList.remove('armed'); endWord(); }
   var LIVE = opt.copy ? opt.copy.els.map(function (el) { return el.textContent; }) : null;
@@ -377,7 +382,7 @@ function makeField(svg, opt) {
   function reborn(now) {
     host.classList.remove('dead');
     if (LIVE) setCopy(LIVE);
-    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null;
+    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null; game.hits = 0; showLives();
     heart.mass = 0; heart.held = []; heart.o = 0; heart.sc = 0; heart.burst = 0; heart.debt = 0;
     measure();
     marks.forEach(function (m) { seed(m); });
@@ -499,9 +504,12 @@ function makeField(svg, opt) {
     var wantO = heart.mass && !heart.burst ? .94 : 0;
     heart.o += (wantO - heart.o) * Math.min(1, (wantO ? 2.2 : 3.2) * dt);   /* never a flash */
     if (heart.burst && heart.o < .02) heart.burst = 0;
-    heart.g.setAttribute('opacity', heart.o.toFixed(3));
+    heart.g.setAttribute('opacity', (heart.o * (now < heart.safeTil ? .45 + .55 * (Math.floor(now / 90) % 2) : 1)).toFixed(3));
     heart.g.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + heart.y.toFixed(1) +
       ') scale(' + (heart.sc / 100).toFixed(4) + ') translate(-50 -50)');
+    lifeO += ((armed && heart.mass ? .9 : 0) - lifeO) * Math.min(1, 1.8 * dt);
+    lifeG.setAttribute('opacity', lifeO.toFixed(3));
+    if (lifeO > .01) lifeG.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + (heart.y - hr - 24).toFixed(1) + ')');
     var col = pct < .75 ? lerpC(C_WHITE, C_PINK, pct / .75) : lerpC(C_PINK, C_RED, Math.min(1, (pct - .75) / .25));
     if (heart.hurt > .01) col = lerpC(col, C_GOLD, heart.hurt);
     var fill = css(col);
@@ -513,17 +521,19 @@ function makeField(svg, opt) {
     var w = game.word;
     if (armed && !w && now >= game.nextWord && fontReady()) { newWord(now); w = game.word; }
     if (w) {
-      var slide = Math.min(1, (now - w.at) / 620);
-      w.x = w.cx + w.side * 300 * (1 - easeOut(slide));
-      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length;
+      var slide = Math.min(1, (now - w.at) / 700);
+      w.x = w.cx + w.side * 200 * (1 - easeOut(slide));
+      /* never more than three pairs in the air: the rest wait their turn */
+      var flying = 0;
+      for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly') flying++;
+      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length && flying <= 4;
       if (canLaunch) {
-        var left = w.letters.length - w.launched;
-        var n = game.wave === 0 && left <= 4 ? left : Math.min(w.group, left);
-        if (!w.mass) w.mass = Math.max(heart.mass, CAP);   /* a word always costs half a full heart */
+        var n = Math.min(2, w.letters.length - w.launched);
         for (var q = 0; q < n; q++) {
           var L = w.letters[w.launched++];
           L.st = 'fly'; L.t0 = now; L.x = w.x + L.tx; L.y = w.cy + L.ty;
-          L.vx = -w.side * 40 + rnd(-40, 40); L.vy = rnd(-70, 70);
+          /* the two of a pair split a little, up and down, then close in */
+          L.vx = -w.side * 120; L.vy = (q ? 1 : -1) * rnd(90, 140);
         }
         w.lastAt = now;
       }
@@ -536,48 +546,52 @@ function makeField(svg, opt) {
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ')');
           L2.el.setAttribute('opacity', L2.o.toFixed(3));
         } else if (L2.st === 'fly') {
-          /* slow for the first ~.25s (the steer rate starts low), then it
-             steers hard onto a (slightly) predicted lead of the target */
+          /* homing for a moment only (longer each word), then it keeps its
+             line and speeds up until it leaves the field: dodge at the right
+             time and it is gone */
           var age = (now - L2.t0) / 1000;
-          var boost = 1 + game.wave * .28;   /* wave 2 outruns the heart, always */
-          var vmax = (280 + 620 * Math.min(1, age / 1.2)) * boost;
-          var aimX = target.x + target.vx * .05, aimY = target.y + target.vy * .05;
-          var adx = aimX - L2.x, ady = aimY - L2.y, ad = Math.hypot(adx, ady) || 1;
-          var desVx = adx / ad * vmax, desVy = ady / ad * vmax;
-          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * (1 + game.wave * .22) * dt);
-          L2.vx += (desVx - L2.vx) * steer; L2.vy += (desVy - L2.vy) * steer;
+          var seek = Math.min(2.4, 1.1 + game.wave * .3);
+          var vmax = (540 + 280 * Math.min(1, age / .5)) * (1 + game.wave * .2);
+          if (age < seek) {
+            var adx = target.x - L2.x, ady = target.y - L2.y, ad = Math.hypot(adx, ady) || 1;
+            var steer = Math.min(1, (2.6 + 4.4 * Math.min(1, age / .4)) * (1 + game.wave * .15) * dt);
+            L2.vx += (adx / ad * vmax - L2.vx) * steer; L2.vy += (ady / ad * vmax - L2.vy) * steer;
+          } else {
+            var vs0 = Math.hypot(L2.vx, L2.vy) || 1, acc = 1 + 1.4 * dt;
+            if (vs0 < vmax * 1.6) { L2.vx *= acc; L2.vy *= acc; }
+          }
           var vs = Math.hypot(L2.vx, L2.vy);
           L2.x += L2.vx * dt; L2.y += L2.vy * dt;
           var dd = Math.hypot(target.x - L2.x, target.y - L2.y) || 1;
-          if (now - L2.fuelAt > 26 && vs > 60) {
+          if (now - L2.fuelAt > 55 && vs > 60) {
             L2.fuelAt = now;
-            puff(L2.x - L2.vx / vs * 16, L2.y - L2.vy / vs * 16, -L2.vx * .12 + rnd(-30, 30), -L2.vy * .12 + rnd(-30, 30),
-                 .48, rnd(4, 7), .55, '#E38A3C');
+            puff(L2.x - L2.vx / vs * 14, L2.y - L2.vy / vs * 14, -L2.vx * .1 + rnd(-24, 24), -L2.vy * .1 + rnd(-24, 24),
+                 .4, rnd(3.5, 6), .45, '#E38A3C');
           }
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ') rotate(' +
             (Math.atan2(L2.vy, L2.vx) * 180 / Math.PI).toFixed(1) + ')');
           var hitR = heart.mass ? Math.max(26, hr * .7) : 30;
-          if (dd < hitR || age > 8) {
+          var out = L2.x < -80 || L2.x > W + 80 || L2.y < -80 || L2.y > H + 80;
+          if (dd < hitR || out || age > 3.4) {
             L2.st = 'gone'; L2.t0 = now; w.gone++;
-            if (dd < hitR) {
-              sparks(L2.x, L2.y, 7, heart.mass ? '#C9A227' : '#FFFFFF');
-              if (heart.mass) {
-                heart.hurt = 1;
-                if (opt.lethal) { die(now); break; }
-                heart.debt += w.mass * (game.wave + 1) / w.letters.length;
-                while (heart.debt >= 1 && heart.held.length) { heart.debt--; release(now, 260, 420); }
-                if (heart.mass <= CAP * .25) { die(now); break; }
-              }
+            /* a hit leaves the heart untouchable for a beat: a pair counts once */
+            if (dd < hitR && heart.mass && now < heart.safeTil) sparks(L2.x, L2.y, 4, '#FFFFFF');
+            else if (dd < hitR && heart.mass) {
+              sparks(L2.x, L2.y, 7, '#C9A227');
+              heart.hurt = 1; heart.safeTil = now + 800; game.hits++; showLives();
+              if (game.hits >= LIVES) { die(now); break; }
             }
           }
         } else if (L2.st === 'gone') {
-          L2.o = Math.max(0, 1 - (now - L2.t0) / 450);
+          if (!L2.el.parentNode) continue;
+          L2.o = Math.max(0, 1 - (now - L2.t0) / 350);
           L2.el.setAttribute('opacity', L2.o.toFixed(3));
+          if (!L2.o) ltrG.removeChild(L2.el);
         }
       }
       if (game.word === w && w.gone >= w.letters.length) {
         if (!w.doneAt) w.doneAt = now;
-        else if (now - w.doneAt > Math.max(250, 1300 - game.wave * 300)) { endWord(); game.wave++; game.nextWord = now; }
+        else if (now - w.doneAt > Math.max(400, 1300 - game.wave * 250)) { endWord(); game.wave++; game.nextWord = now; }
       }
     }
     /* the reading time after a defeat, or the moment the hero steps aside */
@@ -706,8 +720,6 @@ function makeField(svg, opt) {
       }
 
       if (m.phase !== 'idle' || m.t > 0) m.p.setAttribute('d', mix(m.suit, m.t));
-      var wantGlow = m.t > .86;
-      if (wantGlow !== m.glow) { m.glow = wantGlow; m.g.classList.toggle('glow', wantGlow); }
       m.hs += Math.max(-2.4 * dt, Math.min(2.4 * dt, hush - m.hs));
       m.g.setAttribute('opacity', (m.o * m.hs * ent).toFixed(3));
       place(m);
@@ -725,7 +737,7 @@ if (heroField) makeField(heroField, {
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
-  makeField(svg, { w: 1600, h: 620, n: 34, nm: 14, base: .16, peak: .8, r: 270, lethal: true,
+  makeField(svg, { w: 1600, h: 620, n: 34, nm: 14, base: .16, peak: .8, r: 270,
     text: [].slice.call(sec.querySelectorAll('.wrap > *')),
     quiet: { x0: 450, x1: 1150, y0: 130, y1: 510 },
     copy: { els: [sec.querySelector('h2'), sec.querySelector('.fine')],
@@ -842,7 +854,7 @@ var policyG = makeGraph({ id: 'policy', drive: true,
   ] });
 
 /* taught first: the same hundred people, twice. Taught, they do 34% more */
-makeGraph({ id: 'viz',
+var vizG = makeGraph({ id: 'viz', drive: true,
   a: { svg: document.getElementById('barA'), count: 100 }, b: { svg: document.getElementById('barB'), count: 134 },
   setup: function (A, B) {
     A.forEach(function (c) { c.fo = .42; });
@@ -850,9 +862,10 @@ makeGraph({ id: 'viz',
   },
   still: function (A, B) { B.forEach(function (c) { c.p.setAttribute('d', mix('smooth-spade', 1)); }); },
   beats: [
-    { at: 0, cls: 'in', fn: function (A, B) { A.concat(B.slice(0, 100)).forEach(function (c) { c.g.style.transitionDelay = (c.row * 22) + 'ms'; }); } },
-    { at: 650, cls: 'taught', fn: function (A, B) { B.slice(0, 100).forEach(function (c) { morphPath(c.p, 'smooth-spade', 420, c.row * 28 + c.col * 7); }); } },
-    { at: 1600, cls: 'more', fn: function (A, B) {
+    { at: 0, r: .06, cls: 'in', fn: function (A, B) { A.concat(B.slice(0, 100)).forEach(function (c) { c.g.style.transitionDelay = (c.row * 22) + 'ms'; }); } },
+    { at: 650, r: .38, cls: 'taught', fn: function (A, B) { B.slice(0, 100).forEach(function (c) { morphPath(c.p, 'smooth-spade', 420, c.row * 28 + c.col * 7); }); },
+      undo: function (A, B) { B.slice(0, 100).forEach(function (c) { c.p.setAttribute('d', PATHS.square); }); } },
+    { at: 1600, r: .7, cls: 'more', fn: function (A, B) {
       B.slice(100).forEach(function (c, i) { c.p.setAttribute('d', mix('smooth-spade', 1)); c.g.style.transitionDelay = (i * 16) + 'ms'; });
     } }
   ] });
@@ -892,6 +905,13 @@ makeGraph({ id: 'viz',
       cables = document.getElementById('cables'),
       desk = document.getElementById('desk'), reveal = document.getElementById('reveal');
   var idx = 0, els = [], minis = [], drag = null, done = false, touched = false, nudgeTimer = 0, nudgeBack = 0, nudgeSide = 1;
+  /* phones get their own table: no piles beside the deck, the two answer
+     buttons are the piles. A sent card flies into its button and leaves a
+     small card in it. */
+  var phone = matchMedia('(max-width:900px)');
+  var bL = document.getElementById('bLeft'), bR = document.getElementById('bRight');
+  [bL, bR].forEach(function (b) { b.insertAdjacentHTML('beforeend', '<span class="tally" aria-hidden="true"></span>'); });
+  function pileOf(dir) { return phone.matches ? (dir > 0 ? bR : bL) : (dir > 0 ? pileR : pileL); }
   var HINT = 'de 5. Arrastre la carta, use los botones o presione ';
 
   function setHint() {
@@ -949,12 +969,11 @@ makeGraph({ id: 'viz',
       var right = nudgeSide > 0; nudgeSide = -nudgeSide;   /* one side, then the other */
       el.classList.add(right ? 'nudging' : 'nudging-l');
       deck.classList.add(right ? 'hinting' : 'hinting-l');
-      (right ? pileR : pileL).classList.add('nudge');
+      pileOf(right ? 1 : -1).classList.add('nudge');
       nudgeBack = setTimeout(function () {
         el.classList.remove('nudging', 'nudging-l');
         deck.classList.remove('hinting', 'hinting-l');
-        pileR.classList.remove('nudge');
-        pileL.classList.remove('nudge');
+        [pileR, pileL, bL, bR].forEach(function (p) { p.classList.remove('nudge'); });
         if (el.classList.contains('piled')) return;
         el.style.transition = 'transform .45s var(--ease)';
         el.style.transform = el.dataset.rest;
@@ -966,8 +985,7 @@ makeGraph({ id: 'viz',
     touched = true;
     clearTimeout(nudgeTimer); clearTimeout(nudgeBack);
     deck.classList.remove('hinting', 'hinting-l');
-    pileR.classList.remove('nudge');
-    pileL.classList.remove('nudge');
+    [pileR, pileL, bL, bR].forEach(function (p) { p.classList.remove('nudge'); });
     els.forEach(function (el) { el.classList.remove('nudging', 'nudging-l'); });
   }
 
@@ -986,6 +1004,12 @@ makeGraph({ id: 'viz',
 
   /* where the k-th card on a pile rests, relative to the deck */
   function pileSpot(dir, k) {
+    if (phone.matches) {
+      /* into the button: small, turned, gone */
+      var bt = pileOf(dir).getBoundingClientRect(), dk = deck.getBoundingClientRect();
+      return 'translate(' + (bt.left + bt.width / 2 - dk.left - dk.width / 2).toFixed(1) + 'px,' +
+        (bt.top + bt.height / 2 - dk.top - dk.height / 2).toFixed(1) + 'px) rotate(' + (dir * 24) + 'deg) scale(.14)';
+    }
     var pile = (dir > 0 ? pileR : pileL).getBoundingClientRect();
     var here = deck.getBoundingClientRect();
     var sc = .44;
@@ -1002,10 +1026,18 @@ makeGraph({ id: 'viz',
     var k = onPile[side].length;
     el.dataset.fn = String(idx + 1); el.dataset.dir = side; el.dataset.k = k;
     onPile[side].push(el);
-    (dir > 0 ? pileR : pileL).classList.add('hot');
+    pileOf(dir).classList.add('hot');
     el.style.zIndex = 40 + idx;
     el.style.pointerEvents = 'none';
-    el.style.transition = reduce ? 'none' : 'transform .68s cubic-bezier(.16,1,.3,1)';
+    if (phone.matches) {
+      var b = pileOf(dir);
+      el.style.transition = reduce ? 'none' : 'transform .5s cubic-bezier(.5,0,.75,0), opacity .22s linear .3s';
+      el.style.opacity = '0';
+      setTimeout(function () {
+        b.querySelector('.tally').insertAdjacentHTML('beforeend', '<i></i>');
+        b.classList.remove('landed'); void b.offsetWidth; b.classList.add('landed');
+      }, reduce ? 0 : 460);
+    } else el.style.transition = reduce ? 'none' : 'transform .68s cubic-bezier(.16,1,.3,1)';
     el.style.transform = pileSpot(dir, k);
     el.classList.add('piled');
     idx++;
@@ -1017,23 +1049,28 @@ makeGraph({ id: 'viz',
   /* --- the desk: one row per card, the card on the left, its answer on the right --- */
   var stage = document.getElementById('stage'), heads = document.getElementById('heads');
   var SLOT = { w: 0, h: 0 };
-  /* The hand is played. The table clears to the mark, and while it holds the
-     screen the desk is laid out behind it: one row dealt after another. */
+  /* The hand is played. The table fades, the mark holds the screen for a
+     moment (with a small turning ring, so the wait reads as work), and the
+     desk is laid out behind it, unseen. Then the mark lets go and the rows
+     are dealt one after another. */
+  var swipeSec = document.getElementById('swipe');
   function finish() {
     if (done) return;
     done = true;
     stopNudge();
-    var narrow = innerWidth <= 900;
-    var wrapW = desk.getBoundingClientRect().width;
-    SLOT.w = Math.round(Math.min(narrow ? wrapW : 420, wrapW * (narrow ? 1 : .42))); SLOT.h = Math.round(SLOT.w * .6);
+    var narrow = phone.matches;
     minis = [];
-    btns.hidden = true; hint.hidden = true;
 
     function lay() {
+      var wrapW = desk.getBoundingClientRect().width;
+      SLOT.w = Math.round(narrow ? Math.min(wrapW, 420) : Math.min(420, wrapW * .42)); SLOT.h = Math.round(SLOT.w * .6);
+      btns.hidden = true; hint.hidden = true;
       heads.classList.add('flip'); stage.classList.add('flip');
       rows.innerHTML = '';
       els.forEach(function (el) {
-        var cd = CARDS[els.indexOf(el)], right = el.dataset.dir === 'r', flip = !right;
+        var cd = CARDS[els.indexOf(el)], right = el.dataset.dir === 'r';
+        /* the card and its note swap sides row by row, whatever was answered */
+        var flip = !narrow && +el.dataset.fn % 2 === 0;
         var row = document.createElement('div');
         row.className = 'row' + (flip ? ' flip' : '') + (reduce ? '' : ' dealt');
         row.dataset.fn = el.dataset.fn;
@@ -1049,28 +1086,35 @@ makeGraph({ id: 'viz',
         slot.appendChild(el);
         el.classList.remove('piled'); el.classList.add('desk');
         el.style.zIndex = ''; el.style.pointerEvents = ''; el.style.transition = 'none'; el.style.transform = 'none';
+        el.style.opacity = '';
         el.style.width = SLOT.w + 'px'; el.style.height = SLOT.h + 'px';
         minis.push(slot);
       });
       reveal.hidden = false;
-      if (reduce) { rows.querySelectorAll('.row').forEach(function (r) { r.classList.remove('dealt'); }); drawCables(); return; }
-      /* dealt one after another, each from its own side of the table */
+    }
+    function dealRows() {
       var list = [].slice.call(rows.querySelectorAll('.row'));
-      list.forEach(function (r, i) { setTimeout(function () { r.classList.remove('dealt'); }, 120 + i * 170); });
-      setTimeout(drawCables, 120 + list.length * 170 + 700);
+      list.forEach(function (r, i) { setTimeout(function () { r.classList.remove('dealt'); }, 120 + i * 190); });
+      if (!narrow) setTimeout(drawCables, 120 + list.length * 190 + 600);
     }
 
-    if (reduce) { lay(); return; }
-    /* the mark holds the screen while the desk is laid out behind it */
+    if (reduce) { lay(); rows.querySelectorAll('.row').forEach(function (r) { r.classList.remove('dealt'); }); if (!narrow) drawCables(); return; }
+    swipeSec.classList.add('clearing');                  /* the table fades first */
     var veil = document.createElement('div');
     veil.className = 'veil';
-    veil.style.position = 'fixed'; veil.style.inset = '0';   /* it holds the screen, not the section */
-    veil.innerHTML = '<svg viewBox="0 0 1703.11 435.6" aria-hidden="true"><use href="#logo-full" width="1703.11" height="435.6"/></svg>';
+    veil.innerHTML = '<svg class="mark" viewBox="0 0 1703.11 435.6" aria-hidden="true"><use href="#logo-full" width="1703.11" height="435.6"/></svg>' +
+      '<svg class="ring" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/></svg>';
     document.body.appendChild(veil);
-    requestAnimationFrame(function () { veil.classList.add('on'); });
-    setTimeout(lay, 900);
-    setTimeout(function () { veil.classList.remove('on'); }, 1700);
-    setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 2600);
+    setTimeout(function () { veil.classList.add('on'); }, 380);
+    /* opaque from ~1s: only now is the page rebuilt, so the work is never seen */
+    setTimeout(function () {
+      lay();
+      swipeSec.classList.remove('clearing');
+      var hdr = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hdr')) || 72;
+      window.scrollTo(0, heads.getBoundingClientRect().top + scrollY - hdr - 24);
+    }, 1150);
+    setTimeout(function () { veil.classList.add('out'); dealRows(); }, 4000);
+    setTimeout(function () { if (veil.parentNode) veil.parentNode.removeChild(veil); }, 5000);
   }
 
   /* Each card hangs a cable to its note. Real slack, real gravity: the
@@ -1104,7 +1148,7 @@ makeGraph({ id: 'viz',
     var wires = minis.map(function (m) {
       var note = rows.querySelector('.note[data-fn="' + m.dataset.fn + '"]');
       if (!note) return null;
-      var band = m.querySelector('.cband') || m, said = note.querySelector('.said') || note;
+      var band = m.querySelector('.cband') || m, said = note.querySelector('.q') || note;
       var a1 = band.getBoundingClientRect(), b1 = said.getBoundingClientRect();
       var rowEl = m.closest('.row'), flip = !!(rowEl && rowEl.classList.contains('flip'));
       return flip ? { fn: m.dataset.fn,
@@ -1124,7 +1168,7 @@ makeGraph({ id: 'viz',
 
       /* slack grows with the index so no two cables hang on the same curve */
       var span = Math.hypot(r.x2 - r.x1, r.y2 - r.y1);
-      var len = span * 1.16 + 24, seg = len / (N - 1), pts = [];
+      var len = span * 1.07 + 10, seg = len / (N - 1), pts = [];
       for (var k = 0; k < N; k++) {
         var t = k / (N - 1);
         var x = r.x1 + (r.x2 - r.x1) * t, y = r.y1 + (r.y2 - r.y1) * t + Math.sin(t * Math.PI) * 8;
@@ -1180,19 +1224,29 @@ makeGraph({ id: 'viz',
     });
     return best;
   }
-  var hotRope = null;
+  /* one owner for the highlight: whatever the pointer is over (a card, a
+     note) or close to (a cable). A cable once lit stays lit until the pointer
+     is well clear of it, and letting go waits a beat: no flicker. */
+  var hotFn = null, coolT = 0;
+  function setHot(fn) {
+    if (fn) { clearTimeout(coolT); coolT = 0; }
+    if (fn === hotFn) return;
+    if (!fn) { if (!coolT) coolT = setTimeout(function () { coolT = 0; if (hotFn) hot(hotFn, false); hotFn = null; }, 220); return; }
+    if (hotFn) hot(hotFn, false);
+    hot(fn, true); hotFn = fn;
+  }
   desk.addEventListener('pointermove', function (e) {
-    if (!ropes.length) return;
     var l = ropeLocal(e); ptrR.x = l.x; ptrR.y = l.y; ptrR.on = true;
     if (grabbed) { grabbed.rope.pts[grabbed.i].x = l.x; grabbed.rope.pts[grabbed.i].y = l.y; return; }
-    var nb = nearest(l.x, l.y, 30);
-    var fn = nb ? nb.rope.fn : null;
-    if (fn !== hotRope) { if (hotRope) hot(hotRope, false); if (fn) hot(fn, true); hotRope = fn; }
-    desk.style.cursor = nb ? 'grab' : '';
+    var el = e.target.closest ? e.target.closest('[data-fn]') : null;
+    var nb = ropes.length ? nearest(l.x, l.y, 34) : null;
+    if (!nb && hotFn && ropes.length) { var keep = nearest(l.x, l.y, 80); if (keep && keep.rope.fn === hotFn) nb = keep; }
+    setHot(el ? el.dataset.fn : nb ? nb.rope.fn : null);
+    desk.style.cursor = nb && !el ? 'grab' : '';
   }, { passive: true });
   desk.addEventListener('pointerleave', function () {
     ptrR.on = false; ptrR.x = ptrR.y = -1e4;
-    if (hotRope) { hot(hotRope, false); hotRope = null; }
+    setHot(null);
     desk.style.cursor = '';
   }, { passive: true });
   desk.addEventListener('pointerdown', function (e) {
@@ -1220,7 +1274,7 @@ makeGraph({ id: 'viz',
         if (ptrR.on && !grabbed) {
           for (var i = 1; i < rope.pts.length - 1; i++) {
             var p = rope.pts[i], dx = p.x - ptrR.x, dy = p.y - ptrR.y, d = Math.hypot(dx, dy);
-            if (d < 44 && d > 0) { var f = (1 - d / 44) * 2.2; p.x += dx / d * f; p.y += dy / d * f; }
+            if (d < 40 && d > 0) { var f = (1 - d / 40) * 1.1; p.x += dx / d * f; p.y += dy / d * f; }
           }
         }
         stepRope(rope, dt, false);
@@ -1237,17 +1291,15 @@ makeGraph({ id: 'viz',
 
   function link() {
     function fnOf(e) { var el = e.target.closest ? e.target.closest('[data-fn]') : null; return el && el.dataset.fn; }
-    desk.addEventListener('pointerover', function (e) { var fn = fnOf(e); if (fn) hot(fn, true); }, { passive: true });
-    desk.addEventListener('pointerout', function (e) { var fn = fnOf(e); if (fn) hot(fn, false); }, { passive: true });
-    desk.addEventListener('focusin', function (e) { var fn = fnOf(e); if (fn) hot(fn, true); });
-    desk.addEventListener('focusout', function (e) { var fn = fnOf(e); if (fn) hot(fn, false); });
+    desk.addEventListener('focusin', function (e) { setHot(fnOf(e)); });
+    desk.addEventListener('focusout', function () { setHot(null); });
   }
 
   var rz = 0;
   addEventListener('resize', function () {
     if (!done) return;
     clearTimeout(rz);
-    rz = setTimeout(drawCables, 180);
+    rz = setTimeout(function () { if (phone.matches) { cables.innerHTML = ''; ropes = []; } else drawCables(); }, 180);
   }, { passive: true });
 
   function reset() {
@@ -1256,7 +1308,8 @@ makeGraph({ id: 'viz',
     reveal.hidden = true;
     heads.classList.remove('flip'); stage.classList.remove('flip');
     btns.hidden = false; hint.hidden = false;
-    pileL.classList.remove('hot'); pileR.classList.remove('hot');
+    [pileL, pileR, bL, bR].forEach(function (p) { p.classList.remove('hot', 'landed'); });
+    [bL, bR].forEach(function (b) { b.querySelector('.tally').innerHTML = ''; });
     els.forEach(function (el, i) {
       deck.appendChild(el);
       el.classList.remove('desk', 'piled');
@@ -1265,7 +1318,7 @@ makeGraph({ id: 'viz',
       delete el.dataset.fn; delete el.dataset.dir; delete el.dataset.k;
       var rest = 'translateY(' + (i * 6) + 'px) scale(' + (1 - i * 0.02).toFixed(3) + ')';
       el.dataset.rest = rest; el.style.setProperty('--rest', rest);
-      el.style.transition = 'none'; el.style.transform = reduce ? rest : 'none';
+      el.style.transition = 'none'; el.style.transform = reduce ? rest : 'none'; el.style.opacity = '';
       if (i) el.setAttribute('aria-hidden', 'true'); else el.removeAttribute('aria-hidden');
     });
     minis = [];
@@ -1328,7 +1381,8 @@ makeGraph({ id: 'viz',
     var dx = e.clientX - drag.x;
     drag.dx = dx;
     drag.el.style.transform = 'translate(' + dx + 'px,0) rotate(' + (dx * 0.045) + 'deg)';
-    (dx > 0 ? pileR : pileL).classList.toggle('hot', Math.abs(dx) > 30);
+    pileOf(dx > 0 ? 1 : -1).classList.toggle('hot', Math.abs(dx) > 30);
+    pileOf(dx > 0 ? -1 : 1).classList.remove('hot');
   });
   function endDrag(e) {
     if (!drag || (e && e.pointerId !== drag.id)) return;
@@ -1408,28 +1462,75 @@ document.querySelectorAll('.whyband').forEach(function (band) {
     var kind = m.dataset.vis, svg = m.querySelector('.m-vis svg');
     if (!svg) return;
     if (kind === 'smoke') {
+      /* a thick, slow cloud of the brand squares, softened, rising. The hand
+         parts it; behind it a square that turns into a spade the clearer the
+         middle gets. Left alone, it closes again. With no hand for a while, a
+         slow ghost hand passes through, so phones see it too. */
+      var defs = document.createElementNS(NS, 'defs');
+      defs.innerHTML = '<filter id="smokeblur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>';
+      svg.appendChild(defs);
+      var symG = document.createElementNS(NS, 'g'), symP = document.createElementNS(NS, 'path');
+      symP.setAttribute('fill', '#C9A227'); symP.setAttribute('d', PATHS.square);
+      symG.setAttribute('transform', 'translate(160 110) scale(1.15) translate(-50 -50)');
+      symG.setAttribute('opacity', '0'); symG.appendChild(symP); svg.appendChild(symG);
+      var cloud = document.createElementNS(NS, 'g');
+      cloud.setAttribute('filter', 'url(#smokeblur)'); svg.appendChild(cloud);
       var puffs = [];
-      for (var i = 0; i < 16; i++) {
-        var g = document.createElementNS(NS, 'g');
-        var p = document.createElementNS(NS, 'path');
-        p.setAttribute('fill', 'currentColor');
-        p.setAttribute('d', PATHS.square);
-        g.appendChild(p);
-        var x = rnd(90, 230), y = rnd(60, 160), s = rnd(10, 26);
-        g.setAttribute('transform', 'translate(' + x + ' ' + y + ') scale(' + (s / 100) + ') translate(-50 -50)');
-        g.setAttribute('opacity', '.55');
-        g.style.transition = 'opacity 1.6s var(--ease) ' + (i * 40) + 'ms, transform 1.8s var(--ease) ' + (i * 40) + 'ms';
-        svg.appendChild(g);
-        puffs.push({ g: g, x: x, y: y, s: s });
+      for (var i = 0; i < 76; i++) {
+        var g = document.createElementNS(NS, 'g'), p = document.createElementNS(NS, 'path');
+        p.setAttribute('fill', 'currentColor'); p.setAttribute('d', PATHS.square);
+        g.appendChild(p); cloud.appendChild(g);
+        var a = Math.random() * Math.PI * 2, rr = Math.pow(Math.random(), .7);
+        puffs.push({ g: g, hx: 160 + Math.cos(a) * rr * 120, hy: 30 + Math.random() * 170, s: rnd(26, 62),
+          o: rnd(.16, .34), rot: rnd(0, 90), vr: rnd(-9, 9), rise: rnd(5, 12), ph: rnd(0, 6.3), ox: 0, oy: 0 });
       }
-      once(m, function (on) {
-        puffs.forEach(function (q) {
-          var dx = (q.x - 160) * (on ? 1.5 : 1), dy = (q.y - 110) * (on ? 1.5 : 1);
-          q.g.setAttribute('transform', 'translate(' + (160 + dx) + ' ' + (110 + dy) + ') scale(' +
-            (q.s / 100) + ') translate(-50 -50)');
-          q.g.setAttribute('opacity', on ? '.08' : '.55');
-        });
-      });
+      var hand = { x: -1e3, y: -1e3, at: -1e4 }, clear = 0, smokeOn = false, last = 0;
+      function toLocal(e) {
+        var b = svg.getBoundingClientRect(), k = 320 / b.width;
+        hand.x = (e.clientX - b.left) * k; hand.y = (e.clientY - b.top) * k; hand.at = performance.now();
+      }
+      svg.addEventListener('pointermove', toLocal, { passive: true });
+      svg.addEventListener('pointerdown', toLocal, { passive: true });
+      svg.addEventListener('pointerleave', function () { hand.x = hand.y = -1e3; }, { passive: true });
+      function draw(now) {
+        var dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
+        var hx = hand.x, hy = hand.y, push = 520;
+        if (now - hand.at > 3200) {
+          push = 240;                 /* the ghost hand */
+          var u = now / 1000;
+          hx = 160 + Math.sin(u * .55) * 70; hy = 110 + Math.sin(u * 1.1) * 38;
+        }
+        var near = 0;
+        for (var i = 0; i < puffs.length; i++) {
+          var q = puffs[i];
+          q.hy -= q.rise * dt;
+          if (q.hy < 18) { q.hy = 205; q.hx = 160 + rnd(-120, 120); }
+          q.rot += q.vr * dt;
+          var x = q.hx + Math.sin(now / 1900 + q.ph) * 9 + q.ox, y = q.hy + q.oy;
+          var dx = x - hx, dy = y - hy, d = Math.hypot(dx, dy) || 1;
+          if (d < 78) { var f = (1 - d / 78) * push * dt; q.ox += dx / d * f; q.oy += dy / d * f; }
+          q.ox -= q.ox * Math.min(1, .9 * dt); q.oy -= q.oy * Math.min(1, .9 * dt);   /* closes back, slowly */
+          x = q.hx + Math.sin(now / 1900 + q.ph) * 9 + q.ox; y = q.hy + q.oy;
+          if (Math.hypot(x - 160, y - 110) < 62) near += q.s / 40;
+          var edge = Math.min(1, (q.hy - 18) / 40, (205 - q.hy) / 30);
+          q.g.setAttribute('opacity', (q.o * Math.max(0, edge)).toFixed(3));
+          q.g.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + q.rot.toFixed(1) +
+            ') scale(' + (q.s / 100).toFixed(3) + ') translate(-50 -50)');
+        }
+        /* the fewer (and smaller) puffs over the middle, the clearer it is */
+        var want = Math.max(0, Math.min(1, 1 - (near - 2.5) / 8));
+        clear += (want - clear) * Math.min(1, 2.4 * dt);
+        symG.setAttribute('opacity', (.12 + clear * .88).toFixed(3));
+        symP.setAttribute('d', mix('smooth-spade', easeOut(clear)));
+        if (clear > .85) symG.classList.add('glow'); else symG.classList.remove('glow');
+      }
+      if (reduce) { draw(0); symG.setAttribute('opacity', '1'); symP.setAttribute('d', mix('smooth-spade', 1)); }
+      else {
+        new IntersectionObserver(function (es) {
+          smokeOn = es[0].isIntersecting;
+          if (smokeOn) { last = 0; requestAnimationFrame(function step(now) { if (!smokeOn) return; draw(now); requestAnimationFrame(step); }); }
+        }).observe(svg);
+      }
     } else if (kind === 'desk') {
       var keys = ['smooth-spade', 'smooth-heart', 'smooth-diamond'];
       var ps = keys.map(function (k, i) {
@@ -1488,6 +1589,8 @@ document.querySelectorAll('.whyband').forEach(function (band) {
   if (!STAGE) return;
   var stage = document.getElementById('stage2'), hero = document.getElementById('hero');
   var morph = document.getElementById('morph'), swipe = document.getElementById('swipe');
+  var vscr = document.getElementById('vizscr');
+  var counts = [].slice.call(document.querySelectorAll('.split [data-count]'));
   var hst = [].slice.call(document.querySelectorAll('.hstage'));
   var HDR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hdr')) || 72;
   function clamp(v) { return Math.max(0, Math.min(1, v)); }
@@ -1501,13 +1604,15 @@ document.querySelectorAll('.whyband').forEach(function (band) {
       stage.style.setProperty('--q', q.toFixed(4));
       hero.classList.toggle('condensed', q > .5);
       stage.classList.toggle('rest', q < .01);   /* the right column waits out of sight */
+      counts.forEach(function (el) { el.textContent = Math.round(+el.dataset.count * q) + '%'; });
+      /* each screen holds still while the scroll plays it: a pillow of scroll,
+         the animation, and a longer pillow before it lets go */
       if (morph) {
-        /* the cards become the graph as the block crosses the screen */
-        var mr = morph.getBoundingClientRect();
-        var r = clamp((ph * .55 - mr.top) / (ph * .5));
+        var r = clamp((HDR - morph.getBoundingClientRect().top - ph * .7) / (ph * 1.3));
         morph.style.setProperty('--r', r.toFixed(4));
-        if (typeof policyG !== 'undefined' && policyG) policyG.set(r);
+        if (policyG) policyG.set(r);
       }
+      if (vscr && vizG) vizG.set(clamp((HDR - vscr.getBoundingClientRect().top - ph * .2) / (ph * 1.3)));
       if (swipe) {
         var sr = swipe.getBoundingClientRect();
         var f = smooth(clamp(1 - (sr.top - HDR) / ph));
