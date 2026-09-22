@@ -55,6 +55,8 @@ console.log('max letters flying', maxFly, 'max text nodes', maxTexts, 'frames', 
 if (s.phase === 'dead') {
   const d0 = Date.now(); let back = 0;
   await p.mouse.move(box.x + 20, box.y + 20);
+  await sleep(3900); await p.screenshot({ path: `shots/r11/dead-${where}.png` });
+  console.log('pointing', await p.evaluate(s => document.querySelector(s).parentNode.classList.contains('pointing'), sel));
   while (Date.now() - d0 < 26000) { const q = await st(); if (q.phase !== 'dead') { back = Date.now() - d0; break; } await sleep(250); }
   console.log('restart after', (back / 1000).toFixed(1), 's');
 }

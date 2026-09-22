@@ -90,27 +90,10 @@ function makeField(svg, opt) {
      fills, and follows the hand: never glued to it, never left behind. */
   var heart = { g: document.createElementNS(NS, 'g'), p: document.createElementNS(NS, 'path'),
                 mass: 0, held: [], x: W / 2, y: H / 2, vx: 0, vy: 0, sc: 0, o: 0, relAt: 0, eatAt: 0,
-                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '', safeTil: 0 };
+                pulse: 0, hurt: 0, debt: 0, burst: 0, fill: '' };
   heart.p.setAttribute('fill', '#FFFFFF'); heart.p.setAttribute('d', mix('smooth-heart', 1));
   heart.g.setAttribute('class', 'glow heartmark'); heart.g.setAttribute('opacity', '0');
   heart.g.appendChild(heart.p); svg.appendChild(heart.g);
-  var lifeG = document.createElementNS(NS, 'g'), pips = [];
-  lifeG.setAttribute('opacity', '0'); svg.appendChild(lifeG);
-  for (var lv = 0; lv < LIVES; lv++) {
-    var pp = document.createElementNS(NS, 'path');
-    pp.setAttribute('d', 'M0 -9 L7 0 L0 9 L-7 0 Z'); pp.setAttribute('fill', '#FFFFFF');
-    pp.setAttribute('transform', 'translate(' + ((lv - 1) * 22) + ' 0)');
-    lifeG.appendChild(pp); pips.push(pp);
-  }
-  var lifeO = 0;
-  function showLives() {
-    pips.forEach(function (pp, k) {
-      var lost = k >= LIVES - game.hits;
-      pp.setAttribute('fill', lost ? 'none' : '#FFFFFF');
-      pp.setAttribute('stroke', lost ? '#C9A227' : 'none'); pp.setAttribute('stroke-width', '2');
-    });
-  }
-
   /* the war layer: fuel and sparks under the letters, letters over everything */
   var war = document.createElementNS(NS, 'g'); war.setAttribute('class', 'war'); svg.appendChild(war);
   var fuelG = document.createElementNS(NS, 'g'); war.appendChild(fuelG);
@@ -194,7 +177,7 @@ function makeField(svg, opt) {
   }
   function arm(now) {
     game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0; game.hits = 0;
-    host.classList.add('armed'); showLives();
+    host.classList.add('armed');
   }
   function disarm() { game.phase = 'calm'; host.classList.remove('armed'); endWord(); }
   var LIVE = opt.copy ? opt.copy.els.map(function (el) { return el.textContent; }) : null;
@@ -207,8 +190,11 @@ function makeField(svg, opt) {
     });
     setTimeout(measure, 500);
   }
+  var pointT = 0;
   function die(now) {
     game.phase = 'dead'; game.deadAt = now;
+    clearTimeout(pointT);
+    pointT = setTimeout(function () { if (game.phase === 'dead') host.classList.add('pointing'); }, 3000);
     host.classList.remove('armed'); host.classList.add('dead');
     endWord();
     sparks(heart.x, heart.y, 28, '#FFFFFF');
@@ -225,9 +211,10 @@ function makeField(svg, opt) {
     setCopy(opt.copy ? opt.copy.dead : []);
   }
   function reborn(now) {
-    host.classList.remove('dead');
+    clearTimeout(pointT);
+    host.classList.remove('dead', 'pointing');
     if (LIVE) setCopy(LIVE);
-    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null; game.hits = 0; showLives();
+    t0 = now; game.phase = 'calm'; game.wave = 0; game.word = null; game.hits = 0;
     heart.mass = 0; heart.held = []; heart.o = 0; heart.sc = 0; heart.burst = 0; heart.debt = 0;
     measure();
     marks.forEach(function (m) { seed(m); });
@@ -349,12 +336,9 @@ function makeField(svg, opt) {
     var wantO = heart.mass && !heart.burst ? .94 : 0;
     heart.o += (wantO - heart.o) * Math.min(1, (wantO ? 2.2 : 3.2) * dt);   /* never a flash */
     if (heart.burst && heart.o < .02) heart.burst = 0;
-    heart.g.setAttribute('opacity', (heart.o * (now < heart.safeTil ? .45 + .55 * (Math.floor(now / 90) % 2) : 1)).toFixed(3));
+    heart.g.setAttribute('opacity', heart.o.toFixed(3));
     heart.g.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + heart.y.toFixed(1) +
       ') scale(' + (heart.sc / 100).toFixed(4) + ') translate(-50 -50)');
-    lifeO += ((armed && heart.mass ? .9 : 0) - lifeO) * Math.min(1, 1.8 * dt);
-    lifeG.setAttribute('opacity', lifeO.toFixed(3));
-    if (lifeO > .01) lifeG.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + (heart.y - hr - 24).toFixed(1) + ')');
     var col = pct < .75 ? lerpC(C_WHITE, C_PINK, pct / .75) : lerpC(C_PINK, C_RED, Math.min(1, (pct - .75) / .25));
     if (heart.hurt > .01) col = lerpC(col, C_GOLD, heart.hurt);
     var fill = css(col);
@@ -370,22 +354,29 @@ function makeField(svg, opt) {
       w.x = w.cx + w.side * 200 * (1 - easeOut(slide));
       /* never more than three pairs in the air: the rest wait their turn */
       var flying = 0;
-      for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly') flying++;
+      for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly' || w.letters[fi].st === 'queued') flying++;
       var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length && flying <= 4;
       if (canLaunch) {
         var n = Math.min(2, w.letters.length - w.launched);
+        var arc0 = Math.random() < .5 ? 1 : -1;
         for (var q = 0; q < n; q++) {
           var L = w.letters[w.launched++];
-          L.st = 'fly'; L.t0 = now; L.x = w.x + L.tx; L.y = w.cy + L.ty;
-          /* the two of a pair split a little, up and down, then close in */
-          L.vx = -w.side * 120; L.vy = (q ? 1 : -1) * rnd(90, 140);
+          /* the two of a pair take opposite arcs, the second a beat later */
+          L.st = 'queued'; L.go = now + q * rnd(340, 480); L.arc = q ? -arc0 : arc0;
         }
         w.lastAt = now;
       }
       var target = heart;   /* the heart is the mark, never the hand */
       for (var li = 0; li < w.letters.length; li++) {
         var L2 = w.letters[li];
-        if (L2.st === 'held') {
+        if (L2.st === 'queued' && now >= L2.go) {
+          L2.st = 'fly'; L2.t0 = now;
+          var ux = target.x - L2.x, uy = target.y - L2.y, ul = Math.hypot(ux, uy) || 1;
+          ux /= ul; uy /= ul;
+          L2.ux = ux; L2.uy = uy;
+          L2.vx = ux * 140 - uy * L2.arc * 460; L2.vy = uy * 140 + ux * L2.arc * 460;
+        }
+        if (L2.st === 'held' || L2.st === 'queued') {
           L2.x = w.x + L2.tx; L2.y = w.cy + L2.ty;
           if (now - w.at > 60 * L2.i) L2.o = Math.min(1, L2.o + dt / .5);
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ')');
@@ -395,10 +386,13 @@ function makeField(svg, opt) {
              line and speeds up until it leaves the field: dodge at the right
              time and it is gone */
           var age = (now - L2.t0) / 1000;
-          var seek = Math.min(2.4, 1.1 + game.wave * .3);
+          var seek = Math.min(2.4, 1 + game.wave * .3);
           var vmax = (540 + 280 * Math.min(1, age / .5)) * (1 + game.wave * .2);
           if (age < seek) {
-            var adx = target.x - L2.x, ady = target.y - L2.y, ad = Math.hypot(adx, ady) || 1;
+            /* early on it aims wide of the heart, on its own side, and the
+               offset closes: a curve in, not a straight line */
+            var off = Math.max(0, 1 - age / .75) * 240 * L2.arc;
+            var adx = target.x - L2.uy * off - L2.x, ady = target.y + L2.ux * off - L2.y, ad = Math.hypot(adx, ady) || 1;
             var steer = Math.min(1, (2.6 + 4.4 * Math.min(1, age / .4)) * (1 + game.wave * .15) * dt);
             L2.vx += (adx / ad * vmax - L2.vx) * steer; L2.vy += (ady / ad * vmax - L2.vy) * steer;
           } else {
@@ -419,11 +413,9 @@ function makeField(svg, opt) {
           var out = L2.x < -80 || L2.x > W + 80 || L2.y < -80 || L2.y > H + 80;
           if (dd < hitR || out || age > 3.4) {
             L2.st = 'gone'; L2.t0 = now; w.gone++;
-            /* a hit leaves the heart untouchable for a beat: a pair counts once */
-            if (dd < hitR && heart.mass && now < heart.safeTil) sparks(L2.x, L2.y, 4, '#FFFFFF');
-            else if (dd < hitR && heart.mass) {
+            if (dd < hitR && heart.mass) {
               sparks(L2.x, L2.y, 7, '#C9A227');
-              heart.hurt = 1; heart.safeTil = now + 800; game.hits++; showLives();
+              heart.hurt = 1; game.hits++;
               if (game.hits >= LIVES) { die(now); break; }
             }
           }

@@ -21,7 +21,7 @@ hero.sub: Talleres de IA de medio día, interactivos, para equipos ticos. Con la
 hero.btn: Ver el taller
 hero.fine: Mandarnos un mensaje es gratis, con todo gusto los atendemos.
 hero.cue: Bajar
-hero.dead.h1: Por su cuenta, tarde o temprano se paga.
+hero.dead.h1: A ciegas, tarde o temprano se paga.
 hero.dead.sub: La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es que vaya a pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.
 
 ## Funciona. Hasta que deja de funcionar.
