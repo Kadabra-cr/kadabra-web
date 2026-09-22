@@ -568,7 +568,8 @@ html.staged .hero{grid-column:1;position:sticky;top:var(--hdr);height:calc(100sv
   width:calc(100% + (1 - var(--q))*178%);z-index:2;
   transform:translateX(calc(var(--f)*-110%));will-change:transform,width}
 html.staged .hero .wrap{padding:0}
-html.staged .hero h1{font-size:calc(clamp(2.55rem,7.2vw,6.6rem)*(1 - var(--q)*.2))}
+html.staged .hero h1{hyphens:manual;
+  font-size:calc(clamp(2.55rem,7.2vw,6.6rem)*(1 - var(--q)) + var(--q)*3.3vw)}
 html.staged .hero .sub,html.staged .hero .fine{opacity:calc(1 - var(--q)*2.2);max-height:calc((1 - var(--q))*9em);overflow:hidden;
   margin-top:calc(var(--cell)*.5*(1 - var(--q)))}
 html.staged .hero .ctas{margin-top:calc(var(--cell)*.9)}

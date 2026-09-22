@@ -95,9 +95,9 @@ document.querySelectorAll('[data-count]').forEach(function (el) {
    ========================================================================== */
 (function () {
   var TITLES = {
-    '/': 'kadabra. Hands-on AI workshops for teams in Costa Rica',
-    '/workshop/': 'The workshop: AI without the smoke screen. kadabra',
-    '/learn-more/': 'Learn more: the numbers behind the workshop. kadabra'
+    '/': 'kadabra. Talleres prácticos de IA para equipos en Costa Rica',
+    '/workshop/': 'El taller: IA sin cortina de humo. kadabra',
+    '/learn-more/': 'Más información: los números detrás del taller. kadabra'
   };
   var routes = Array.prototype.slice.call(document.querySelectorAll('.route'));
   var navs = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
@@ -276,8 +276,7 @@ function makeField(svg, opt) {
 
   var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = ['wrong invoice', 'fake numbers', 'bad advice', 'breach', 'wrong price',
-               'data leak', 'made-up quote', 'client data', 'leaked contract', 'lawsuit'];
+  var WORDS = 'factura equivocada, números inventados, mal consejo, fuga de datos, precio equivocado, cita inventada, datos del cliente, contrato filtrado, demanda, sin política'.split(', ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -540,11 +539,12 @@ function makeField(svg, opt) {
           /* slow for the first ~.25s (the steer rate starts low), then it
              steers hard onto a (slightly) predicted lead of the target */
           var age = (now - L2.t0) / 1000;
-          var vmax = 280 + 820 * Math.min(1, age / 1.2);
+          var boost = 1 + game.wave * .28;   /* wave 2 outruns the heart, always */
+          var vmax = (280 + 620 * Math.min(1, age / 1.2)) * boost;
           var aimX = target.x + target.vx * .05, aimY = target.y + target.vy * .05;
           var adx = aimX - L2.x, ady = aimY - L2.y, ad = Math.hypot(adx, ady) || 1;
           var desVx = adx / ad * vmax, desVy = ady / ad * vmax;
-          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * dt);
+          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * (1 + game.wave * .22) * dt);
           L2.vx += (desVx - L2.vx) * steer; L2.vy += (desVy - L2.vy) * steer;
           var vs = Math.hypot(L2.vx, L2.vy);
           L2.x += L2.vx * dt; L2.y += L2.vy * dt;
@@ -721,8 +721,7 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['On your own, it bites back.',
-                 'The leak, the made-up number, the prompt nobody saw coming: not if, when. Half a day with us and your team sees them first.'] }
+          dead: ['Por su cuenta, tarde o temprano se paga.', 'La fuga, el dato inventado, el mensaje que nadie vio venir: no es si pasa, es cuándo. Medio día con nosotros y su equipo los ve venir.'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
@@ -730,7 +729,7 @@ document.querySelectorAll('.closefield').forEach(function (svg) {
     text: [].slice.call(sec.querySelectorAll('.wrap > *')),
     quiet: { x0: 450, x1: 1150, y0: 130, y1: 510 },
     copy: { els: [sec.querySelector('h2'), sec.querySelector('.fine')],
-            dead: ['It bit back. Ready when you are.', 'Half a day, on your files, and your team sees it coming.'] } });
+            dead: ['Se pagó la factura. Cuando ustedes quieran.', 'Medio día, con sus archivos, y su equipo lo ve venir.'] } });
 });
 
 /* ==========================================================================
@@ -867,21 +866,21 @@ makeGraph({ id: 'viz',
   /* two answers per card: what to know if you hand it over, what to know if
      you keep it. Neither is wrong. Both come with a catch. */
   var CARDS = [
-    { q: "Answer a client asking why their invoice is higher this month.", pip: "classic-spade",
-      r: "It writes a convincing reply in seconds. If it doesn't have the numbers, it invents a reason. Give it the invoice, then read before sending.",
-      l: "Fair. Then you are typing that reply yourself. It can still draft it: hand it the invoice, keep the decision and the send button." },
-    { q: "Summarise the 40-page supplier contract.", pip: "classic-heart",
-      r: "Good summary, and it will skip the one clause that matters. Ask for the clause list first, then read those pages yourself.",
-      l: "Forty pages is a long afternoon. Let it list the clauses and where they sit, then read only those pages. The reading that counts stays yours." },
-    { q: "Enter this stack of receipts into the system.", pip: "classic-diamond",
-      r: "It reads receipts well. It is blind to duplicates and wrong dates. Spot-check one in ten.",
-      l: "This is the one most teams hand over first. It reads receipts well. Keep the spot-check: one in ten, and anything that looks doubled." },
-    { q: "Write the monthly report for the owner.", pip: "classic-club",
-      r: "The structure in a minute. Every number needs a human check: numbers are where it sounds most sure and is most wrong.",
-      l: "The structure it can do in a minute. The numbers are the part to guard: check every one, because it sounds most sure where it is most wrong." },
-    { q: "Decide whether the new client gets 60-day payment terms.", pip: "classic-spade",
-      r: "It can list the pros and cons. The decision, and the risk, stay with a person. If it says yes, it is still your yes.",
-      l: "Right call to keep. It can still lay out the pros and cons in a minute. The decision, and the risk, stay with a person." }
+    { q: "Responderle a un cliente que pregunta por qué su factura salió más alta este mes.", pip: "classic-spade",
+      r: "Escribe una respuesta convincente en segundos. Si no tiene los números, se inventa una razón. Déle la factura y lea antes de enviar.",
+      l: "Bien pensado. Entonces esa respuesta la escribe usted. Igual puede pedirle un borrador: déle la factura y quédese con la decisión y con el botón de enviar." },
+    { q: "Resumir el contrato de 40 páginas del proveedor.", pip: "classic-heart",
+      r: "Hace un buen resumen y se salta la cláusula que importa. Pídale primero la lista de cláusulas y lea esas páginas usted.",
+      l: "Cuarenta páginas son una tarde entera. Déjela listar las cláusulas y dónde están, y lea solo esas páginas. La lectura que cuenta sigue siendo suya." },
+    { q: "Digitar este montón de facturas en el sistema.", pip: "classic-diamond",
+      r: "Lee bien las facturas. No ve los duplicados ni las fechas equivocadas. Revise una de cada diez.",
+      l: "Esta es la que más equipos entregan de primero. Lee bien las facturas. Mantenga la revisión: una de cada diez y todo lo que parezca duplicado." },
+    { q: "Escribir el informe mensual para la gerencia.", pip: "classic-club",
+      r: "La estructura en un minuto. Cada número necesita revisión de una persona: en los números es donde suena más segura y más se equivoca.",
+      l: "La estructura la arma en un minuto. Los números son la parte que hay que cuidar: revíselos todos, porque ahí es donde suena más segura y más se equivoca." },
+    { q: "Decidir si al cliente nuevo se le dan 60 días de plazo de pago.", pip: "classic-spade",
+      r: "Puede listar los pros y los contras. La decisión, y el riesgo, quedan en manos de una persona. Si dice que sí, el sí sigue siendo suyo.",
+      l: "Bien hecho en no soltarla. Igual puede armar los pros y los contras en un minuto. La decisión, y el riesgo, quedan en manos de una persona." }
   ];
   var hint = document.getElementById('hint'),
       table = document.getElementById('table'),
@@ -893,10 +892,10 @@ makeGraph({ id: 'viz',
       cables = document.getElementById('cables'),
       desk = document.getElementById('desk'), reveal = document.getElementById('reveal');
   var idx = 0, els = [], minis = [], drag = null, done = false, touched = false, nudgeTimer = 0, nudgeBack = 0, nudgeSide = 1;
-  var HINT = 'Drag the card, use the buttons, or press ';
+  var HINT = 'de 5. Arrastre la carta, use los botones o presione ';
 
   function setHint() {
-    hint.innerHTML = 'Card ' + Math.min(idx + 1, 5) + ' of 5. ' + HINT +
+    hint.innerHTML = 'Carta ' + Math.min(idx + 1, 5) + ' ' + HINT +
       '<span class="kbd"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span>.';
   }
 
@@ -1043,7 +1042,7 @@ makeGraph({ id: 'viz',
         slot.style.width = SLOT.w + 'px'; slot.style.height = SLOT.h + 'px';
         var note = document.createElement('div');
         note.className = 'note'; note.dataset.fn = el.dataset.fn; note.tabIndex = 0;
-        note.innerHTML = '<p class="said">You said: <b>' + (right ? 'AI can take it' : 'Best not') + '</b></p>' +
+        note.innerHTML = '<p class="said">Usted dijo: <b>' + (right ? 'La IA puede' : 'Mejor no') + '</b></p>' +
           '<p class="q">' + cd.q + '</p><p class="a">' + (right ? cd.r : cd.l) + '</p>';
         if (flip) { row.appendChild(note); row.appendChild(slot); } else { row.appendChild(slot); row.appendChild(note); }
         rows.appendChild(row);

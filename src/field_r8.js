@@ -385,11 +385,12 @@ function makeField(svg, opt) {
           /* slow for the first ~.25s (the steer rate starts low), then it
              steers hard onto a (slightly) predicted lead of the target */
           var age = (now - L2.t0) / 1000;
-          var vmax = 280 + 820 * Math.min(1, age / 1.2);
+          var boost = 1 + game.wave * .28;   /* wave 2 outruns the heart, always */
+          var vmax = (280 + 620 * Math.min(1, age / 1.2)) * boost;
           var aimX = target.x + target.vx * .05, aimY = target.y + target.vy * .05;
           var adx = aimX - L2.x, ady = aimY - L2.y, ad = Math.hypot(adx, ady) || 1;
           var desVx = adx / ad * vmax, desVy = ady / ad * vmax;
-          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * dt);
+          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * (1 + game.wave * .22) * dt);
           L2.vx += (desVx - L2.vx) * steer; L2.vy += (desVy - L2.vy) * steer;
           var vs = Math.hypot(L2.vx, L2.vy);
           L2.x += L2.vx * dt; L2.y += L2.vy * dt;

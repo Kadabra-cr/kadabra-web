@@ -95,9 +95,9 @@ document.querySelectorAll('[data-count]').forEach(function (el) {
    ========================================================================== */
 (function () {
   var TITLES = {
-    '/': 'kadabra. Hands-on AI workshops for teams in Costa Rica',
-    '/workshop/': 'The workshop: AI without the smoke screen. kadabra',
-    '/learn-more/': 'Learn more: the numbers behind the workshop. kadabra'
+    '/': '@@t.meta.home.title@@',
+    '/workshop/': '@@t.meta.work.title@@',
+    '/learn-more/': '@@t.meta.learn.title@@'
   };
   var routes = Array.prototype.slice.call(document.querySelectorAll('.route'));
   var navs = Array.prototype.slice.call(document.querySelectorAll('[data-nav]'));
@@ -276,8 +276,7 @@ function makeField(svg, opt) {
 
   var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = ['wrong invoice', 'fake numbers', 'bad advice', 'breach', 'wrong price',
-               'data leak', 'made-up quote', 'client data', 'leaked contract', 'lawsuit'];
+  var WORDS = '@@t.game.words@@'.split(', ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -540,11 +539,12 @@ function makeField(svg, opt) {
           /* slow for the first ~.25s (the steer rate starts low), then it
              steers hard onto a (slightly) predicted lead of the target */
           var age = (now - L2.t0) / 1000;
-          var vmax = 280 + 820 * Math.min(1, age / 1.2);
+          var boost = 1 + game.wave * .28;   /* wave 2 outruns the heart, always */
+          var vmax = (280 + 620 * Math.min(1, age / 1.2)) * boost;
           var aimX = target.x + target.vx * .05, aimY = target.y + target.vy * .05;
           var adx = aimX - L2.x, ady = aimY - L2.y, ad = Math.hypot(adx, ady) || 1;
           var desVx = adx / ad * vmax, desVy = ady / ad * vmax;
-          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * dt);
+          var steer = Math.min(1, (1.8 + 4.2 * Math.min(1, age / 1)) * (1 + game.wave * .22) * dt);
           L2.vx += (desVx - L2.vx) * steer; L2.vy += (desVy - L2.vy) * steer;
           var vs = Math.hypot(L2.vx, L2.vy);
           L2.x += L2.vx * dt; L2.y += L2.vy * dt;
@@ -721,8 +721,7 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['On your own, it bites back.',
-                 'The leak, the made-up number, the prompt nobody saw coming: not if, when. Half a day with us and your team sees them first.'] }
+          dead: ['@@t.hero.dead.h1@@', '@@t.hero.dead.sub@@'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
@@ -730,7 +729,7 @@ document.querySelectorAll('.closefield').forEach(function (svg) {
     text: [].slice.call(sec.querySelectorAll('.wrap > *')),
     quiet: { x0: 450, x1: 1150, y0: 130, y1: 510 },
     copy: { els: [sec.querySelector('h2'), sec.querySelector('.fine')],
-            dead: ['It bit back. Ready when you are.', 'Half a day, on your files, and your team sees it coming.'] } });
+            dead: ['@@t.close.dead.h2@@', '@@t.close.dead.fine@@'] } });
 });
 
 /* ==========================================================================
@@ -867,21 +866,21 @@ makeGraph({ id: 'viz',
   /* two answers per card: what to know if you hand it over, what to know if
      you keep it. Neither is wrong. Both come with a catch. */
   var CARDS = [
-    { q: "Answer a client asking why their invoice is higher this month.", pip: "classic-spade",
-      r: "It writes a convincing reply in seconds. If it doesn't have the numbers, it invents a reason. Give it the invoice, then read before sending.",
-      l: "Fair. Then you are typing that reply yourself. It can still draft it: hand it the invoice, keep the decision and the send button." },
-    { q: "Summarise the 40-page supplier contract.", pip: "classic-heart",
-      r: "Good summary, and it will skip the one clause that matters. Ask for the clause list first, then read those pages yourself.",
-      l: "Forty pages is a long afternoon. Let it list the clauses and where they sit, then read only those pages. The reading that counts stays yours." },
-    { q: "Enter this stack of receipts into the system.", pip: "classic-diamond",
-      r: "It reads receipts well. It is blind to duplicates and wrong dates. Spot-check one in ten.",
-      l: "This is the one most teams hand over first. It reads receipts well. Keep the spot-check: one in ten, and anything that looks doubled." },
-    { q: "Write the monthly report for the owner.", pip: "classic-club",
-      r: "The structure in a minute. Every number needs a human check: numbers are where it sounds most sure and is most wrong.",
-      l: "The structure it can do in a minute. The numbers are the part to guard: check every one, because it sounds most sure where it is most wrong." },
-    { q: "Decide whether the new client gets 60-day payment terms.", pip: "classic-spade",
-      r: "It can list the pros and cons. The decision, and the risk, stay with a person. If it says yes, it is still your yes.",
-      l: "Right call to keep. It can still lay out the pros and cons in a minute. The decision, and the risk, stay with a person." }
+    { q: "@@t.card1.q@@", pip: "classic-spade",
+      r: "@@t.card1.r@@",
+      l: "@@t.card1.l@@" },
+    { q: "@@t.card2.q@@", pip: "classic-heart",
+      r: "@@t.card2.r@@",
+      l: "@@t.card2.l@@" },
+    { q: "@@t.card3.q@@", pip: "classic-diamond",
+      r: "@@t.card3.r@@",
+      l: "@@t.card3.l@@" },
+    { q: "@@t.card4.q@@", pip: "classic-club",
+      r: "@@t.card4.r@@",
+      l: "@@t.card4.l@@" },
+    { q: "@@t.card5.q@@", pip: "classic-spade",
+      r: "@@t.card5.r@@",
+      l: "@@t.card5.l@@" }
   ];
   var hint = document.getElementById('hint'),
       table = document.getElementById('table'),
@@ -893,10 +892,10 @@ makeGraph({ id: 'viz',
       cables = document.getElementById('cables'),
       desk = document.getElementById('desk'), reveal = document.getElementById('reveal');
   var idx = 0, els = [], minis = [], drag = null, done = false, touched = false, nudgeTimer = 0, nudgeBack = 0, nudgeSide = 1;
-  var HINT = 'Drag the card, use the buttons, or press ';
+  var HINT = '@@t.swipe.hint.mid@@ ';
 
   function setHint() {
-    hint.innerHTML = 'Card ' + Math.min(idx + 1, 5) + ' of 5. ' + HINT +
+    hint.innerHTML = '@@t.swipe.hint.pre@@ ' + Math.min(idx + 1, 5) + ' ' + HINT +
       '<span class="kbd"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span>.';
   }
 
@@ -1043,7 +1042,7 @@ makeGraph({ id: 'viz',
         slot.style.width = SLOT.w + 'px'; slot.style.height = SLOT.h + 'px';
         var note = document.createElement('div');
         note.className = 'note'; note.dataset.fn = el.dataset.fn; note.tabIndex = 0;
-        note.innerHTML = '<p class="said">You said: <b>' + (right ? 'AI can take it' : 'Best not') + '</b></p>' +
+        note.innerHTML = '<p class="said">@@t.swipe.said@@ <b>' + (right ? '@@t.swipe.pileR@@' : '@@t.swipe.pileL@@') + '</b></p>' +
           '<p class="q">' + cd.q + '</p><p class="a">' + (right ? cd.r : cd.l) + '</p>';
         if (flip) { row.appendChild(note); row.appendChild(slot); } else { row.appendChild(slot); row.appendChild(note); }
         rows.appendChild(row);

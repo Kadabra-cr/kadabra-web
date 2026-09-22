@@ -229,11 +229,11 @@ ok('1 screenshots', true, `${ROUTES.length * 2} files in .check/shots/`);
   await page.goBack();
   await sleep(700);
   const b = await page.evaluate(() => ({ url: location.pathname, title: document.title, alive: window.__alive, vis: document.querySelector('.route:not([hidden])').dataset.route }));
-  ok('7a spa nav', a.url === '/workshop/' && a.alive === 1 && /workshop/i.test(a.title) && a.vis === '/workshop/',
+  ok('7a spa nav', a.url === '/workshop/' && a.alive === 1 && /taller/i.test(a.title) && a.vis === '/workshop/',
     `-> ${a.url} "${a.title}" alive=${a.alive} shown=${a.vis}`);
   ok('7b back', b.url === '/' && b.alive === 1 && b.vis === '/', `back to ${b.url} shown=${b.vis} alive=${b.alive}`);
 
-  for (const [route, name] of [['/workshop/', 'AI without the smoke screen'], ['/learn-more/', 'The trick, with receipts.']]) {
+  for (const [route, name] of [['/workshop/', 'IA sin cortina de humo'], ['/learn-more/', 'El truco, con respaldo.']]) {
     await page.goto(BASE + route, { waitUntil: 'load' });
     await sleep(400);
     const r = await page.evaluate(() => ({ vis: document.querySelector('.route:not([hidden])').dataset.route, h2: document.querySelector('.route:not([hidden]) h2').textContent.trim(), title: document.title }));

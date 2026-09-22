@@ -17,40 +17,68 @@ SPRITES = open(os.path.join(SITE, "sprites.svg"), encoding="utf-8").read().strip
 APPSRC = open(os.path.join(HERE, "app.src.js"), encoding="utf-8").read()
 MORPH = json.load(open(os.path.join(HERE, "suits-square-morph.json"), encoding="utf-8"))["paths"]
 
-DESC = "Half-day, hands-on AI workshops for teams in Costa Rica. Your real work, your tools, nothing to buy afterwards."
+
+# ---- the copy: every visible string lives in src/copy.es.md ----------------
+COPY_PATH = os.path.join(HERE, "copy.es.md")
+
+
+def load_copy():
+    out = {}
+    for line in open(COPY_PATH, encoding="utf-8"):
+        line = line.rstrip("\n")
+        if line.startswith("#") or not line.strip() or ": " not in line:
+            continue
+        key, _, val = line.partition(": ")
+        if re.match(r"^[a-z][A-Za-z0-9._]*$", key.strip()):
+            out[key.strip()] = val.strip()
+    return out
+
+
+COPY = load_copy()
+TOKEN = re.compile(r"@@t\.([A-Za-z0-9._]+)@@")
+
+
+def tr(s, where):
+    missing = [m.group(1) for m in TOKEN.finditer(s) if m.group(1) not in COPY]
+    if missing:
+        sys.exit("copy.es.md has no line for: %s (in %s)" % (", ".join(sorted(set(missing))), where))
+    return TOKEN.sub(lambda m: COPY[m.group(1)], s)
+
+
+DESC = "@@t.meta.home.desc@@"
 ORIGIN = "https://kadabra.cr"
 
 ROUTES = {
     "/": dict(
         file="index.html",
-        title="kadabra. Hands-on AI workshops for teams in Costa Rica",
+        title="@@t.meta.home.title@@",
         desc=DESC),
     "/workshop/": dict(
         file="workshop/index.html",
-        title="The workshop: AI without the smoke screen. kadabra",
-        desc="Half a day, seven moments, your own work on the table. What actually happens in a kadabra workshop."),
+        title="@@t.meta.work.title@@",
+        desc="@@t.meta.work.desc@@"),
     "/learn-more/": dict(
         file="learn-more/index.html",
-        title="Learn more: the numbers behind the workshop. kadabra",
-        desc="Four numbers explain why kadabra teaches the way it does. Each one links to the study it came from."),
+        title="@@t.meta.learn.title@@",
+        desc="@@t.meta.learn.desc@@"),
 }
 
 CLOSE = """<section class="close" id="close-{k}">
   <svg class="closefield" viewBox="0 0 1600 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
   <div class="wrap">
-    <h2 class="rise">Ready when you are.</h2>
-    <p><a class="cta rise" href="#TODO-whatsapp">Book a half-day</a></p>
-    <p class="fine rise">Opens a WhatsApp chat. Half a day, on your files, nothing to buy afterwards.</p>{more}
+    <h2 class="rise">@@t.close.h2@@</h2>
+    <p><a class="cta rise" href="#TODO-whatsapp">@@t.cta.book@@</a></p>
+    <p class="fine rise">@@t.close.fine@@</p>{more}
   </div>
 </section>"""
 
 HALF = """<div class="hstage" id="hstage-{k}"><div class="hpin">
 <section class="band halfday" id="halfday-{k}">
   <div class="wrap">
-    <h2 class="h2 rise">See what half a day looks like.</h2>
-    <p class="lede rise">Seven moments, your own work on the table, and a one-page plan the week after. Two minutes to read.</p>
-    <p class="rise gorow"><a class="btn go arrow light" href="/workshop/">See the workshop<svg class="arr" viewBox="0 0 64 28" aria-hidden="true"><use href="#arrow"/></svg></a></p>
-    <div class="hcue" aria-hidden="true"><svg viewBox="0 0 64 28"><use href="#chevron-down"/></svg><span>Keep scrolling to book with us</span></div>
+    <h2 class="h2 rise">@@t.half.h2@@</h2>
+    <p class="lede rise">@@t.half.lede@@</p>
+    <p class="rise gorow"><a class="btn go arrow light" href="/workshop/">@@t.half.btn@@<svg class="arr" viewBox="0 0 64 28" aria-hidden="true"><use href="#arrow"/></svg></a></p>
+    <div class="hcue" aria-hidden="true"><svg viewBox="0 0 64 28"><use href="#chevron-down"/></svg><span>@@t.half.cue@@</span></div>
   </div>
 </section>
 </div></div>
@@ -65,12 +93,7 @@ def host(url):
     return urlsplit(url).netloc.replace("www.", "")
 
 
-MEANS = [
-    "Your competitors' tech teams already save time with AI. The tools work. That part is not in question.",
-    "Almost nobody has written down what may leave the building, or who checks what. That is the part we fix in an afternoon.",
-    "More than half of the people using AI at work were never shown how. Ask around your office.",
-    "The biggest gains go to beginners who get taught. That is your team. That is the half-day.",
-]
+MEANS = ["@@t.learn.means1@@", "@@t.learn.means2@@", "@@t.learn.means3@@", "@@t.learn.means4@@"]
 
 
 def sources_markup():
@@ -84,7 +107,7 @@ def sources_markup():
         out.append('      <li class="beat rise">')
         out.append('        <b class="fig">%s</b>' % esc(r["figure"]))
         out.append("        <div>")
-        out.append('          <p class="claim">%s</p>' % esc(r["claim"]))
+        out.append('          <p class="claim">@@t.learn.claim%d@@</p>' % (i + 1))
         out.append('          <p class="means">%s</p>' % esc(MEANS[i]))
         out.append('          <p class="meta"><a href="%s" rel="noopener noreferrer nofollow" target="_blank">%s, %s</a></p>'
                    % (esc(r["url"]), esc(r["source"]), esc(r["year"])))
@@ -95,11 +118,11 @@ def sources_markup():
 
     also = []
     also.append('    <div class="also rise">')
-    also.append("      <h3>Also worth a read</h3>")
+    also.append("      <h3>@@t.learn.also.h3@@</h3>")
     also.append('      <ul class="alsolist">')
-    for r in data["alsoRead"]:
-        also.append('        <li><a href="%s" rel="noopener noreferrer nofollow" target="_blank">%s</a> <span>%s, %s</span></li>'
-                    % (esc(r["url"]), esc(r["claim"]), esc(r["source"]), esc(r["year"])))
+    for j, r in enumerate(data["alsoRead"]):
+        also.append('        <li><a href="%s" rel="noopener noreferrer nofollow" target="_blank">@@t.also%d@@</a> <span>%s, %s</span></li>'
+                    % (esc(r["url"]), j + 1, esc(r["source"]), esc(r["year"])))
     also.append("      </ul>")
     also.append("    </div>")
     return "\n".join(out), "\n".join(also)
@@ -117,12 +140,14 @@ def whybands(page):
 def main():
     # app.js: the morph paths are embedded so the hero never waits on a fetch.
     app = APPSRC.replace("@@PATHS@@", json.dumps(MORPH, indent=2, ensure_ascii=False))
+    app = tr(app, "app.src.js")
     assert "@@" not in app, "unreplaced placeholder in app.src.js"
     with open(os.path.join(SITE, "app.js"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(app)
     print("%-22s %6d bytes" % ("app.js", len(app)))
 
     src, also = sources_markup()
+    src, also = tr(src, "sources"), tr(also, "also")
     for route, meta in ROUTES.items():
         page = SHELL
         page = whybands(page)
@@ -132,12 +157,13 @@ def main():
         page = page.replace("@@CLOSE_WORK@@", CLOSE.format(k="work", more=""))
         page = page.replace("@@CLOSE_LEARN@@", HALF.format(k="learn") + CLOSE.format(k="learn", more=""))
         page = page.replace("@@ALSO@@", also)
-        page = page.replace("@@TITLE@@", esc(meta["title"]))
-        page = page.replace("@@DESC@@", esc(meta["desc"]))
+        page = page.replace("@@TITLE@@", esc(tr(meta["title"], "title")))
+        page = page.replace("@@DESC@@", esc(tr(meta["desc"], "desc")))
         page = page.replace("@@CANON@@", ORIGIN + route)
         page = page.replace("@@HIDE_HOME@@", "" if route == "/" else "hidden")
         page = page.replace("@@HIDE_WORK@@", "" if route == "/workshop/" else "hidden")
         page = page.replace("@@HIDE_SRC@@", "" if route == "/learn-more/" else "hidden")
+        page = tr(page, route)
         assert "@@" not in page, "unreplaced placeholder in " + route
         dest = os.path.join(SITE, meta["file"])
         os.makedirs(os.path.dirname(dest), exist_ok=True)

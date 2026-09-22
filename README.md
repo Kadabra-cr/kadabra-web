@@ -1,14 +1,14 @@
 # kadabra — sitio web
 
 Sitio de **kadabra**, estudio costarricense de talleres prácticos de IA de medio día.
-Producción: https://kadabra-site.pages.dev (Cloudflare Pages).
+Todo el texto del sitio vive en `src/copy.es.md`: ese archivo se edita y se vuelve a construir.
 
 ## Estructura
 
 | Carpeta | Qué contiene |
 | --- | --- |
 | `site/` | Lo que se publica. HTML, CSS, JS y SVG, sin framework ni pasos de compilación. |
-| `src/` | Fuentes de las tres rutas: `shell.html`, `app.src.js`, `field_r8.js` y `build.py`. |
+| `src/` | Fuentes de las tres rutas: `copy.es.md`, `shell.html`, `app.src.js`, `field_r8.js` y `build.py`. |
 | `tools/` | Verificaciones con Playwright y capturas de pantalla. |
 | `brand/` | Logotipo en SVG y archivos originales de Affinity. |
 | `docs/` | Investigación, datos citados en el sitio, retroalimentación y exploraciones. |
@@ -23,13 +23,7 @@ python -m http.server 4173 --bind 127.0.0.1 --directory site
 cd tools && BASE=http://127.0.0.1:4173 node shots.mjs   # 14 verificaciones
 ```
 
-## Publicar
-
-```bash
-wrangler pages deploy site --project-name=kadabra-site --branch=main --commit-dirty=true
-```
-
 ## Pendientes
 
 - Número de WhatsApp, correo, LinkedIn y ciudad: hoy son `TODO` visibles en rojo.
-- Traducción del sitio al español.
+- Revisar el texto en `src/copy.es.md` y volver a construir.
