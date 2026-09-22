@@ -183,12 +183,12 @@ foot.site: Sitio
 foot.home: Inicio
 foot.contact: Contacto
 foot.whatsapp: WhatsApp
-foot.whatsapp.todo: +506 87110401
+foot.whatsapp.value: +506 87110401
 foot.email: Correo
-foot.email.todo: En proceso
+foot.email.value: contacts@kadabracr.com
 foot.linkedin: LinkedIn
-foot.linkedin.todo: En proceso
-foot.city.todo: Ciudad Quesada, San Carlos
+foot.linkedin.value: En proceso
+foot.city.value: Ciudad Quesada, San Carlos
 foot.country: , Alajuela, Costa Rica
 foot.legal: &copy; 2026 kadabra CR. Todos los derechos reservados.
 

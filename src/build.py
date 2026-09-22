@@ -35,6 +35,7 @@ def load_copy():
 
 
 COPY = load_copy()
+COPY["wa.link"] = "https://wa.me/" + re.sub(r"\D", "", COPY["foot.whatsapp.value"])
 TOKEN = re.compile(r"@@t\.([A-Za-z0-9._]+)@@")
 
 
@@ -67,7 +68,7 @@ CLOSE = """<section class="close" id="close-{k}">
   <svg class="closefield" viewBox="0 0 1600 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
   <div class="wrap">
     <h2 class="rise">@@t.close.h2@@</h2>
-    <p><a class="cta rise" href="#TODO-whatsapp">@@t.cta.book@@</a></p>
+    <p><a class="cta rise" href="@@t.wa.link@@">@@t.cta.book@@</a></p>
     <p class="fine rise">@@t.close.fine@@</p>{more}
   </div>
 </section>"""
