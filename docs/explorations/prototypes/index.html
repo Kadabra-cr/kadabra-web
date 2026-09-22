@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kadabra — decision prototypes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Gabarito 900: wordmark and titles only. Body: Hanken Grotesk (humanist grotesque,
+     tall x-height, open apertures — reads clean small on felt; not a banned face). -->
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800;900&family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#1B3A2F; --felt-deep:#12261F; --felt-lift:#22483A;
+  --bone:#F3EFE6; --white:#fff; --carbon:#1C1A17;
+  --red:#8E1424; --red-lift:#D8566A; --gold:#C9A227;
+  --on-felt-dim:#9DBBAC;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--felt); color:var(--white);
+  font:500 17px/1.55 "Hanken Grotesk",system-ui,sans-serif; letter-spacing:-.005em;
+  scrollbar-color:var(--felt-lift) var(--felt-deep);
+}
+::selection{ background:var(--gold); color:var(--carbon) }
+a:focus-visible{ outline:2px solid var(--gold); outline-offset:4px; border-radius:4px }
+.wrap{ max-width:1080px; margin:0 auto; padding:clamp(40px,7vw,90px) clamp(18px,4vw,40px) 110px }
+
+.wordmark{
+  font-family:Gabarito,sans-serif; font-weight:900; letter-spacing:-.05em; line-height:1;
+  font-size:clamp(3rem,10vw,5.5rem); margin:0; display:flex; align-items:center; gap:.28em;
+}
+.wordmark svg{ width:.62em; height:.62em; color:var(--gold); flex:none }
+.lede{ margin:18px 0 0; max-width:54ch; color:var(--on-felt-dim); font-size:clamp(1rem,2.2vw,1.18rem) }
+
+h2{
+  font-family:Gabarito,sans-serif; font-weight:800; letter-spacing:-.035em;
+  font-size:clamp(1.5rem,3.4vw,2.1rem); margin:clamp(48px,6.5vw,80px) 0 4px;
+}
+h2 + p.sub{ margin:0 0 22px; color:var(--on-felt-dim); font-size:15px }
+
+/* --- prototype list: a list, not a card grid --- */
+ol.protos{ list-style:none; margin:0; padding:0; border-top:1px solid rgba(255,255,255,.14) }
+ol.protos li{ border-bottom:1px solid rgba(255,255,255,.14) }
+ol.protos a{
+  display:grid; grid-template-columns:26px minmax(0,13rem) 1fr 22px; align-items:center; gap:clamp(12px,2.4vw,26px);
+  padding:20px 6px 20px 2px; text-decoration:none; color:inherit;
+  transition:background .35s var(--ease), padding .35s var(--ease);
+}
+ol.protos a:hover{ background:rgba(255,255,255,.055); padding-left:12px; padding-right:12px }
+ol.protos .suit{ width:19px; height:19px; color:var(--gold) }
+ol.protos .file{
+  font-family:Gabarito,sans-serif; font-weight:800; letter-spacing:-.03em;
+  font-size:clamp(1.15rem,2.6vw,1.55rem); white-space:nowrap;
+}
+ol.protos .what{ color:var(--on-felt-dim); font-size:15.5px; line-height:1.35 }
+ol.protos .arrow{ width:14px; height:14px; color:var(--on-felt-dim); transition:transform .4s var(--ease), color .3s var(--ease) }
+ol.protos a:hover .arrow{ transform:translateX(5px); color:var(--white) }
+
+/* --- headlines --- */
+ul.heads{ list-style:none; margin:0; padding:0; max-width:46ch }
+ul.heads li{
+  font-family:Gabarito,sans-serif; font-weight:800; letter-spacing:-.035em; line-height:1.1;
+  font-size:clamp(1.25rem,3vw,1.8rem); padding:13px 0; border-bottom:1px solid rgba(255,255,255,.12);
+}
+ul.heads li:last-child{ border-bottom:0 }
+
+/* --- TODO --- */
+.todo{
+  margin-top:clamp(48px,6.5vw,80px); background:var(--felt-deep);
+  border:1px solid rgba(216,86,106,.45); border-radius:14px;
+  padding:22px 24px; max-width:56ch; display:flex; gap:14px; align-items:flex-start;
+  box-shadow:0 3px 6px rgba(0,0,0,.2), 0 22px 44px -20px rgba(0,0,0,.6);
+}
+.todo svg{ width:20px; height:20px; flex:none; color:var(--red-lift); margin-top:3px }
+.todo b{ display:block; color:var(--red-lift); font-family:Gabarito,sans-serif; font-weight:800;
+  letter-spacing:-.02em; font-size:1.12rem; margin-bottom:5px }
+.todo p{ margin:0; color:var(--on-felt-dim); font-size:15px }
+.todo code{ font-family:"Hanken Grotesk",sans-serif; font-weight:700; color:var(--white) }
+
+@media (max-width:760px){
+  ol.protos a{ grid-template-columns:22px 1fr 18px; row-gap:6px }
+  ol.protos .what{ grid-column:2 / 4 }
+}
+@media (prefers-reduced-motion:reduce){ *{ transition-duration:.001ms!important } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+  <symbol id="s-spade" viewBox="0 0 100 100"><path fill="currentColor" d="M50 6 14 48v12l18 12 18-16 18 16 18-12V48Z M50 56l10 38H40Z"/></symbol>
+  <symbol id="s-heart" viewBox="0 0 100 100"><path fill="currentColor" d="M50 96 8 48V26l20-14 22 22 22-22 20 14v22Z"/></symbol>
+  <symbol id="s-diamond" viewBox="0 0 100 100"><path fill="currentColor" d="M50 2 88 42l-6 8 6 8L50 98 12 58l6-8-6-8Z"/></symbol>
+  <symbol id="s-club" viewBox="0 0 100 100"><path fill="currentColor" d="M50 2 76 28 50 54 24 28Z M26 26 52 52 26 78 0 52Z M74 26 100 52 74 78 48 52Z M50 56l14 42-14-10-14 10Z"/></symbol>
+  <symbol id="s-spark" viewBox="0 0 100 100"><path fill="currentColor" d="M50 0 58 42l42 8-42 8-8 42-8-42L0 50l42-8Z"/></symbol>
+  <symbol id="s-chev" viewBox="0 0 100 100"><path fill="currentColor" d="M26 8 74 50 26 92l-14-14 34-28-34-28Z"/></symbol>
+</defs></svg>
+
+<main class="wrap">
+  <h1 class="wordmark"><svg aria-hidden="true"><use href="#s-spark"/></svg>kadabra</h1>
+  <p class="lede">Decision prototypes. Nothing here is the final site — each page exists so one choice can be made and closed.</p>
+
+  <h2>Prototypes</h2>
+  <p class="sub">What to decide on each page.</p>
+  <ol class="protos">
+    <li><a href="https://kadabra-site.pages.dev/">
+      <svg class="suit" aria-hidden="true"><use href="#s-spark"/></svg>
+      <span class="file">site/ (THE site)</span>
+      <span class="what">The production site: three routes, chevron rule, client-side routing. Not a prototype.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="mockup/">
+      <svg class="suit" aria-hidden="true"><use href="#s-spade"/></svg>
+      <span class="file">mockup/ (round 2)</span>
+      <span class="what">Brand study applied: centered hero, morphing mat, contrast story, swipe cards. Read DESIGN.md alongside.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="suits.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-spade"/></svg>
+      <span class="file">suits.html</span>
+      <span class="what">Which suit drawing ships: sharp or classic.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="hero-a.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-heart"/></svg>
+      <span class="file">hero-a.html</span>
+      <span class="what">Wand behaviour and headline pick — version A.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="hero-b.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-heart"/></svg>
+      <span class="file">hero-b.html</span>
+      <span class="what">Wand behaviour and headline pick — version B.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="hero-c.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-heart"/></svg>
+      <span class="file">hero-c.html</span>
+      <span class="what">Wand behaviour and headline pick — version C.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="contrast.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-diamond"/></svg>
+      <span class="file">contrast.html</span>
+      <span class="what">Palette weight: green-heavy, or green and bone split.</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+    <li><a href="puzzle.html">
+      <svg class="suit" aria-hidden="true"><use href="#s-club"/></svg>
+      <span class="file">puzzle.html</span>
+      <span class="what">Puzzle feel: does sorting six tasks earn its place on the page?</span>
+      <svg class="arrow" aria-hidden="true"><use href="#s-chev"/></svg></a></li>
+  </ol>
+
+  <h2>Headline candidates</h2>
+  <p class="sub">Pick one. The heroes each show a different set.</p>
+  <ul class="heads">
+    <li>The trick is teaching, not tools.</li>
+    <li>Nothing up our sleeves. Just your work, done faster.</li>
+    <li>Your team already holds the wand. We teach the trick.</li>
+    <li>Less magic show. More magic.</li>
+    <li>Learn the trick behind the trick.</li>
+  </ul>
+
+  <div class="todo">
+    <svg aria-hidden="true"><use href="#s-spark"/></svg>
+    <div>
+      <b>TODO: WhatsApp number and prefilled message</b>
+      <p>Every CTA points at <code>#TODO-whatsapp</code>. Needs the real number and the prefilled text before any of this goes live.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

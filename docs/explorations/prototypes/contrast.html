@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kadabra — It works. Until it doesn't. (palette weight)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Gabarito 900 for the numbers and titles only. Body: Hanken Grotesk — humanist grotesque,
+     tall x-height, open apertures; holds up small on felt AND on bone, which this page needs
+     because the same copy is set on both grounds. Not Inter/Roboto/Open Sans/Poppins/Montserrat. -->
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800;900&family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#1B3A2F; --felt-deep:#12261F; --felt-lift:#22483A;
+  --bone:#F3EFE6; --white:#fff; --carbon:#1C1A17;
+  --red:#8E1424; --gold:#C9A227;
+  --on-felt-dim:#9DBBAC;     /* tinted from the felt hue */
+  --on-bone-dim:#5A6259;     /* tinted from the bone hue */
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--felt-deep); color:var(--white);
+  font:500 17px/1.55 "Hanken Grotesk",system-ui,sans-serif; letter-spacing:-.005em;
+  scrollbar-color:var(--felt-lift) var(--felt-deep);
+}
+::selection{ background:var(--gold); color:var(--carbon) }
+:focus-visible{ outline:2px solid var(--gold); outline-offset:3px }
+
+.pagehead{ padding:34px clamp(18px,4vw,40px) 10px; max-width:1240px; margin:0 auto }
+.mark{ font-family:Gabarito,sans-serif; font-weight:900; font-size:19px; letter-spacing:-.04em }
+.pagehead p{ color:var(--on-felt-dim); font-size:15px; margin:10px 0 0; max-width:60ch }
+
+.variant-tag{
+  max-width:1240px; margin:0 auto; padding:44px clamp(18px,4vw,40px) 0;
+  font:700 12.5px/1 "Hanken Grotesk",sans-serif; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold);
+}
+
+section.pane{ padding:clamp(34px,5vw,60px) 0 clamp(60px,8vw,110px) }
+.v1{ background:var(--felt) }
+.v2{ background:var(--felt-deep) }
+.inner{ max-width:1240px; margin:0 auto; padding:0 clamp(18px,4vw,40px) }
+
+h2.title{
+  font-family:Gabarito,sans-serif; font-weight:900; letter-spacing:-.045em; line-height:.92;
+  font-size:clamp(2.6rem,8vw,5.6rem); margin:0 0 clamp(34px,5vw,60px); max-width:13ch; text-wrap:balance;
+}
+.v2 h2.title{ color:var(--white) }
+
+/* ---------- the PROCOMER pair: one object, two halves ---------- */
+.pair{
+  display:grid; grid-template-columns:1fr 1fr; gap:1px;
+  background:rgba(255,255,255,.16); border-radius:18px; overflow:hidden;
+}
+/* v1: no fills at all — the pair is held together by its hairline, not by boxes */
+.v1 .pair, .v1 .singles{ background:rgba(255,255,255,.16) }
+.v1 .half, .v1 .cell{ background:var(--felt) }
+.pair .half{ padding:clamp(24px,3.4vw,40px) clamp(22px,3vw,38px) clamp(26px,3.4vw,38px) }
+.pair .n{
+  font-family:Gabarito,sans-serif; font-weight:900; letter-spacing:-.055em; line-height:.8;
+  font-size:clamp(4.6rem,13.5vw,9rem); display:block; font-variant-numeric:tabular-nums;
+}
+.pair .line{ margin:22px 0 0; font-size:clamp(1rem,1.9vw,1.25rem); max-width:26ch; line-height:1.35 }
+.pair .src{ margin:16px 0 0; font-size:13px; letter-spacing:.02em }
+
+/* ---------- the three singles ---------- */
+.singles{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; margin-top:14px;
+  background:rgba(255,255,255,.16); border-radius:18px; overflow:hidden }
+.singles .cell{ padding:clamp(22px,2.8vw,34px) clamp(20px,2.4vw,30px) clamp(24px,2.8vw,32px) }
+.singles .n{
+  font-family:Gabarito,sans-serif; font-weight:900; letter-spacing:-.05em; line-height:.84;
+  font-size:clamp(3rem,7vw,5rem); display:block; font-variant-numeric:tabular-nums;
+}
+.singles .line{ margin:18px 0 0; font-size:1.02rem; line-height:1.38; max-width:24ch }
+.singles .src{ margin:14px 0 0; font-size:12.8px; letter-spacing:.02em }
+
+/* ---------- grounds ---------- */
+.on-felt{ background:var(--felt); color:var(--white) }
+.on-felt .n{ color:var(--white) }
+.on-felt .src{ color:var(--on-felt-dim) }
+.on-deep{ background:var(--felt-deep); color:var(--white) }
+.on-deep .n{ color:var(--white) }
+.on-deep .src{ color:var(--on-felt-dim) }
+.on-bone{ background:var(--bone); color:var(--carbon) }
+.on-bone .n{ color:var(--carbon) }
+.on-bone .src{ color:var(--on-bone-dim) }
+
+/* v1: green-heavy — bone appears once, inside the small closing note */
+.note{
+  margin-top:clamp(34px,4.6vw,56px); background:var(--bone); color:var(--carbon);
+  border-radius:16px; padding:clamp(22px,2.8vw,32px) clamp(24px,3vw,36px);
+  max-width:40ch; display:flex; gap:16px; align-items:flex-start;
+  box-shadow:0 4px 8px rgba(0,0,0,.18), 0 26px 50px -18px rgba(0,0,0,.55);
+}
+.note svg{ width:22px; height:22px; flex:none; color:var(--red); margin-top:4px }
+.note p{ margin:0; font-family:Gabarito,sans-serif; font-weight:800; font-size:clamp(1.22rem,2.5vw,1.6rem);
+  line-height:1.12; letter-spacing:-.03em; text-wrap:balance }
+
+/* v2: the closing line carries the split too */
+.close2{ margin-top:clamp(34px,4.6vw,56px); display:flex; gap:16px; align-items:flex-start; max-width:44ch }
+.close2 svg{ width:24px; height:24px; flex:none; color:var(--gold); margin-top:6px }
+.close2 p{ margin:0; font-family:Gabarito,sans-serif; font-weight:900; letter-spacing:-.035em;
+  font-size:clamp(1.5rem,3.4vw,2.3rem); line-height:1.04; color:var(--white); text-wrap:balance }
+
+@media (max-width:860px){
+  .singles{ grid-template-columns:1fr }
+  .pair{ grid-template-columns:1fr }
+  .pair .n{ font-size:clamp(4.4rem,22vw,6rem) }
+  .singles .n{ font-size:clamp(3rem,14vw,4rem) }
+}
+@media (prefers-reduced-motion:reduce){ *{ transition-duration:.001ms!important } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+  <symbol id="s-spade" viewBox="0 0 100 100"><path fill="currentColor" d="M50 6 14 48v12l18 12 18-16 18 16 18-12V48Z M50 56l10 38H40Z"/></symbol>
+  <symbol id="s-heart" viewBox="0 0 100 100"><path fill="currentColor" d="M50 96 8 48V26l20-14 22 22 22-22 20 14v22Z"/></symbol>
+  <symbol id="s-diamond" viewBox="0 0 100 100"><path fill="currentColor" d="M50 2 88 42l-6 8 6 8L50 98 12 58l6-8-6-8Z"/></symbol>
+  <symbol id="s-club" viewBox="0 0 100 100"><path fill="currentColor" d="M50 2 76 28 50 54 24 28Z M26 26 52 52 26 78 0 52Z M74 26 100 52 74 78 48 52Z M50 56l14 42-14-10-14 10Z"/></symbol>
+</defs></svg>
+
+<header class="pagehead">
+  <div class="mark">kadabra</div>
+  <p>Decision prototype — palette weight. The same section is built twice. Pick the one that should ship.</p>
+</header>
+
+<!-- ================= VARIANT 1 : green-heavy ================= -->
+<p class="variant-tag">Variant 1: green-heavy</p>
+<section class="pane v1">
+ <div class="inner">
+  <h2 class="title">It works. Until it doesn't.</h2>
+
+  <div class="pair">
+    <div class="half on-felt">
+      <span class="n" data-to="93">0%</span>
+      <p class="line">of Costa Rican tech companies save time on repetitive tasks with AI.</p>
+      <p class="src">PROCOMER, 2025</p>
+    </div>
+    <div class="half on-felt">
+      <span class="n" data-to="9">0%</span>
+      <p class="line">have any AI policy.</p>
+      <p class="src">PROCOMER, 2025</p>
+    </div>
+  </div>
+
+  <div class="singles">
+    <div class="cell on-felt">
+      <span class="n" data-to="95">0%</span>
+      <p class="line">of company AI pilots show no measurable return.</p>
+      <p class="src">MIT NANDA, 2025</p>
+    </div>
+    <div class="cell on-felt">
+      <span class="n" data-to="34">0%</span>
+      <p class="line">Beginners get up to 34% more done with AI. Experts: almost nothing.</p>
+      <p class="src">NBER, 2023</p>
+    </div>
+    <div class="cell on-felt">
+      <span class="n" data-to="52">0%</span>
+      <p class="line">of employees hide that they use AI at work.</p>
+      <p class="src">Microsoft Work Trend Index, 2024</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <svg aria-hidden="true"><use href="#s-spade"/></svg>
+    <p>The difference is never the tool. It's whether anyone taught the team.</p>
+  </div>
+ </div>
+</section>
+
+<!-- ================= VARIANT 2 : green + bone split ================= -->
+<p class="variant-tag">Variant 2: green + bone split — felt for the fear numbers, bone for the result numbers</p>
+<section class="pane v2">
+ <div class="inner">
+  <h2 class="title">It works. Until it doesn't.</h2>
+
+  <div class="pair">
+    <div class="half on-bone">
+      <span class="n" data-to="93">0%</span>
+      <p class="line">of Costa Rican tech companies save time on repetitive tasks with AI.</p>
+      <p class="src">PROCOMER, 2025</p>
+    </div>
+    <div class="half on-felt">
+      <span class="n" data-to="9">0%</span>
+      <p class="line">have any AI policy.</p>
+      <p class="src">PROCOMER, 2025</p>
+    </div>
+  </div>
+
+  <div class="singles">
+    <div class="cell on-felt">
+      <span class="n" data-to="95">0%</span>
+      <p class="line">of company AI pilots show no measurable return.</p>
+      <p class="src">MIT NANDA, 2025</p>
+    </div>
+    <div class="cell on-bone">
+      <span class="n" data-to="34">0%</span>
+      <p class="line">Beginners get up to 34% more done with AI. Experts: almost nothing.</p>
+      <p class="src">NBER, 2023</p>
+    </div>
+    <div class="cell on-felt">
+      <span class="n" data-to="52">0%</span>
+      <p class="line">of employees hide that they use AI at work.</p>
+      <p class="src">Microsoft Work Trend Index, 2024</p>
+    </div>
+  </div>
+
+  <div class="close2">
+    <svg aria-hidden="true"><use href="#s-heart"/></svg>
+    <p>The difference is never the tool. It's whether anyone taught the team.</p>
+  </div>
+ </div>
+</section>
+
+<script>
+// count up once, on entry, easeOutExpo, ~900ms
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const expo = t => t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+function run(el){
+  const to = +el.dataset.to;
+  if (reduced) { el.textContent = to + "%"; return; }
+  const t0 = performance.now();
+  (function step(now){
+    const p = expo(Math.min((now - t0) / 900, 1));
+    el.textContent = Math.round(to * p) + "%";
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) if (e.isIntersecting) { run(e.target); io.unobserve(e.target); }
+}, { threshold: .45 });
+document.querySelectorAll("[data-to]").forEach(el => io.observe(el));
+</script>
+</body>
+</html>

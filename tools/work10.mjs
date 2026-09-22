@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const b = await chromium.launch(); const errs = [];
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+p.on('pageerror', e => errs.push(e.message));
+await p.goto('http://127.0.0.1:4173/workshop/', { waitUntil: 'load' }); await sleep(900);
+await p.evaluate(() => document.querySelector('[data-vis=break]').scrollIntoView({ block: 'center' })); await sleep(2600);
+await p.screenshot({ path: 'shots/r10/r-workshop-break.png' });
+const spine = await p.evaluate(() => { const s = document.getElementById('spineline'), d = document.getElementById('spinedots'), m = document.getElementById('spinemark');
+  return { solid: Math.round(s.getBoundingClientRect().height), dotted: Math.round(d.getBoundingClientRect().height), mark: !!m }; });
+console.log('spine', JSON.stringify(spine), 'errors', errs);
+await b.close();

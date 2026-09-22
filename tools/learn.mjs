@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1440,height:900}});
+const errs=[]; p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto('http://127.0.0.1:4173/learn-more/',{waitUntil:'networkidle'});
+const H = await p.evaluate(()=>document.body.scrollHeight); for(let y=0;y<H;y+=400){await p.evaluate(v=>scrollTo(0,v),y);await p.waitForTimeout(120);} await p.evaluate(()=>scrollTo(0,0)); await p.waitForTimeout(900);
+await p.screenshot({path:'shots/learn-1440.png',fullPage:true});
+await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'}); await p.waitForTimeout(2200); await p.screenshot({path:'shots/hero-buttons.png'});
+const w = await p.$('.whyband'); await w.scrollIntoViewIfNeeded(); await p.waitForTimeout(1500);
+const h0=await p.evaluate(()=>document.querySelector('.whyband').offsetHeight); const hb=await w.boundingBox(); await p.mouse.move(hb.x+300,hb.y+40); await p.waitForTimeout(900);
+const h1=await p.evaluate(()=>document.querySelector('.whyband').offsetHeight); console.log('whyband idle/hover', h0, h1);
+await p.screenshot({path:'shots/why-hover2.png'});
+console.log('errors',errs); await b.close();

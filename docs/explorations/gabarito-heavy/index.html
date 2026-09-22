@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gabarito Bold · ExtraBold · Black — the heavy-weight hunt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0e0e10; --fg:#f2f0eb; --dim:#9a968d; --line:#2a2a2e; --acc:#ffd84d; --hot:#ff5a3c; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:Gabarito,system-ui,sans-serif;font-size:17px;line-height:1.55}
+  .wrap{max-width:940px;margin:0 auto;padding:56px 24px 120px}
+  h1{font-size:clamp(38px,7vw,74px);font-weight:900;line-height:0.95;letter-spacing:-0.03em;margin:0 0 14px}
+  h2{font-size:clamp(23px,3.4vw,31px);font-weight:800;letter-spacing:-0.015em;margin:64px 0 6px;padding-top:24px;border-top:1px solid var(--line)}
+  h3{font-size:18px;font-weight:700;margin:30px 0 8px;color:var(--acc)}
+  p{margin:0 0 14px;max-width:72ch}
+  .lede{font-size:20px;color:var(--dim)}
+  .note{font-size:15px;color:var(--dim);max-width:72ch}
+  ul{list-style:none;padding:0;margin:14px 0 0}
+  li{padding:12px 0;border-bottom:1px solid var(--line)}
+  a{color:var(--fg);text-decoration:none;border-bottom:1px solid #555}
+  a:hover{color:var(--acc);border-color:var(--acc)}
+  code,.mono{font-family:"DM Mono",ui-monospace,monospace;font-size:13px}
+  .meta{display:block;font-family:"DM Mono",monospace;font-size:13px;color:var(--dim);margin-top:4px;line-height:1.55}
+  .tag{display:inline-block;font-family:"DM Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin-right:6px;color:var(--dim)}
+  .tag.v{color:#7fe08a;border-color:#2d5c35}
+  .tag.no{color:#ff8b74;border-color:#5c2d26}
+  table{border-collapse:collapse;width:100%;margin:18px 0;font-family:"DM Mono",monospace;font-size:13px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:400;text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+  td.n{text-align:right}
+  .hl{color:var(--acc)}
+  .lab{background:#141416;border:1px solid var(--line);border-radius:14px;padding:22px;margin:18px 0}
+  .lab .row{border-bottom:1px solid var(--line);padding:14px 0}
+  .lab .row:last-child{border:0;padding-bottom:0}
+  .lab .row:first-child{padding-top:0}
+  .w700{font-weight:700}.w800{font-weight:800}.w900{font-weight:900}
+  .disp{font-size:clamp(34px,7.4vw,74px);line-height:0.95;letter-spacing:-0.03em;margin:0}
+  .onlight{background:#f2f0eb;color:#0e0e10;border-radius:14px;padding:22px;margin:18px 0}
+  .onlight .meta{color:#6a6760}
+  .capt{font-weight:900;text-transform:uppercase;letter-spacing:-0.03em;font-size:clamp(28px,5.5vw,56px);-webkit-text-stroke:3px #000;paint-order:stroke fill;color:#fff}
+  .play label{font-family:"DM Mono",monospace;font-size:12px;color:var(--dim);display:inline-block;margin:0 18px 8px 0}
+  input[type=range]{vertical-align:middle;width:180px;accent-color:var(--acc)}
+  footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-family:"DM Mono",monospace;font-size:13px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="meta">Hunt #2 · 20 Sep 2026 · companion to <a href="https://gabarito-research.pages.dev/">gabarito-research.pages.dev</a></p>
+<h1>The heavy end:<br>700 · 800 · 900</h1>
+<p class="lede">Who actually pushes Gabarito past Bold, what it does to the letterforms when they do, and how to set it so it doesn't clog.</p>
+
+<p class="note"><strong>Headline finding, and it's a sharp one:</strong> every curated, design-vetted use of Gabarito I can verify stops at <strong>700</strong>. Not one of the gallery-listed sites loads 800 or 900. The heavy weights are being used — just not by the people getting featured. They live in motion graphics, app UI stat numbers, and one-weight display loads. So <span class="hl">800/900 is close to unclaimed territory</span>, and the reason is half taste, half a real optical limit you can see in the numbers below.</p>
+
+<h2>1 · Weight forensics of the documented uses</h2>
+<p class="note">I refetched every site from hunt #1 and read what weights they actually request and apply. This is served-source evidence, not a gallery claim.</p>
+<table>
+<thead><tr><th>Site</th><th>Weights it actually uses</th><th>Ceiling</th></tr></thead>
+<tbody>
+<tr><td><a href="https://www.tinyshots.app">tinyshots.app</a></td><td>500 / 600 / 700 (self-hosted via next/font)</td><td class="n">700</td></tr>
+<tr><td><a href="https://www.siteclub.co">siteclub.co</a></td><td>400 / 600 / 700</td><td class="n">700</td></tr>
+<tr><td><a href="https://naipefoundry.com/">naipefoundry.com</a> (the foundry itself)</td><td>inline specimen at <code>font-bold</code></td><td class="n">700</td></tr>
+<tr><td><a href="https://maxibestof.one/websites/81511-aurelien-liguori">Aurélien Liguori portfolio</a></td><td>Gabarito + DM Mono, display set Bold</td><td class="n">700</td></tr>
+<tr><td><a href="https://fontsinuse.com/uses/70099/empowerment-and-vielfalt-frauen-gestalten-die">studiokwi / FU Berlin posters</a></td><td>print — heaviest documented display setting, "type in a band", hyper-extended glyphs</td><td class="n">≈800+</td></tr>
+</tbody>
+</table>
+<p class="note"><span class="tag no">note</span> TinyShots is the most committed Gabarito site on the web and it never goes above <code>font-bold</code>. Take that as data, not as gospel — it's one designer's call, repeated by a very small sample.</p>
+
+<h2>2 · Where 800/900 actually gets used</h2>
+<p class="note">Found by code-searching public source for <code>Gabarito:wght@900</code> / <code>@800</code> / <code>font-black</code> / <code>Gabarito-ExtraBold</code> — i.e. catching real implementations rather than curated screenshots. Three repeatable patterns fell out.</p>
+
+<h3>A. Burned-in video captions (the strongest heavy use I found)</h3>
+<ul>
+<li><a href="https://github.com/heygen-com/hyperframes">HeyGen — Hyperframes, <code>caption-emoji-pop</code> component</a>
+  <span class="meta">HTML-to-video framework by HeyGen. The caption component loads <strong>Gabarito 900 and nothing else</strong>, sets it UPPERCASE at 72px, <code>letter-spacing:-0.03em</code>, white with a <code>3px</code> black <code>-webkit-text-stroke</code> and <code>paint-order:stroke fill</code>, plus per-word colour accents. This is Gabarito Black doing the TikTok/Reels caption job — and it's the single most considered heavy-weight setting in the wild.</span></li>
+</ul>
+<div class="lab" style="background:#000">
+  <div class="capt">EVERY GREAT VIDEO</div>
+  <div class="capt" style="color:#FF76FF">STARTS WITH A FRAME</div>
+  <span class="meta" style="margin-top:10px">↑ HeyGen's exact recipe, reproduced live: 900 · uppercase · −0.03em · 3px stroke · paint-order stroke fill.</span>
+</div>
+
+<h3>B. Big numbers in app UI</h3>
+<ul>
+<li><a href="https://github.com/calumerskine/good-partner">good-partner (React Native app)</a>
+  <span class="meta">Uses <code>font-gabarito font-black</code> at <code>text-4xl</code>/<code>text-5xl</code> for XP counts, stat tiles and screen titles — Regular/Medium everywhere else. The pattern: Black is reserved for <em>one number or one line per screen</em>. That's the cleanest heavy-weight discipline I found.</span></li>
+<li><a href="https://github.com/FIEZEL-APPS/FIEZEL-APPS">FIEZEL — redesign mockups</a>
+  <span class="meta"><code>font-gabarito font-black tracking-tight</code> for the wordmark ("FIEZEL.") <em>and</em> for the primary CTA label. Proof Gabarito Black survives being a logotype and a button at the same time.</span></li>
+</ul>
+
+<h3>C. Loaded alone, as a pure display face</h3>
+<p class="note">The recurring signal: when people reach for the heavy end, they request <code>family=Gabarito:wght@900</code> <strong>as the only weight on the page</strong> and pair it with something else for text — Workbench, Roboto, Poppins, Kanit, Chakra Petch. Nobody ramps 400→900 within one family. Examples in public source: <a href="https://github.com/Apricot-Software/CasterV2">Apricot CasterV2</a>, <a href="https://github.com/datainkio/11ty-portfolio-source">datainkio 11ty portfolio</a>, <a href="https://github.com/Gabinator80/Palm-Tree-Studio">Palm Tree Studio</a>, plus a long tail of banner/hero CSS packs.</p>
+<p class="note">And for 800 specifically: <a href="https://github.com/angular-experts-io/resource">Angular Experts' resource showcase</a> (Gabarito 800 + Sora), <a href="https://github.com/marmelab/FakeRest">marmelab/FakeRest</a> (500/600/700/900 — the only project I saw skip 800 and jump straight to Black for its display line).</p>
+
+<h2>3 · What the heavy weights measure</h2>
+<p class="note">Pulled from the variable source (<code>Gabarito[wght].ttf</code>, upem 1000) by instancing each weight and measuring the outlines. This is where the "don't push it too far" advice comes from — it's not a matter of taste, it's counter space.</p>
+<table>
+<thead><tr><th>wght</th><th class="n">stem (l)</th><th class="n">o counter</th><th class="n">o sidebearings</th><th class="n">H advance</th><th class="n">cap height</th></tr></thead>
+<tbody>
+<tr><td>400 Regular</td><td class="n">149</td><td class="n">201</td><td class="n">70</td><td class="n">698</td><td class="n">681</td></tr>
+<tr><td>700 Bold</td><td class="n">193</td><td class="n">128</td><td class="n">48</td><td class="n">678</td><td class="n">681</td></tr>
+<tr><td>800 ExtraBold</td><td class="n">208</td><td class="n">104</td><td class="n">40</td><td class="n">671</td><td class="n">681</td></tr>
+<tr><td class="hl">900 Black</td><td class="n hl">226</td><td class="n hl">74</td><td class="n hl">31</td><td class="n hl">663</td><td class="n">681</td></tr>
+</tbody>
+</table>
+<p class="note">Read it like this:</p>
+<ul>
+<li><span class="tag">1</span> <strong>The counter collapses, fast.</strong> The inside of the <code>o</code> goes 201 → 128 → 104 → <strong>74</strong>. Black's counter is <strong>37% of Regular's</strong>, and ExtraBold→Black alone drops it another 29%. That's the whole story of why Black clogs at small sizes, in print at low ink coverage, and on dark backgrounds (where white-on-dark optically fattens the stems further).</li>
+<li><span class="tag">2</span> <strong>It gets heavier by eating space, not by getting wider.</strong> <code>H</code> advance actually <em>shrinks</em> 698 → 663 from Regular to Black. Gabarito Black is 5% narrower per cap than Regular — unusual, and genuinely useful: your headline doesn't blow out its line when you go heavy. Nice for a compact logotype.</li>
+<li><span class="tag">3</span> <strong>Sidebearings halve.</strong> 70 → 31 units of air around the <code>o</code>. The font is already tracking itself tighter as you go up, so <em>don't stack much negative letter-spacing on top</em>. −0.02 to −0.03em at display size is the ceiling before the letters start touching; at anything under ~24px you want 0 or slightly positive.</li>
+<li><span class="tag">4</span> <strong>x-height and cap height don't move</strong> (488→490, 681 flat). No optical compensation — the heavy weights are pure weight gain, so the ladder from Medium to Black reads as emphasis, never as a size change. Good for hierarchy, means you must carry contrast with size.</li>
+</ul>
+
+<h2>4 · The lab — look before you commit</h2>
+<div class="lab">
+  <div class="row"><p class="disp w700">Bold 700 — Kadabra</p><span class="meta">700 · −0.03em · the safe display weight. Every vetted site stops here.</span></div>
+  <div class="row"><p class="disp w800">ExtraBold 800 — Kadabra</p><span class="meta">800 · −0.03em · noticeably more presence, counters still open. The underused middle.</span></div>
+  <div class="row"><p class="disp w900">Black 900 — Kadabra</p><span class="meta">900 · −0.03em · maximum voice. Watch the <em>a</em>, <em>b</em> and <em>d</em> counters at this size vs at 16px.</span></div>
+</div>
+
+<div class="onlight">
+  <p class="disp w900" style="margin-bottom:6px">Black on light</p>
+  <p class="disp w900" style="font-size:clamp(20px,3vw,30px);margin:0 0 6px">Black at 30px — counters holding</p>
+  <p class="w900" style="font-size:16px;letter-spacing:0;margin:0">Black at 16px — this is where it starts to clog, and why there is no case for Black in body copy.</p>
+  <span class="meta">Same three settings on light. Black behaves better on light than on dark — on dark, stems bloom and the 74-unit counters close.</span>
+</div>
+
+<div class="lab play">
+  <label>weight <input id="w" type="range" min="400" max="900" step="1" value="900"> <span class="mono" id="wv">900</span></label>
+  <label>tracking <input id="t" type="range" min="-60" max="20" step="1" value="-30"> <span class="mono" id="tv">-0.030em</span></label>
+  <label>size <input id="s" type="range" min="16" max="120" step="1" value="72"> <span class="mono" id="sv">72px</span></label>
+  <p id="demo" style="font-variation-settings:'wght' 900;font-size:72px;letter-spacing:-0.03em;line-height:1;margin:18px 0 0">Kadabra</p>
+  <span class="meta">Drag size down to 16–20px at 900 to see the clog point yourself. That's the whole argument for keeping Black above ~28px.</span>
+</div>
+
+<h2>5 · Rules for the heavy end</h2>
+<ul>
+<li><span class="tag v">do</span> <strong>Pick one heavy weight and hold it.</strong> Every credible use loads a single heavy weight and pairs it downward (900 + a text face, or 700 + 400/500). Nobody ships 700/800/900 together — three near-identical heavies read as inconsistency, not hierarchy.</li>
+<li><span class="tag v">do</span> <strong>Use 800 if you want the room nobody's in.</strong> 700 is where every vetted site sits; 900 is where the caption/banner crowd sits. ExtraBold holds the counters (104 vs 74) and still hits harder than Bold. For a logotype that needs to survive small sizes, it's the better bet.</li>
+<li><span class="tag v">do</span> <strong>Keep Black above ~28px</strong>, tracked −0.02 to −0.03em, uppercase or tight sentence case. That's the HeyGen setting and it's right.</li>
+<li><span class="tag no">don't</span> <strong>Don't put Black on a dark background at small size</strong> without dropping to 800 — the counter is already at 74 units before the optical bloom.</li>
+<li><span class="tag no">don't</span> <strong>Don't expect a light weight to balance it.</strong> The family is 400–900; there is no 300/200. Your contrast ladder has to come from size and colour, not from a hairline counterpart. Pimp my Type flags the same gap, plus the missing italics.</li>
+<li><span class="tag">test</span> <strong>Stroke-and-fill is a legitimate trick here.</strong> <code>-webkit-text-stroke</code> + <code>paint-order:stroke fill</code> at 900 is what makes it read over video/photo. If your brand ever touches motion, that recipe is proven.</li>
+</ul>
+
+<h2>6 · Verdict for the brand</h2>
+<p class="note">Your distinctive asset at the heavy end is <strong>ExtraBold 800</strong>. Bold is what the two or three people who've been seen using Gabarito already chose, Black is what the caption/banner long tail grabs, and 800 sits in between with nobody on it and better counters than 900. A compact wordmark benefits from Gabarito's counter-intuitive narrowing at weight (H advance drops 5% from 400 to 900), so a Black or ExtraBold logotype takes <em>less</em> horizontal room than the Regular would — rare, and worth exploiting.</p>
+
+<h2>7 · Sources for this hunt</h2>
+<ul>
+<li><a href="https://github.com/naipefoundry/gabarito">naipefoundry/gabarito</a> · <a href="https://github.com/google/fonts/tree/main/ofl/gabarito">google/fonts — ofl/gabarito</a><span class="meta">The variable source I measured. Named instances: Regular 400, Medium 500, SemiBold 600, Bold 700, ExtraBold 800, Black 900. One axis, <code>wght 400–900</code>, default 400.</span></li>
+<li><a href="https://github.com/heygen-com/hyperframes">HeyGen Hyperframes — caption-emoji-pop</a><span class="meta">The 900 caption recipe, in full source.</span></li>
+<li><a href="https://pimpmytype.com/font/gabarito/">Pimp my Type — Gabarito</a><span class="meta">"May appear too bold for very large displays", no light weight, no italics. The measurements above are why.</span></li>
+<li><a href="https://fonts.google.com/specimen/Gabarito">Google Fonts specimen</a> · <a href="https://store.naipefoundry.com/fonts/gabarito">Naipe store specimen</a><span class="meta">Type-test the heavy weights against your own strings before committing.</span></li>
+<li><a href="https://gabarito-research.pages.dev/">Hunt #1 — the full Gabarito census</a><span class="meta">Every documented use, specimen, pairing and near-match.</span></li>
+</ul>
+
+<footer>
+Compiled 20 Sep 2026. Weight-usage claims come from fetching each live page and reading the served CSS/markup; heavy-weight examples come from public source-code search, not from galleries — galleries don't index by weight.<br>
+Metrics measured with fontTools from <code>Gabarito[wght].ttf</code> (google/fonts, upem 1000), instanced per weight; stem = bbox width of <code>l</code>, counter = <code>o</code> bbox width − 2·stem.
+</footer>
+
+</div>
+<script>
+  const w=document.getElementById('w'),t=document.getElementById('t'),s=document.getElementById('s'),d=document.getElementById('demo');
+  const draw=()=>{ d.style.fontVariationSettings="'wght' "+w.value; d.style.letterSpacing=(t.value/1000)+'em'; d.style.fontSize=s.value+'px';
+    wv.textContent=w.value; tv.textContent=(t.value/1000).toFixed(3)+'em'; sv.textContent=s.value+'px'; };
+  [w,t,s].forEach(e=>e.addEventListener('input',draw)); draw();
+</script>
+</body>
+</html>

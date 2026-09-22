@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>@@TITLE@@</title>
+<meta name="description" content="@@DESC@@">
+<link rel="canonical" href="@@CANON@@">
+<meta property="og:title" content="@@TITLE@@">
+<meta property="og:description" content="@@DESC@@">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1C1A17">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Gabarito 800: titles and numbers only. Hanken Grotesk: everything a person reads. -->
+<link rel="preload" as="style"
+  href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<link rel="preload" as="style" href="/styles.css">
+<link rel="stylesheet" href="/styles.css">
+<script>document.documentElement.className="js"</script>
+<script src="/app.js" defer></script>
+</head>
+<body>
+
+@@SPRITES@@
+
+<a class="sr" href="#main">Skip to content</a>
+<span id="sweep" class="rule" aria-hidden="true"></span>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="kadabra, home">
+      <svg class="logo" viewBox="0 0 1694.24 358.08" role="img" aria-label="kadabra"
+           width="125" height="32"><use href="#logo-full" width="1703.11" height="435.6"/></svg>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/workshop/" data-nav="/workshop/">The workshop</a>
+      <a href="/learn-more/" data-nav="/learn-more/">Learn more</a>
+    </nav>
+    <a class="cta" href="#TODO-whatsapp">Talk to us on WhatsApp</a>
+  </div>
+</header>
+
+<div id="main">
+
+<!-- ======================================================================= -->
+<!-- ROUTE: /                                                                -->
+<!-- ======================================================================= -->
+<main class="route" data-route="/" @@HIDE_HOME@@>
+
+<div class="split" id="stage2">
+<section class="hero" id="hero">
+  <svg id="field" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="wrap">
+    <h1 class="rise">The trick is teaching, not tools.</h1>
+    <p class="sub rise">Half-day, hands-on AI workshops for teams in Costa Rica. Your real work, your tools, nothing to buy afterwards.</p>
+    <p class="ctas rise"><a class="cta" href="#TODO-whatsapp">Talk to us on WhatsApp</a>
+      <a class="btn go arrow" href="/workshop/">See the workshop<svg class="arr" viewBox="0 0 64 28" aria-hidden="true"><use href="#arrow"/></svg></a></p>
+    <p class="fine rise">Opens a WhatsApp chat. No form, nothing to buy.</p>
+  </div>
+  <div class="cue" aria-hidden="true"><svg viewBox="0 0 64 28"><use href="#chevron-down"/></svg><span>Scroll</span></div>
+</section>
+<div class="stage-right">
+
+<!-- ---------------------------- it works. until it doesn't. ------------- -->
+<section class="breaks" id="breaks">
+  <div class="morph" id="morph">
+    <div class="morph-pin">
+      <div class="wrap">
+        <h2 class="h2">It works. Until it doesn't.</h2>
+        <div class="viz policy first" id="policy">
+          <div class="vizgrid">
+            <div class="bars" role="img" aria-label="Two bars of a hundred marks each. Ninety-three lit in the first: companies that save time with AI. Nine lit in the second: companies with any AI policy.">
+              <div class="pair" id="pair">
+                <div class="a">
+                  <b class="fignum" data-count="93">93%</b>
+                  <p>of Costa Rican tech companies save time on repetitive tasks with AI.</p>
+                  <p class="src">PROCOMER, 2025</p>
+                </div>
+                <div class="b">
+                  <b class="fignum" data-count="9">9%</b>
+                  <p>of them have any formal AI policy.</p>
+                  <p class="src">PROCOMER, 2025</p>
+                </div>
+              </div>
+              <figure class="barcol base">
+                <svg id="polA" aria-hidden="true"></svg>
+                <figcaption><b>93%</b><span>Save time with AI</span></figcaption>
+              </figure>
+              <figure class="barcol rules">
+                <svg id="polB" aria-hidden="true"></svg>
+                <figcaption><b>9%</b><span>Have any AI policy</span></figcaption>
+              </figure>
+            </div>
+            <div class="story">
+              <p class="beat-l" data-beat="in">A hundred Costa Rican tech companies.</p>
+              <p class="beat-l" data-beat="lit">Ninety-three of them already save time with AI.</p>
+              <p class="beat-l" data-beat="rules">Nine of them have any rule about it.</p>
+              <p class="aside">The other eighty-four are running on luck. Same companies, same year.</p>
+              <div class="cites">
+                <p class="src">93% save time, 9% have a policy &mdash; PROCOMER, Caracterizaci&oacute;n del Sector TIC, 2025</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------- numbers, cream --------------------------- -->
+<section class="band numbers" id="numbers">
+  <div class="wrap">
+    <div class="viz" id="viz">
+      <h3>Teams taught to use AI get more done.</h3>
+      <span class="rule ruledraw" aria-hidden="true"></span>
+      <p class="lede">The same hundred people, twice. Teach one group to use AI on its own work first, and that group gets up to a third more done.</p>
+
+      <div class="vizgrid">
+        <div class="bars" id="bars" role="img" aria-label="Two bars made of marks. Squares for people working it out alone, spades for people taught first. The spade bar is thirty-four percent taller.">
+          <figure class="barcol base">
+            <svg id="barA" aria-hidden="true"></svg>
+            <figcaption><span>Working it out alone</span></figcaption>
+          </figure>
+          <figure class="barcol taught">
+            <p class="delta" aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#classic-spade"/></svg><span>+34%</span></p>
+            <svg id="barB" aria-hidden="true"></svg>
+            <figcaption><span>Taught first</span></figcaption>
+          </figure>
+        </div>
+        <div class="story">
+          <p class="beat-l" data-beat="in">The same hundred people, twice.</p>
+          <p class="beat-l" data-beat="taught">One group is taught to use AI on its own work first.</p>
+          <p class="beat-l" data-beat="more">That group gets up to a third more done.</p>
+          <p class="aside">And today only <b>47%</b> of people at work were ever taught to use AI at all.</p>
+          <div class="cites">
+            <p class="src">+34% for taught beginners &mdash; Brynjolfsson, Li &amp; Raymond, NBER 31161, 2023</p>
+            <p class="src">47% trained &mdash; KPMG &times; Melbourne Business School, 2025</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- /stage-right -->
+</div><!-- /stage -->
+
+
+<!-- ---------------------------- swipe, felt ------------------------------ -->
+<section class="band swipe" id="swipe">
+  <div class="wrap">
+    <div class="heads" id="heads">
+      <div class="swipehead" id="swipehead">
+        <h2 class="h2">Can AI<br>take this?</h2>
+        <p class="lede">Five things that land on an office desk every week. Swipe right if AI can take it. Left if best not.</p>
+      </div>
+      <div class="deskhead" id="deskhead">
+        <h3>Here's your desk.</h3>
+        <p>Five calls, five catches. None of them wrong. Each one has a detail worth knowing before Monday.</p>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="table" id="table">
+        <div class="pile l" id="pileL">
+          <p class="pile-h">Best not</p>
+        </div>
+        <div class="deck" id="deck" tabindex="0" role="group"
+             aria-label="Five cards. Press the left arrow key for best not, the right arrow key for AI can take it."></div>
+        <div class="pile r" id="pileR">
+          <p class="pile-h">AI can take it</p>
+        </div>
+      </div>
+      <div class="desk" id="desk">
+        <div class="cables" id="cables" aria-hidden="true"></div>
+        <div class="rows" id="rows"></div>
+      </div>
+    </div>
+
+    <div class="btns" id="btns">
+      <button class="btn" id="bLeft" type="button">Best not</button>
+      <button class="btn" id="bRight" type="button">AI can take it</button>
+      <button class="btn quiet" id="bSkip" type="button">Just show me the notes</button>
+    </div>
+    <p class="hint" id="hint" role="status" aria-live="polite"></p>
+
+    <div id="reveal" hidden>
+      <div class="finale rise">
+        <span class="guide l" aria-hidden="true"><svg viewBox="0 0 28 64"><use href="#chevron"/></svg><svg viewBox="0 0 28 64"><use href="#chevron"/></svg><svg viewBox="0 0 28 64"><use href="#chevron"/></svg></span>
+        <article class="fcard">
+          <svg class="pip" viewBox="0 0 100 100" aria-hidden="true"><use href="#classic-heart"/></svg>
+          <span class="ix ixa">6<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#classic-heart"/></svg></span>
+          <div class="top"></div>
+          <div class="cband"><p class="workshopline">Those catches are what we teach in half a day.</p></div>
+          <div class="bot"></div>
+          <span class="ix ixb">6<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#classic-heart"/></svg></span>
+        </article>
+        <span class="guide r" aria-hidden="true"><svg viewBox="0 0 28 64"><use href="#chevron"/></svg><svg viewBox="0 0 28 64"><use href="#chevron"/></svg><svg viewBox="0 0 28 64"><use href="#chevron"/></svg></span>
+      </div>
+      <p class="ctas rise"><a class="cta" href="/workshop/">See the workshop</a>
+        <button class="btn" id="bAgain" type="button">Deal again</button></p>
+    </div>
+  </div>
+</section>
+
+<!-- ---------------------------- why us, cream ---------------------------- -->
+<section class="band why" id="why">
+  <div class="wrap">
+    <h2 class="h2">Why us</h2>
+    <div class="bands">
+      <div class="whyband" data-suit="smooth-spade">
+        <svg class="suit" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor"/></svg>
+        <div>
+          <p class="t">Your real work, not slides.</p>
+          <p class="pf">We open your files, not a template.</p>
+          <span class="rule mid drift" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="whyband" data-suit="smooth-heart">
+        <svg class="suit" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor"/></svg>
+        <div>
+          <p class="t">First in, not catching up.</p>
+          <p class="pf">Daily users, not certified presenters.</p>
+          <span class="rule mid drift" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="whyband" data-suit="smooth-diamond">
+        <svg class="suit" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor"/></svg>
+        <div>
+          <p class="t">The risks, not just the hype.</p>
+          <p class="pf">We make it fail in front of you on purpose.</p>
+          <span class="rule mid drift" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="whyband" data-suit="smooth-club">
+        <svg class="suit" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor"/></svg>
+        <div>
+          <p class="t">Nothing to sell you afterwards.</p>
+          <p class="pf">No licences, no platform, no upsell.</p>
+          <span class="rule mid drift" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+@@CLOSE_HOME@@
+</main>
+
+<!-- ======================================================================= -->
+<!-- ROUTE: /workshop/                                                       -->
+<!-- ======================================================================= -->
+<main class="route" data-route="/workshop/" @@HIDE_WORK@@>
+<section class="work">
+  <div class="wrap work-head">
+    <h2 class="h2">AI without the smoke screen</h2>
+    <p>The main workshop. Half a day, seven moments, your own work on the table.</p>
+  </div>
+  <ol class="moments wrap" id="moments">
+    <div class="spineline" id="spineline" aria-hidden="true"></div>
+    <div class="spineline dotted" id="spinedots" aria-hidden="true"></div>
+    <svg class="spinemark" id="spinemark" viewBox="0 0 64 28" aria-hidden="true"><use href="#chevron-down"/></svg>
+
+    <li class="moment" data-vis="smoke">
+      <div class="spine"></div>
+      <div class="m-body"><h3>The smoke.</h3>
+        <p>What your team has been told AI does. We clear it in ten minutes, using your own examples.</p></div>
+      <div class="m-vis"><svg viewBox="0 0 320 220" aria-hidden="true"></svg></div>
+    </li>
+
+    <li class="moment" data-vis="desk">
+      <div class="spine"></div>
+      <div class="m-body"><h3>Your desk.</h3>
+        <p>Three real tasks from your team's week. Not ours. Yours.</p></div>
+      <div class="m-vis"><svg viewBox="0 0 320 220" aria-hidden="true"></svg></div>
+    </li>
+
+    <li class="moment" data-vis="keys">
+      <div class="spine"></div>
+      <div class="m-body"><h3>Hands on.</h3>
+        <p>Everyone at a keyboard or a phone, with the tools they already have. We bring our own tools for teaching, tailored to your team.</p></div>
+      <div class="m-vis"><svg class="vis-key" viewBox="0 0 320 220" aria-hidden="true">
+        <rect x="14" y="62" width="196" height="118" rx="7" fill="none" stroke="currentColor" stroke-width="3" opacity=".5"/>
+        <rect x="28" y="78" width="26" height="20" rx="3"/><rect x="60" y="78" width="26" height="20" rx="3"/>
+        <rect x="92" y="78" width="26" height="20" rx="3"/><rect x="124" y="78" width="26" height="20" rx="3"/>
+        <rect x="156" y="78" width="40" height="20" rx="3"/>
+        <rect x="28" y="104" width="34" height="20" rx="3"/><rect x="68" y="104" width="26" height="20" rx="3"/>
+        <rect x="100" y="104" width="26" height="20" rx="3"/><rect x="132" y="104" width="26" height="20" rx="3"/>
+        <rect x="164" y="104" width="32" height="20" rx="3"/>
+        <rect x="28" y="130" width="26" height="20" rx="3"/><rect x="60" y="130" width="26" height="20" rx="3"/>
+        <rect x="92" y="130" width="104" height="20" rx="3"/>
+        <rect x="236" y="34" width="66" height="146" rx="10" fill="none" stroke="currentColor" stroke-width="3" opacity=".5"/>
+        <rect x="248" y="52" width="42" height="14" rx="3"/><rect x="248" y="74" width="42" height="14" rx="3"/>
+        <rect x="248" y="96" width="30" height="14" rx="3"/>
+      </svg></div>
+    </li>
+
+    <li class="moment" data-vis="magic">
+      <div class="spine"></div>
+      <div class="m-body"><h3>Teaching magic.</h3>
+        <p>One task, done with AI, in front of everyone.</p></div>
+      <div class="m-vis"><svg viewBox="0 0 320 220" aria-hidden="true"></svg></div>
+    </li>
+
+    <li class="moment" data-vis="break">
+      <div class="spine"></div>
+      <div class="m-body"><h3>Where it breaks.</h3>
+        <p>We make it fail on purpose, so you see it before a client does.</p></div>
+      <div class="m-vis"><svg class="vis-break" viewBox="0 0 320 220" aria-hidden="true">
+        <clipPath id="crackL"><polygon points="0,0 176,0 150,58 178,104 146,150 170,220 0,220"/></clipPath>
+        <clipPath id="crackR"><polygon points="176,0 320,0 320,220 170,220 146,150 178,104 150,58"/></clipPath>
+        <g class="half l" clip-path="url(#crackL)"><g class="host"><path fill="currentColor" opacity=".8"/></g></g>
+        <g class="half r" clip-path="url(#crackR)"><g class="host"><path fill="currentColor" opacity=".8"/></g></g>
+      </svg></div>
+    </li>
+
+    <li class="moment" data-vis="rules">
+      <div class="spine"></div>
+      <div class="m-body"><h3>House rules.</h3>
+        <p>What never leaves the building. Who checks what. Three lines, written together.</p></div>
+      <div class="m-vis vis-rules">
+        <span class="rule mid drift" aria-hidden="true"></span>
+        <span class="rule mid drift" aria-hidden="true"></span>
+        <span class="rule mid drift" aria-hidden="true"></span>
+      </div>
+    </li>
+
+    <li class="moment opt" data-vis="page">
+      <div class="spine"></div>
+      <div class="m-body">
+        <span class="optflag">Optional</span>
+        <h3>Next week.</h3>
+        <p>A one-page plan in your inbox: what to automate first, what to guard, what to ignore. Yours to use, no second session needed.</p></div>
+      <div class="m-vis"><svg class="vis-page" viewBox="0 0 320 220" aria-hidden="true">
+        <rect x="70" y="24" width="180" height="172" rx="4" fill="none" stroke="currentColor" stroke-width="3" opacity=".55"/>
+        <rect class="ln" x="92" y="58" width="136" height="9" fill="currentColor" opacity=".8"/>
+        <rect class="ln" x="92" y="88" width="110" height="9" fill="currentColor" opacity=".55"/>
+        <rect class="ln" x="92" y="118" width="124" height="9" fill="currentColor" opacity=".55"/>
+        <rect class="ln" x="92" y="148" width="78" height="9" fill="#C9A227"/>
+      </svg></div>
+    </li>
+  </ol>
+</section>
+
+@@CLOSE_WORK@@
+</main>
+
+<!-- ======================================================================= -->
+<!-- ROUTE: /learn-more/                                                     -->
+<!-- ======================================================================= -->
+<main class="route" data-route="/learn-more/" @@HIDE_SRC@@>
+<section class="band learn">
+  <div class="wrap">
+    <h2 class="h2 rise">The trick, with receipts.</h2>
+    <p class="lede rise">Four numbers explain why we teach the way we do. Each one links to where it came from. Read them, then bring us your team's week.</p>
+@@SOURCES@@
+    <div class="learn-cta rise">
+      <p class="big">Half a day. Your files. Nothing to buy afterwards.</p>
+      <p class="ctas"><a class="cta" href="#TODO-whatsapp">Talk to us on WhatsApp</a>
+        <a class="btn go dark" href="/workshop/">See the workshop</a></p>
+    </div>
+@@ALSO@@
+  </div>
+</section>
+@@CLOSE_LEARN@@
+</main>
+
+</div><!-- /#main -->
+
+<footer>
+  <div class="wrap">
+    <span class="rule mid drift" aria-hidden="true"></span>
+    <div class="foot">
+      <div>
+        <a class="footbrand" href="/" aria-label="kadabra, home">
+          <svg class="logo" viewBox="0 0 1703.11 435.6" role="img" aria-label="kadabra"
+               width="125" height="32"><use href="#logo-full" width="1703.11" height="435.6"/></svg>
+        </a>
+        <p class="tag">Hands-on AI workshops for teams in Costa Rica.</p>
+      </div>
+      <div>
+        <h3>Site</h3>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/workshop/">The workshop</a></li>
+          <li><a href="/learn-more/">Learn more</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li>WhatsApp <span class="todo">TODO number</span></li>
+          <li>Email <span class="todo">TODO address</span></li>
+          <li>LinkedIn <span class="todo">TODO url</span></li>
+          <li><span class="todo">TODO city</span>, Costa Rica</li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>&copy; 2026 kadabra CR. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

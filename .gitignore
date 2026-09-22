@@ -1,0 +1,8 @@
+node_modules/
+tools/shots/
+.deploy-site/
+.wrangler/
+*.bak
+__pycache__/
+*~lock~
+.DS_Store

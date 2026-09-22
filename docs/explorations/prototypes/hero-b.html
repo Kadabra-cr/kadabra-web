@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>kadabra — hero B (the wand draws the headline)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Titles: Gabarito 900 (brand). Body: Hanken Grotesk — humanist grotesque,
+     tall x-height, open apertures, legible small on dark felt, warm without the
+     roundness of Poppins/Montserrat. Not Inter/Roboto/Open Sans. -->
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800;900&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#1B3A2F;--felt-deep:#12261F;--felt-up:#264C3D;
+  --bone:#F3EFE6;--white:#fff;--carbon:#1C1A17;--red:#8E1424;--gold:#C9A227;
+  --mint:#A8C4B4;--ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--felt-deep);color:var(--white);
+  font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:17px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--gold);color:var(--carbon)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:2px}
+html{scrollbar-color:var(--felt-up) var(--felt-deep);scrollbar-width:thin}
+::-webkit-scrollbar{width:11px}::-webkit-scrollbar-track{background:var(--felt-deep)}
+::-webkit-scrollbar-thumb{background:var(--felt-up)}
+
+.hero{position:relative;min-height:100svh;background:var(--felt);
+  display:grid;grid-template-rows:auto 1fr auto;
+  padding:clamp(22px,3.2vw,44px);padding-bottom:calc(32svh + 8px);overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 8% 0%,rgba(255,255,255,.075),transparent 62%)}
+.hero > *{position:relative;z-index:2}
+
+.mark{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--white)}
+.mark svg{width:18px;height:18px;fill:var(--gold);flex:none}
+.mark span{font-family:Gabarito;font-weight:900;font-size:1.32rem;letter-spacing:-.045em}
+
+.mid{position:relative;display:flex;flex-direction:column;justify-content:center;
+  gap:clamp(22px,3vh,34px);padding:clamp(24px,5vh,70px) 0}
+h1{font-family:Gabarito;font-weight:900;margin:0;color:var(--white);
+  font-size:clamp(2.6rem,8vw,7.2rem);line-height:.92;letter-spacing:-.04em;max-width:11ch;text-wrap:balance;
+  clip-path:inset(0 100% 0 0)}
+h1.shown{clip-path:inset(0 -4% 0 0)}
+
+.sub{color:var(--mint);font-size:clamp(1rem,1.35vw,1.18rem);max-width:46ch;margin:0;
+  opacity:0;transform:translateY(16px);transition:opacity .9s var(--ease) .1s,transform 1s var(--ease) .1s}
+/* the wand lives in this row, so only the button fades in - not the row */
+.cta-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.cta-row .btn{opacity:0;transform:translateY(16px)}
+.lift .sub{opacity:1;transform:none}
+.lift .cta-row .btn{opacity:1;transform:none}
+
+.btn{display:inline-flex;align-items:center;gap:12px;background:var(--red);color:var(--white);
+  font-weight:600;font-size:1.04rem;padding:16px 28px;border-radius:2px;text-decoration:none;
+  /* red on felt is ~1.3:1 as a surface: the rim + shadow carry the edge,
+     white at 9.3:1 carries the label */
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),0 14px 30px -12px rgba(0,0,0,.8);
+  transition:transform 1s var(--ease) .22s,opacity .9s var(--ease) .22s,background .3s var(--ease),box-shadow .55s var(--ease)}
+.btn svg{width:17px;height:17px;fill:currentColor}
+.btn:hover{transform:translateY(-2px);background:#A0182B;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),0 20px 40px -14px rgba(0,0,0,.85)}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips .lab{color:var(--mint);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+.chip{appearance:none;border:1px solid rgba(255,255,255,.26);background:transparent;color:var(--mint);
+  font:inherit;font-size:.9rem;font-weight:500;width:34px;height:34px;border-radius:50%;cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease)}
+.chip:hover{color:var(--white);border-color:rgba(255,255,255,.6);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--white);color:var(--felt);border-color:var(--white)}
+
+/* idle field --------------------------------------------------------- */
+.field{position:absolute;left:0;right:0;bottom:0;height:32%;z-index:1;pointer-events:none;display:grid;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 34%);
+          mask-image:linear-gradient(to bottom,transparent 0%,#000 34%)}
+.cell{position:relative}
+.cell svg{position:absolute;inset:14%;fill:var(--white);opacity:0;transform:scale(.55) rotate(-12deg);
+  transition:opacity 1s var(--ease),transform 1s var(--ease);will-change:transform,opacity}
+.cell svg.on{opacity:.3;transform:scale(1) rotate(0)}
+.cell.red svg.on{fill:#C4374A;opacity:.3}
+
+/* the drawing wand --------------------------------------------------- */
+/* The wand lives in the CTA row: that is its resting place, so the rest state
+   needs no measurement. The sweep is animated as an offset from it. Origin is
+   the wand's tip, so scaling during the sweep does not move the tip. */
+.wand{flex:none;width:96px;height:96px;z-index:4;pointer-events:none;opacity:0;
+  transform-origin:77.5% 20.8%;filter:drop-shadow(0 8px 18px rgba(0,0,0,.55))}
+.wand .rod{fill:var(--bone)}
+.wand .ferrule{fill:var(--gold)}
+.wand .tipspark{fill:var(--white)}
+.wand .tipspark.beat{animation:beat 620ms var(--ease) infinite alternate}
+@keyframes beat{from{opacity:.55}to{opacity:1}}
+
+@media(max-width:760px){.field{height:30%}
+  .hero{padding-bottom:calc(30svh + 8px)}.wand{width:74px;height:74px}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
+  h1{clip-path:none}.sub,.cta-row .btn{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SET A "sharp" suits in the field: at 30–60 px the straight cuts hold their
+     silhouette and share a vocabulary with the square and diamond the cells morph
+     through. The classic set goes mushy at that size and starts reading as a deck. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="sq" viewBox="0 0 100 100"><path d="M14 14 H86 V86 H14 Z"/></symbol>
+  <symbol id="dia" viewBox="0 0 100 100"><path d="M50 4 L84 50 L50 96 L16 50 Z"/></symbol>
+  <symbol id="spade" viewBox="0 0 100 100"><path fill-rule="evenodd" d="M50 6 L14 46 L14 62 L30 70 L44 62 L44 66 L32 90 L68 90 L56 66 L56 62 L70 70 L86 62 L86 46 Z M34 40 L46 51 L34 62 L27 57.5 L33.5 51 L27 44.5 Z"/></symbol>
+  <symbol id="heart" viewBox="0 0 100 100"><path fill-rule="evenodd" d="M50 91 L12 46 L12 30 L26 17 L40 17 L50 29 L60 17 L74 17 L88 30 L88 46 Z M38 42 L50 53 L38 64 L31 59.5 L37.5 53 L31 46.5 Z"/></symbol>
+  <symbol id="club" viewBox="0 0 100 100"><path d="M50 9 L67 19 L67 33 L50 43 L33 33 L33 19 Z M27 35 L44 45 L44 59 L27 69 L10 59 L10 45 Z M73 35 L90 45 L90 59 L73 69 L56 59 L56 45 Z M44 30 L56 30 L63 90 L37 90 Z M44 18 L38 21.4 L43.5 26 L38 30.6 L44 34 L54 26 Z"/></symbol>
+  <symbol id="sparkle" viewBox="0 0 100 100"><path d="M50 2 C54 30 70 46 98 50 C70 54 54 70 50 98 C46 70 30 54 2 50 C30 46 46 30 50 2 Z"/></symbol>
+</defs></svg>
+
+<main class="hero" id="hero">
+  <a class="mark" href="#top"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#sparkle"/></svg><span>kadabra</span></a>
+
+  <div class="mid" id="mid">
+    <h1 id="headline">The trick is teaching, not tools.</h1>
+    <p class="sub">Half-day, hands-on AI workshops for teams in Costa Rica. Your real work, your tools, nothing to buy afterwards.</p>
+    <div class="cta-row">
+      <a class="btn" id="cta" href="#TODO-whatsapp"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#spade"/></svg>Talk to us on WhatsApp</a>
+      <svg class="wand" id="wand" viewBox="0 0 120 120" aria-hidden="true">
+        <path class="rod" d="M15 99 L93 25 L95 27 L21 105 Z"/>
+        <path class="ferrule" d="M28.2 84.8 L34.3 78.7 L41.3 85.7 L35.2 91.8 Z"/>
+        <g class="tipspark beat" id="tipspark" transform="translate(76 0) scale(.34)"><use href="#sparkle" width="100" height="100"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="chips" role="group" aria-label="Headline candidates">
+    <span class="lab">Headline</span>
+    <button class="chip" type="button" aria-pressed="true">1</button>
+    <button class="chip" type="button" aria-pressed="false">2</button>
+    <button class="chip" type="button" aria-pressed="false">3</button>
+    <button class="chip" type="button" aria-pressed="false">4</button>
+    <button class="chip" type="button" aria-pressed="false">5</button>
+  </div>
+
+  <div class="field" id="field" aria-hidden="true"></div>
+</main>
+
+<script>
+const HEADLINES=[
+  "The trick is teaching, not tools.",
+  "Nothing up our sleeves. Just your work, done faster.",
+  "Your team already holds the wand. We teach the trick.",
+  "Less magic show. More magic.",
+  "Learn the trick behind the trick."
+];
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const h1=document.getElementById('headline'),mid=document.getElementById('mid'),
+      wand=document.getElementById('wand'),cta=document.getElementById('cta'),
+      spark=document.getElementById('tipspark');
+
+/* the wand stroke: it glides left to right, the headline is revealed behind
+   its tip with a clip-path, then it settles as a static mark by the CTA ---- */
+const DRAW=1450, SETTLE=950, REST='translate(0px,0px) rotate(-13deg) scale(1)';
+function draw(){
+  wand.getAnimations().forEach(a=>a.cancel());
+  h1.getAnimations().forEach(a=>a.cancel());
+  wand.style.transform=REST;
+  wand.style.opacity=1;
+
+  if(REDUCED){h1.classList.add('shown');mid.classList.add('lift');spark.classList.remove('beat');return;}
+
+  h1.classList.remove('shown');
+  mid.classList.remove('lift');
+  spark.classList.add('beat');
+
+  /* where the tip is at rest, and where it has to be for the sweep */
+  const w=wand.getBoundingClientRect(), hb=h1.getBoundingClientRect();
+  const tipX=w.left+w.width*0.775, tipY=w.top+w.height*0.208;
+  const lineY=hb.top+hb.height*0.5;
+  const dx0=hb.left-46-tipX, dx1=hb.right+34-tipX;
+  const dy0=lineY+22-tipY,   dy1=lineY-tipY;
+
+  const travel=wand.animate([
+    {transform:`translate(${dx0}px,${dy0}px) rotate(-5deg) scale(1.6)`},
+    {transform:`translate(${dx1}px,${dy1}px) rotate(0deg) scale(1.6)`}
+  ],{duration:DRAW,easing:'cubic-bezier(.42,0,.16,1)',fill:'forwards'});
+
+  /* the reveal edge tracks the tip: same duration, same curve */
+  h1.animate([{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 -4% 0 0)'}],
+    {duration:DRAW,easing:'cubic-bezier(.42,0,.16,1)',fill:'forwards'});
+
+  travel.finished.then(()=>{
+    h1.classList.add('shown');
+    mid.classList.add('lift');
+    spark.classList.remove('beat');
+    wand.animate([
+      {transform:`translate(${dx1}px,${dy1}px) rotate(0deg) scale(1.6)`},
+      {transform:REST}
+    ],{duration:SETTLE,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
+  }).catch(()=>{});
+}
+
+document.fonts.ready.then(()=>requestAnimationFrame(draw));
+addEventListener('resize',()=>{clearTimeout(window._hz);window._hz=setTimeout(draw,260)});
+
+document.querySelectorAll('.chip').forEach((b,i)=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(o=>o.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+  h1.getAnimations().forEach(a=>a.cancel());
+  h1.textContent=HEADLINES[i];
+  draw();
+}));
+
+/* idle field ---------------------------------------------------------- */
+const SHAPES=['sq','dia','spade','heart','club'];
+const field=document.getElementById('field');
+let cells=[],cols=0,rows=0;
+function build(){
+  const w=field.clientWidth,h=field.clientHeight;
+  const target=w<680?46:Math.min(74,Math.max(52,w/22));
+  cols=Math.max(6,Math.round(w/target));rows=Math.max(3,Math.round(h/target));
+  field.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  field.style.gridTemplateRows=`repeat(${rows},1fr)`;
+  field.innerHTML='';cells=[];
+  const frag=document.createDocumentFragment();
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const d=document.createElement('div');d.className='cell';
+    if((c*7+r*11)%13===0)d.classList.add('red');
+    d.innerHTML=SHAPES.map(s=>`<svg viewBox="0 0 100 100"><use href="#${s}"/></svg>`).join('');
+    const start=(c+r*2)%SHAPES.length;d.children[start].classList.add('on');
+    frag.appendChild(d);cells.push({layers:[...d.children],i:start,c,r});
+  }
+  field.appendChild(frag);
+}
+build();
+addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(build,220)});
+
+if(!REDUCED){
+  const TAU=Math.PI*2,P1=7300,P2=11900;   /* non-harmonic: never visibly repeats */
+  setInterval(()=>{
+    const t=performance.now();
+    for(const k of cells){
+      const v=Math.sin((t/P1+k.c*.21+k.r*.47)*TAU)+Math.sin((t/P2+k.c*.53-k.r*.19)*TAU);
+      const idx=Math.min(4,Math.max(0,Math.floor((v+2)/4*5)));
+      if(idx!==k.i){k.layers[k.i].classList.remove('on');k.i=idx;k.layers[idx].classList.add('on')}
+    }
+  },170);
+}
+</script>
+</body>
+</html>

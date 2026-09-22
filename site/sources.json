@@ -1,0 +1,126 @@
+{
+  "shown": [
+    {
+      "claim": "93% of Costa Rican tech companies save time on repetitive tasks with AI.",
+      "figure": "93%",
+      "source": "PROCOMER 2025 Caracterización del Sector TIC, via El Financiero",
+      "year": "2025",
+      "url": "https://www.elfinancierocr.com/tecnologia/la-industria-tic-de-costa-rica-se-reinventa/TLIKQRXLNZAEFJ42SZG42LZY4I/story/",
+      "note": "data.md figure matches exactly (93%). Reported via El Financiero's coverage of the Procomer study, not a direct Procomer publication link; CR scope."
+    },
+    {
+      "claim": "Only 9% have a formal AI policy.",
+      "figure": "9%",
+      "source": "PROCOMER 2025 Caracterización del Sector TIC's Costa Rica",
+      "year": "2025",
+      "url": "https://procomer.com/cr-consolida-sector-tic-exportador-con-adopcion-masiva-de-inteligencia-artificial-y-vocacion-global/",
+      "note": "9% have formal AI governance policies (data.md also notes 12% have dedicated AI/ML teams, not used here). CR-specific; adoption (76%) far outpaces governance."
+    },
+    {
+      "claim": "47% of employees have ever received any AI training.",
+      "figure": "47%",
+      "source": "KPMG x Melbourne Business School, Trust, attitudes and use of AI: A global study 2025",
+      "year": "2025",
+      "url": "https://kpmg.com/xx/en/media/press-releases/2025/04/trust-of-ai-remains-a-critical-challenge.html",
+      "note": "47% received AI training (data.md also notes 40% have a workplace gen-AI policy, not used here). Global, 48,000+ people across 47 countries, fieldwork Nov 2024-Jan 2025."
+    },
+    {
+      "claim": "Beginners who are taught get up to 34% more done.",
+      "figure": "34%",
+      "source": "Brynjolfsson, Li & Raymond, NBER Working Paper 31161, Generative AI at Work",
+      "year": "2023",
+      "url": "https://www.nber.org/papers/w31161",
+      "note": "+34% productivity gain for novice/low-skilled customer-support agents using an AI assistant (vs ~0% for experts, +14% avg overall). Global/US; single Fortune 500 software firm, 5,179 agents."
+    }
+  ],
+  "alsoRead": [
+    {
+      "claim": "CR tech/TIC companies already use generative AI tools or digital agents in operations",
+      "figure": "76% of companies",
+      "source": "PROCOMER, Caracterización del Sector TIC's Costa Rica 2025 (86 companies)",
+      "year": "2025",
+      "url": "https://procomer.com/cr-consolida-sector-tic-exportador-con-adopcion-masiva-de-inteligencia-artificial-y-vocacion-global/",
+      "note": "Headline CR adoption stat; small sample (86 companies) but a real local dataset."
+    },
+    {
+      "claim": "CR TIC firms cut product development cycle time with AI",
+      "figure": "70% reduction in dev cycles; 3-5 day reduction per functionality",
+      "source": "El Financiero / Procomer study",
+      "year": "2026",
+      "url": "https://www.elfinancierocr.com/tecnologia/la-industria-tic-de-costa-rica-se-reinventa/TLIKQRXLNZAEFJ42SZG42LZY4I/story/",
+      "note": "Concrete CR efficiency figure; 2026 article covering 2025 Procomer data."
+    },
+    {
+      "claim": "CR ranks as Latin America's leader in AI human-talent/skills",
+      "figure": "#1 in region (5th overall in ILIA composite)",
+      "source": "La Nación, citing ILIA 2025",
+      "year": "2026",
+      "url": "https://www.nacion.com/economia/ia-en-costa-rica-sectores-de-servicios-los-mas/XK5OMMRY75HCBDFNX2EV3VDUC4/story/",
+      "note": "Regional differentiator to lead with; not an adoption/usage stat."
+    },
+    {
+      "claim": "CR jobs theoretically exposed to large-language-model automation",
+      "figure": "19.2% of total CR employment exposed (2023 analysis)",
+      "source": "La Nación, citing MICITT/Anthropic/OpenAI GDPval/OECD/IDB/WEF/McKinsey analyses",
+      "year": "2026-04-08",
+      "url": "https://www.nacion.com/economia/ia-en-costa-rica-sectores-de-servicios-los-mas/XK5OMMRY75HCBDFNX2EV3VDUC4/story/",
+      "note": "Belief-vs-evidence material; 53% of exposed jobs are high-skilled, 0% low-skilled."
+    },
+    {
+      "claim": "Gap between AI's theoretical task coverage and its practical use in knowledge work",
+      "figure": "AI could do 94% of knowledge-work tasks in theory, but is practically used for only 33%",
+      "source": "La Nación, citing same CR analysis",
+      "year": "2026",
+      "url": "https://www.nacion.com/economia/ia-en-costa-rica-sectores-de-servicios-los-mas/XK5OMMRY75HCBDFNX2EV3VDUC4/story/",
+      "note": "Strong 'task not whole job' puzzle fact; CR/global."
+    },
+    {
+      "claim": "Organizations regularly using AI in at least one business function",
+      "figure": "88% (up from 78% in 2024, 55% in 2023)",
+      "source": "McKinsey, The state of AI in 2025",
+      "year": "2025",
+      "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
+      "note": "Global adoption headline; contrast with McKinsey's own 5.5% real-ROI figure elsewhere in data.md."
+    },
+    {
+      "claim": "Most enterprise generative AI pilots fail to show P&L impact",
+      "figure": "95% of pilots deliver no measurable financial return; only 5% extract real value",
+      "source": "MIT Project NANDA, The GenAI Divide: State of AI in Business 2025",
+      "year": "2025-08",
+      "url": "https://www.forbes.com/sites/jasonsnyder/2025/08/26/mit-finds-95-of-genai-pilots-fail-because-companies-avoid-friction/",
+      "note": "Core failure-mode-3 stat; 52 exec interviews, 153 leader survey, 300 deployments. Global."
+    },
+    {
+      "claim": "Global belief that AI will shrink the job market",
+      "figure": "46% median across 37 countries say AI will mean fewer jobs; only 9% say more jobs",
+      "source": "Pew Research Center, 37-country global survey",
+      "year": "2026-09-17",
+      "url": "https://www.pewresearch.org/global/2026/09/17/globally-more-people-expect-ai-to-cause-job-loss-than-growth/",
+      "note": "Belief-vs-evidence anchor stat; global."
+    },
+    {
+      "claim": "Employees \"bring their own AI\" to work, bypassing company tools/oversight",
+      "figure": "78% of AI users use personal AI tools at work (BYOAI); 80% at SMBs",
+      "source": "Microsoft/LinkedIn 2024 Work Trend Index",
+      "year": "2024-05-08",
+      "url": "https://news.microsoft.com/source/2024/05/08/microsoft-and-linkedin-release-the-2024-work-trend-index-on-the-state-of-ai-at-work/",
+      "note": "Shadow-AI/failure-mode-4 evidence; global survey."
+    },
+    {
+      "claim": "Orgs report using AI in at least one function, per Stanford AI Index",
+      "figure": "78% (up from 55% one year earlier)",
+      "source": "Stanford HAI, 2025 AI Index Report, Economy chapter",
+      "year": "2025",
+      "url": "https://hai.stanford.edu/ai-index/2025-ai-index-report/economy",
+      "note": "Independent confirmation of McKinsey adoption trend; global."
+    },
+    {
+      "claim": "Knowledge workers using GPT-4 on \"inside the frontier\" tasks did more, faster, better work",
+      "figure": "+12.2% tasks completed, 25.1% faster, 40% higher quality",
+      "source": "Harvard Business School + BCG, Navigating the Jagged Technological Frontier",
+      "year": "2023-09-22",
+      "url": "https://www.thecrimson.com/article/2023/10/13/jagged-edge-ai-bcg/",
+      "note": "Strong quality/speed uplift stat, paired with caveat elsewhere in data.md: -19% accuracy on tasks outside AI's competence. Global; 758 BCG consultants."
+    }
+  ]
+}

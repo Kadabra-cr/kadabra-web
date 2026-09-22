@@ -1,0 +1,18 @@
+import { chromium } from 'playwright';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const b = await chromium.launch(); const errs = [];
+const m = await (await b.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+m.on('pageerror', e => errs.push('phone: ' + e.message));
+await m.goto('http://127.0.0.1:4173/', { waitUntil: 'load' }); await sleep(900);
+console.log('phone staged?', await m.evaluate(() => document.documentElement.className));
+await m.evaluate(() => document.getElementById('breaks').scrollIntoView()); await sleep(2200);
+await m.screenshot({ path: 'shots/r10/p-phone-breaks.png' });
+await m.evaluate(() => document.getElementById('halfday-home').scrollIntoView()); await sleep(1200);
+await m.screenshot({ path: 'shots/r10/p-phone-half.png' });
+const l = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+l.on('pageerror', e => errs.push('learn: ' + e.message));
+await l.goto('http://127.0.0.1:4173/learn-more/', { waitUntil: 'load' }); await sleep(900);
+await l.evaluate(() => document.getElementById('halfday-learn').scrollIntoView({ block: 'center' })); await sleep(1200);
+await l.screenshot({ path: 'shots/r10/q-learn-half.png' });
+console.log('learn-more has split stage?', await l.evaluate(() => !!document.querySelector('.route:not([hidden]) .split')));
+console.log('errors', errs); await b.close();

@@ -1,0 +1,27 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const p = await b.newPage({viewport:{width:1440,height:900}});
+const errs=[]; p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+const sw = await p.$('#swipe'); await sw.scrollIntoViewIfNeeded(); await p.evaluate(()=>scrollBy(0,-40)); await p.waitForTimeout(1200);
+let n=0; const shot=async(tag)=>{await p.screenshot({path:`shots/f${String(n++).padStart(2,'0')}-${tag}.png`});};
+await shot('start');
+await p.click('#bRight'); await p.waitForTimeout(250); await shot('fly1'); await p.waitForTimeout(600); await shot('landed1');
+await p.click('#bLeft'); await p.waitForTimeout(700);
+await p.click('#bRight'); await p.waitForTimeout(700);
+await p.click('#bLeft'); await p.waitForTimeout(700); await shot('four');
+await p.click('#bRight'); await p.waitForTimeout(700); await shot('five-landed');
+await p.waitForTimeout(900); await shot('pause');  // ~1.6s after 5th: finish just fired
+await p.waitForTimeout(500); await shot('flip-mid');
+await p.waitForTimeout(700); await shot('flip-end');
+await p.waitForTimeout(1600); await shot('ropes');
+const bb = await (await p.$('.desk')).boundingBox();
+await p.mouse.move(bb.x+bb.width*0.46, bb.y+bb.height*0.35); await p.waitForTimeout(400); await shot('hover-rope');
+await p.click('#bAgain'); await p.waitForTimeout(400); await shot('again-mid'); await p.waitForTimeout(1200); await shot('again-end');
+await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+const v = await p.$('#viz'); await v.scrollIntoViewIfNeeded(); await p.waitForTimeout(600); await shot('viz-b1'); await p.waitForTimeout(1500); await shot('viz-b2'); await p.waitForTimeout(2200); await shot('viz-b3');
+const w = await p.$('.whyband'); await w.scrollIntoViewIfNeeded(); await p.waitForTimeout(1400); const hb=await w.boundingBox(); await p.mouse.move(hb.x+60,hb.y+hb.height/2); await p.waitForTimeout(900); await shot('why-hover');
+await p.goto('http://127.0.0.1:4173/workshop/',{waitUntil:'networkidle'}); await p.evaluate(()=>scrollTo(0,900)); await p.waitForTimeout(700); await shot('work-1');
+await p.evaluate(()=>scrollTo(0,document.body.scrollHeight-1900)); await p.waitForTimeout(700); await shot('work-end');
+await p.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'}); await p.waitForTimeout(2200); await p.mouse.move(300,300); await p.waitForTimeout(700); await shot('hero-anchor');
+const c = await p.$('.close'); await c.scrollIntoViewIfNeeded(); await p.waitForTimeout(1500); await shot('close');
+console.log('errors', errs); await b.close();

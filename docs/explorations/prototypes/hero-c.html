@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>kadabra — hero C (the wand as the image)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Titles: Gabarito 900 (brand). Body: Hanken Grotesk — humanist grotesque,
+     tall x-height, open apertures, legible small on dark felt, warm without the
+     roundness of Poppins/Montserrat. Not Inter/Roboto/Open Sans. -->
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800;900&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --felt:#1B3A2F;--felt-deep:#12261F;--felt-up:#264C3D;
+  --bone:#F3EFE6;--white:#fff;--carbon:#1C1A17;--red:#8E1424;--gold:#C9A227;
+  --mint:#A8C4B4;--ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--felt-deep);color:var(--white);
+  font-family:"Hanken Grotesk",system-ui,sans-serif;font-size:17px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--gold);color:var(--carbon)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:2px}
+html{scrollbar-color:var(--felt-up) var(--felt-deep);scrollbar-width:thin}
+::-webkit-scrollbar{width:11px}::-webkit-scrollbar-track{background:var(--felt-deep)}
+::-webkit-scrollbar-thumb{background:var(--felt-up)}
+
+.hero{position:relative;min-height:100svh;background:var(--felt);
+  display:grid;grid-template-rows:auto 1fr auto;
+  padding:clamp(22px,3.2vw,44px);padding-bottom:calc(32svh + 8px);overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(110% 90% at 78% 6%,rgba(255,255,255,.085),transparent 58%)}
+.hero > *{position:relative;z-index:2}
+
+.mark{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--white)}
+.mark svg{width:18px;height:18px;fill:var(--gold);flex:none}
+.mark span{font-family:Gabarito;font-weight:900;font-size:1.32rem;letter-spacing:-.045em}
+
+/* headline column + the wand as the single image ---------------------- */
+.mid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(220px,.62fr);
+  gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(24px,4vh,56px) 0}
+.copy{display:flex;flex-direction:column;gap:clamp(20px,2.8vh,32px)}
+h1{font-family:Gabarito;font-weight:900;margin:0;color:var(--white);
+  font-size:clamp(2.6rem,8vw,7.2rem);line-height:.92;letter-spacing:-.04em;max-width:11ch;text-wrap:balance}
+h1 .w{display:inline-block;overflow:hidden;vertical-align:top}
+h1 .w i{display:inline-block;font-style:normal;transform:translateY(110%);opacity:0}
+h1.in .w i{transform:translateY(0);opacity:1;
+  transition:transform 1.15s var(--ease),opacity .7s var(--ease)}
+
+.sub{color:var(--mint);font-size:clamp(1rem,1.35vw,1.18rem);max-width:46ch;margin:0}
+.btn{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;
+  background:var(--red);color:var(--white);font-weight:600;font-size:1.04rem;
+  padding:16px 28px;border-radius:2px;text-decoration:none;
+  /* red on felt is ~1.3:1 as a surface: rim + shadow carry the edge,
+     white at 9.3:1 carries the label */
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3),0 14px 30px -12px rgba(0,0,0,.8);
+  transition:transform .55s var(--ease),background .3s var(--ease),box-shadow .55s var(--ease)}
+.btn svg{width:17px;height:17px;fill:currentColor}
+.btn:hover{transform:translateY(-2px);background:#A0182B;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.45),0 20px 40px -14px rgba(0,0,0,.85)}
+
+.art{display:grid;place-items:center}
+.wand{width:min(100%,330px);height:auto;max-height:66svh;
+  filter:drop-shadow(0 26px 46px rgba(0,0,0,.55))}
+.wand .rod{fill:var(--bone)}
+.wand .band{fill:var(--gold)}
+.wand .spark{fill:var(--white)}
+.wand .ray{stroke:var(--gold);stroke-width:1.6;opacity:.42}
+/* subtle idle: the three sparkles breathe on different, non-matching periods */
+.wand .spark{transform-box:fill-box;transform-origin:center}
+.wand .s1{animation:idle1 4.6s var(--ease) infinite alternate}
+.wand .s2{animation:idle2 6.7s var(--ease) infinite alternate}
+.wand .s3{animation:idle3 5.3s var(--ease) infinite alternate}
+@keyframes idle1{from{opacity:.82;transform:scale(.94) rotate(0)}to{opacity:1;transform:scale(1.05) rotate(9deg)}}
+@keyframes idle2{from{opacity:.35;transform:scale(.7)}to{opacity:.95;transform:scale(1.08)}}
+@keyframes idle3{from{opacity:.9;transform:scale(1.04)}to{opacity:.3;transform:scale(.72)}}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips .lab{color:var(--mint);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin-right:6px}
+.chip{appearance:none;border:1px solid rgba(255,255,255,.26);background:transparent;color:var(--mint);
+  font:inherit;font-size:.9rem;font-weight:500;width:34px;height:34px;border-radius:50%;cursor:pointer;
+  font-variant-numeric:tabular-nums;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease)}
+.chip:hover{color:var(--white);border-color:rgba(255,255,255,.6);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--white);color:var(--felt);border-color:var(--white)}
+
+/* idle field --------------------------------------------------------- */
+.field{position:absolute;left:0;right:0;bottom:0;height:32%;z-index:1;pointer-events:none;display:grid;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 34%);
+          mask-image:linear-gradient(to bottom,transparent 0%,#000 34%)}
+.cell{position:relative}
+.cell svg{position:absolute;inset:14%;fill:var(--white);opacity:0;transform:scale(.55) rotate(-12deg);
+  transition:opacity 1s var(--ease),transform 1s var(--ease);will-change:transform,opacity}
+.cell svg.on{opacity:.3;transform:scale(1) rotate(0)}
+.cell.red svg.on{fill:#C4374A;opacity:.3}
+
+@media(max-width:820px){
+  .mid{grid-template-columns:1fr;gap:clamp(18px,3vh,30px)}
+  .art{order:-1;justify-items:end;width:100%}
+  .wand{width:min(42vw,190px);max-height:34svh;margin-left:auto}
+  .field{height:28%}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation:none!important}
+  h1 .w i{transform:none;opacity:1}
+}
+</style>
+</head>
+<body>
+
+<!-- SET A "sharp" suits in the field: at 30–60 px the straight cuts hold their
+     silhouette and share a vocabulary with the square and diamond the cells morph
+     through. The classic set goes mushy at that size and reads as a deck of cards. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="sq" viewBox="0 0 100 100"><path d="M14 14 H86 V86 H14 Z"/></symbol>
+  <symbol id="dia" viewBox="0 0 100 100"><path d="M50 4 L84 50 L50 96 L16 50 Z"/></symbol>
+  <symbol id="spade" viewBox="0 0 100 100"><path fill-rule="evenodd" d="M50 6 L14 46 L14 62 L30 70 L44 62 L44 66 L32 90 L68 90 L56 66 L56 62 L70 70 L86 62 L86 46 Z M34 40 L46 51 L34 62 L27 57.5 L33.5 51 L27 44.5 Z"/></symbol>
+  <symbol id="heart" viewBox="0 0 100 100"><path fill-rule="evenodd" d="M50 91 L12 46 L12 30 L26 17 L40 17 L50 29 L60 17 L74 17 L88 30 L88 46 Z M38 42 L50 53 L38 64 L31 59.5 L37.5 53 L31 46.5 Z"/></symbol>
+  <symbol id="club" viewBox="0 0 100 100"><path d="M50 9 L67 19 L67 33 L50 43 L33 33 L33 19 Z M27 35 L44 45 L44 59 L27 69 L10 59 L10 45 Z M73 35 L90 45 L90 59 L73 69 L56 59 L56 45 Z M44 30 L56 30 L63 90 L37 90 Z M44 18 L38 21.4 L43.5 26 L38 30.6 L44 34 L54 26 Z"/></symbol>
+  <symbol id="sparkle" viewBox="0 0 100 100"><path d="M50 2 C54 30 70 46 98 50 C70 54 54 70 50 98 C46 70 30 54 2 50 C30 46 46 30 50 2 Z"/></symbol>
+</defs></svg>
+
+<main class="hero">
+  <a class="mark" href="#top"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#sparkle"/></svg><span>kadabra</span></a>
+
+  <div class="mid">
+    <div class="copy">
+      <h1 id="headline"></h1>
+      <p class="sub">Half-day, hands-on AI workshops for teams in Costa Rica. Your real work, your tools, nothing to buy afterwards.</p>
+      <a class="btn" href="#TODO-whatsapp"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#spade"/></svg>Talk to us on WhatsApp</a>
+    </div>
+
+    <div class="art">
+      <!-- The wand, drawn straight: one tapered bone shaft, a turned butt cap and
+           two gold bands, a four-point sparkle at the tip and two smaller ones.
+           Straight edges only, no curl, no stars-and-moon costume. -->
+      <svg class="wand" viewBox="0 0 200 460" role="img" aria-label="A magic wand">
+        <path class="rod"  d="M51.2 427.9 L137.1 89.3 L142.9 90.7 L68.8 432.1 Z"/>
+        <path class="band" d="M49.8 427.6 L54.2 408.9 L74.6 413.7 L70.2 432.4 Z"/>
+        <path class="band" d="M66.3 359.7 L69.9 344.4 L89.3 349.0 L85.7 364.3 Z"/>
+        <path class="band" d="M72.6 336.1 L73.8 331.0 L91.9 335.2 L90.7 340.3 Z"/>
+
+        <g class="ray" stroke-linecap="round">
+          <line x1="156" y1="62" x2="172" y2="36"/>
+          <line x1="172" y1="92" x2="198" y2="84"/>
+          <line x1="124" y1="60" x2="112" y2="34"/>
+        </g>
+
+        <g class="spark s1"><use href="#sparkle" x="101" y="51" width="78" height="78"/></g>
+        <g class="spark s2"><use href="#sparkle" x="157" y="31" width="30" height="30"/></g>
+        <g class="spark s3"><use href="#sparkle" x="106" y="30" width="20" height="20"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="chips" role="group" aria-label="Headline candidates">
+    <span class="lab">Headline</span>
+    <button class="chip" type="button" aria-pressed="true">1</button>
+    <button class="chip" type="button" aria-pressed="false">2</button>
+    <button class="chip" type="button" aria-pressed="false">3</button>
+    <button class="chip" type="button" aria-pressed="false">4</button>
+    <button class="chip" type="button" aria-pressed="false">5</button>
+  </div>
+
+  <div class="field" id="field" aria-hidden="true"></div>
+</main>
+
+<script>
+const HEADLINES=[
+  "The trick is teaching, not tools.",
+  "Nothing up our sleeves. Just your work, done faster.",
+  "Your team already holds the wand. We teach the trick.",
+  "Less magic show. More magic.",
+  "Learn the trick behind the trick."
+];
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const h1=document.getElementById('headline');
+
+function setHeadline(text){
+  h1.classList.remove('in');
+  h1.innerHTML=text.split(' ').map(w=>`<span class="w"><i>${w}</i></span>`).join(' ');
+  [...h1.querySelectorAll('i')].forEach((el,i)=>{
+    el.style.transitionDelay=(i*0.062+Math.random()*0.075).toFixed(3)+'s';
+  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>h1.classList.add('in')));
+}
+setHeadline(HEADLINES[0]);
+document.querySelectorAll('.chip').forEach((b,i)=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(o=>o.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+  setHeadline(HEADLINES[i]);
+}));
+
+/* idle field ---------------------------------------------------------- */
+const SHAPES=['sq','dia','spade','heart','club'];
+const field=document.getElementById('field');
+let cells=[],cols=0,rows=0;
+function build(){
+  const w=field.clientWidth,h=field.clientHeight;
+  const target=w<680?46:Math.min(74,Math.max(52,w/22));
+  cols=Math.max(6,Math.round(w/target));rows=Math.max(3,Math.round(h/target));
+  field.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  field.style.gridTemplateRows=`repeat(${rows},1fr)`;
+  field.innerHTML='';cells=[];
+  const frag=document.createDocumentFragment();
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const d=document.createElement('div');d.className='cell';
+    if((c*7+r*11)%13===0)d.classList.add('red');
+    d.innerHTML=SHAPES.map(s=>`<svg viewBox="0 0 100 100"><use href="#${s}"/></svg>`).join('');
+    const start=(c+r*2)%SHAPES.length;d.children[start].classList.add('on');
+    frag.appendChild(d);cells.push({layers:[...d.children],i:start,c,r});
+  }
+  field.appendChild(frag);
+}
+build();
+addEventListener('resize',()=>{clearTimeout(window._rz);window._rz=setTimeout(build,220)});
+
+if(!REDUCED){
+  const TAU=Math.PI*2,P1=7300,P2=11900;   /* non-harmonic: never visibly repeats */
+  setInterval(()=>{
+    const t=performance.now();
+    for(const k of cells){
+      const v=Math.sin((t/P1+k.c*.21+k.r*.47)*TAU)+Math.sin((t/P2+k.c*.53-k.r*.19)*TAU);
+      const idx=Math.min(4,Math.max(0,Math.floor((v+2)/4*5)));
+      if(idx!==k.i){k.layers[k.i].classList.remove('on');k.i=idx;k.layers[idx].classList.add('on')}
+    }
+  },170);
+}
+</script>
+</body>
+</html>

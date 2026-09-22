@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const b = await chromium.launch(); const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+await p.goto('http://127.0.0.1:4173/', { waitUntil: 'load' }); await sleep(800);
+await p.evaluate(() => document.getElementById('swipe').scrollIntoView()); await sleep(1200);
+await p.click('#bSkip'); await sleep(6000);
+await p.evaluate(() => document.getElementById('reveal').scrollIntoView({ block: 'center' })); await sleep(2200);
+console.log(await p.evaluate(() => { const f = document.querySelector('.fcard').getBoundingClientRect(), g = document.querySelector('.finale .guide svg').getBoundingClientRect(); const rows = [...document.querySelectorAll('#rows .row')]; const last = rows[rows.length - 1].getBoundingClientRect();
+  return { fcard: [Math.round(f.width), Math.round(f.height)], guide: [Math.round(g.width), Math.round(g.height)], gapFromLastRow: Math.round(f.top - last.bottom) }; }));
+await p.screenshot({ path: 'shots/r9/finale.png' });
+await b.close();
