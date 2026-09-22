@@ -16,17 +16,17 @@ cta.book: Reservar medio día
 
 ## Portada
 
-hero.h1: El truco está en enseñar, no en la herramienta.
-hero.sub: Talleres de IA de medio día, prácticos, para equipos en Costa Rica. Con el trabajo real de ustedes, con las herramientas que ya usan y sin nada que comprar después.
+hero.h1: El truco no es la herramienta, es saber usarla.
+hero.sub: Talleres de IA de medio día, interactivos, para equipos ticos. Con las herramientas que usan, sin vender humo.
 hero.btn: Ver el taller
-hero.fine: Abre un chat de WhatsApp. Sin formularios y sin nada que comprar.
+hero.fine: Mandarnos un mensaje es gratis, con todo gusto los atendemos.
 hero.cue: Bajar
 hero.dead.h1: Por su cuenta, tarde o temprano se paga.
-hero.dead.sub: La fuga, el dato inventado, el mensaje que nadie vio venir: no es si pasa, es cuándo. Medio día con nosotros y su equipo los ve venir.
+hero.dead.sub: La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es que vaya a pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.
 
 ## Funciona. Hasta que deja de funcionar.
 
-breaks.h2: Funciona. Hasta que deja de funcionar.
+breaks.h2: Funciona. Hasta que algo sale mal.
 breaks.a.fig: 93%
 breaks.a.text: de las empresas tecnológicas costarricenses ahorran tiempo en tareas repetitivas con IA.
 breaks.b.fig: 9%
@@ -37,23 +37,23 @@ policy.capA.fig: 93%
 policy.capA.label: Ahorran tiempo con IA
 policy.capB.fig: 9%
 policy.capB.label: Tienen política de IA
-policy.beat1: Cien empresas tecnológicas costarricenses.
-policy.beat2: Noventa y tres ya ahorran tiempo con IA.
-policy.beat3: Nueve tienen alguna regla al respecto.
-policy.aside: Las otras ochenta y cuatro están corriendo con suerte. Mismas empresas, mismo año.
+policy.beat1: Si tomamos cien empresas tecnológicas costarricenses
+policy.beat2: Noventa y tres empresas ya ahorran tiempo con IA.
+policy.beat3: Sólo nueve tienen alguna regla al respecto.
+policy.aside: Las otras ochenta y cuatro están tentando la suerte.
 policy.cite: 93% ahorran tiempo, 9% tienen política &mdash; PROCOMER, Caracterización del Sector TIC, 2025
 
 ## Los equipos con enseñanza rinden más
 
-viz.h3: Los equipos a los que se les enseña rinden más.
-viz.lede: Las mismas cien personas, dos veces. Si a un grupo se le enseña primero a usar IA en su propio trabajo, ese grupo llega a hacer hasta un tercio más.
+viz.h3: Los equipos aprendidos rinden más.
+viz.lede: Los mismos cien trabajadores, en dos situaciones diferentes. Si a un grupo se le enseña primero a usar IA en su propio trabajo, ese grupo llega a lograr hasta un tercio más.
 viz.aria: Dos barras hechas de marcas. Cuadros para quienes lo resuelven solos, espadas para quienes recibieron enseñanza primero. La barra de espadas es treinta y cuatro por ciento más alta.
 viz.capA: Resolviéndolo solos
 viz.capB: Con enseñanza primero
 viz.delta: +34%
 viz.beat1: Las mismas cien personas, dos veces.
 viz.beat2: A un grupo se le enseña primero a usar IA en su propio trabajo.
-viz.beat3: Ese grupo hace hasta un tercio más.
+viz.beat3: Ese grupo aprendido logra 1/3 más de trabajo.
 viz.aside.pre: Y hoy solo al
 viz.aside.fig: 47%
 viz.aside.post: de las personas en el trabajo se les ha enseñado a usar IA.
@@ -64,74 +64,74 @@ viz.cite2: 47% con capacitación &mdash; KPMG &times; Melbourne Business School,
 
 swipe.h2.a: ¿Puede la IA
 swipe.h2.b: encargarse de esto?
-swipe.sub: Cinco cosas que llegan a un escritorio cada semana. Deslice a la derecha si la IA puede encargarse. A la izquierda si mejor no.
-swipe.pileL: Mejor no
+swipe.sub: Cinco tareas que llegan a la oficina. Deslice a la derecha si cree que la IA puede encargarse. A la izquierda si mejor lo hace un humano.
+swipe.pileL: Mejor una persona
 swipe.pileR: La IA puede
-swipe.btnL: Mejor no
+swipe.btnL: Mejor una persona
 swipe.btnR: La IA puede
-swipe.skip: Solo muéstreme las notas
+swipe.skip: Solo muéstreme el resultado.
 swipe.hint.pre: Carta
 swipe.hint.mid: de 5. Arrastre la carta, use los botones o presione
-swipe.desk.h3: Este es su escritorio.
+swipe.desk.h3: Realmente no es tan sencillo.
 swipe.desk.sub: Cinco decisiones, cinco detalles. Ninguna está mal. Cada una tiene algo que conviene saber antes del lunes.
 swipe.said: Usted dijo:
-swipe.line: Esos detalles son los que enseñamos en medio día.
-swipe.again: Repartir de nuevo
+swipe.line: Esos detalles delicados son los que enseñamos en medio día.
+swipe.again: Hacerlo de nuevo
 swipe.deck.aria: Cinco cartas. Presione la flecha izquierda para mejor no y la flecha derecha para la IA puede.
 
 ## Las cinco cartas
 
 card1.q: Responderle a un cliente que pregunta por qué su factura salió más alta este mes.
-card1.r: Escribe una respuesta convincente en segundos. Si no tiene los números, se inventa una razón. Déle la factura y lea antes de enviar.
-card1.l: Bien pensado. Entonces esa respuesta la escribe usted. Igual puede pedirle un borrador: déle la factura y quédese con la decisión y con el botón de enviar.
+card1.r: La IA puede escribir una respuesta convincente en segundos, pero si no tiene los números, se inventa una razón. Déle la factura y léala antes de enviar.
+card1.l: El toque humano es importante, pero la IA puede repetir la forma en la que usted se comunica con sus clientes, es cuestión de saber darle esa información. 
 card2.q: Resumir el contrato de 40 páginas del proveedor.
-card2.r: Hace un buen resumen y se salta la cláusula que importa. Pídale primero la lista de cláusulas y lea esas páginas usted.
-card2.l: Cuarenta páginas son una tarde entera. Déjela listar las cláusulas y dónde están, y lea solo esas páginas. La lectura que cuenta sigue siendo suya.
+card2.r: La IA hace un buen resumen, pero puede que se salte la cláusula que importa. Pídale primero lo que necesita su atención y lea esas páginas usted antes que la IA.
+card2.l: Cuarenta páginas son una tarde entera. Déjela listar las cláusulas y dónde están, y lea solo páginas que sean importantes revisar a mano.
 card3.q: Digitar este montón de facturas en el sistema.
-card3.r: Lee bien las facturas. No ve los duplicados ni las fechas equivocadas. Revise una de cada diez.
-card3.l: Esta es la que más equipos entregan de primero. Lee bien las facturas. Mantenga la revisión: una de cada diez y todo lo que parezca duplicado.
+card3.r: La IA lee bien las facturas, pero es probable que no vea los duplicados ni las fechas equivocadas por sí sola, hay que mantenerla supervisada.
+card3.l: Esta es la que más equipos entregan de primero. La IA lee bien las facturas, aunque sí se debe mantener una revisión, al menos una de cada diez.
 card4.q: Escribir el informe mensual para la gerencia.
-card4.r: La estructura en un minuto. Cada número necesita revisión de una persona: en los números es donde suena más segura y más se equivoca.
-card4.l: La estructura la arma en un minuto. Los números son la parte que hay que cuidar: revíselos todos, porque ahí es donde suena más segura y más se equivoca.
+card4.r: La IA arma la estructura en un minuto, pero cada número necesita revisión de una persona, pues en los números es donde suena más confiada y más se equivoca.
+card4.l: La IA puede hacerle la estructura en un minuto, no hay que perder tiempo en eso ya, pero los números son la parte que hay que cuidar, porque ahí es donde suena más segura y más se equivoca.
 card5.q: Decidir si al cliente nuevo se le dan 60 días de plazo de pago.
-card5.r: Puede listar los pros y los contras. La decisión, y el riesgo, quedan en manos de una persona. Si dice que sí, el sí sigue siendo suyo.
-card5.l: Bien hecho en no soltarla. Igual puede armar los pros y los contras en un minuto. La decisión, y el riesgo, quedan en manos de una persona.
+card5.r: La IA puede listar los pros y los contras, pero la decisión, y el riesgo, deben quedar en manos de una persona. Una IA no se hace responsable.
+card5.l: Bien hecho en no dejarla decidir. Igual puede armar los pros y los contras en un minuto, puede ayudar solo que la decisión y el riesgo debe tomarla una persona informada.
 
 ## Por qué nosotros
 
-why.h2: Por qué nosotros
-why1.t: Su trabajo real, no diapositivas.
-why1.pf: Abrimos sus archivos, no una plantilla.
-why2.t: Llegamos primero, no de último.
-why2.pf: Usuarios diarios, no expositores certificados.
-why3.t: Los riesgos, no solo la promesa.
-why3.pf: La hacemos fallar enfrente de ustedes, a propósito.
-why4.t: Nada que venderles después.
-why4.pf: Sin licencias, sin plataforma, sin ventas adicionales.
+why.h2: ¿Por qué nosotros?
+why1.t: Usamos la parte práctica, no diapositivas aburridas.
+why1.pf: Personalizamos nuestro trabajo a cada cliente, les enseñamos con lo que ustedes hacen, no es una plantilla.
+why2.t: Dinámicas, interactividad y talleristas carismáticos.
+why2.pf: Los lapsos de atención son cada vez más pequeños. Nos la jugamos con eso y hacemos lo mejor de su tiempo.
+why3.t: Le enseñamos los riesgos y la realidad, no solo la promesa.
+why3.pf: Hacemos la IA fallar frente a ustedes, para valorar el uso apropiado.
+why4.t: Somos de los primeros en la zona.
+why4.pf: Como profesionales en el área, sabemos lo que falla y lo que se necesita.
 
 ## El taller
 
-work.h2: IA sin cortina de humo
-work.lede: El taller principal. Medio día, siete momentos y el trabajo de ustedes sobre la mesa.
+work.h2: Inteligencia Artificial sin humo
+work.lede: El taller principal. Medio día, aprendizaje interactivo y el trabajo de ustedes como el aspecto principal.
 work1.h3: El humo.
-work1.p: Lo que le han dicho a su equipo que hace la IA. Lo aclaramos en diez minutos, con ejemplos de ustedes.
+work1.p: Lo que le han dicho a su equipo que hace la IA. Lo aclaramos en diez minutos, con ejemplos de su área.
 work2.h3: Su escritorio.
 work2.p: Tres tareas reales de la semana de su equipo. No las nuestras. Las de ustedes.
 work3.h3: Manos a la obra.
-work3.p: Cada persona en un teclado o en el teléfono, con las herramientas que ya tienen. Nosotros llevamos las nuestras para enseñar, ajustadas a su equipo.
+work3.p: Cada persona en el teléfono o en un teclado, con las herramientas que ya usan. Nosotros llevamos las nuestras para enseñar, ajustadas a su equipo.
 work4.h3: Enseñar la magia.
-work4.p: Una tarea, hecha con IA, enfrente de todos.
+work4.p: Una tarea, algo práctico hecho con ayuda de IA. Su equipo guía el proceso para ir aprendiendo.
 work5.h3: Dónde se rompe.
 work5.p: La hacemos fallar a propósito, para que lo vean ustedes antes que un cliente.
 work6.h3: Reglas de la casa.
-work6.p: Qué nunca sale de la empresa. Quién revisa qué. Tres líneas, escritas entre todos.
+work6.p: Las 3 reglas que se escriben en el taller con ayuda de todos, para que la IA sea bien utilizada en su negocio.
 work7.flag: Opcional
 work7.h3: La próxima semana.
-work7.p: Un plan de una página en su correo: qué automatizar primero, qué cuidar y qué dejar de lado. Para usarlo ustedes, sin necesidad de una segunda sesión.
+work7.p: Una guía en su correo, qué dejarle a la IA, qué cuidar y qué dejar para personas. Lo aprendido en la sesión para usarlo ustedes, sin necesidad de una segunda reunión.
 
 ## Más información
 
-learn.h2: El truco, con respaldo.
+learn.h2: El truco, y de dónde lo sacamos.
 learn.lede: Cuatro números explican por qué enseñamos así. Cada uno enlaza a su fuente. Léalos y después tráiganos la semana de su equipo.
 learn.claim1: 93% de las empresas tecnológicas costarricenses ahorran tiempo en tareas repetitivas con IA.
 learn.means1: Los equipos técnicos de su competencia ya ahorran tiempo con IA. Las herramientas funcionan. Esa parte no está en discusión.
@@ -161,16 +161,16 @@ also11: Personas que trabajan con conocimiento y usaron GPT-4 en tareas dentro d
 ## Antes de reservar
 
 half.h2: Vea cómo es medio día.
-half.lede: Siete momentos, el trabajo de ustedes sobre la mesa y un plan de una página la semana siguiente. Dos minutos de lectura.
+half.lede: Aprendizaje interactivo, el trabajo de ustedes sobre la mesa y una guía de una página la semana siguiente.
 half.btn: Ver el taller
 half.cue: Siga bajando para reservar
 
 ## Cierre
 
 close.h2: Cuando ustedes quieran.
-close.fine: Abre un chat de WhatsApp. Medio día, con sus archivos, sin nada que comprar después.
-close.dead.h2: Se pagó la factura. Cuando ustedes quieran.
-close.dead.fine: Medio día, con sus archivos, y su equipo lo ve venir.
+close.fine: Escríbanos por Whatsapp con ese botón, con todo gusto los atendemos.
+close.dead.h2: Es peligroso sin ayuda.
+close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 ## Palabras del juego de la portada
 
@@ -183,13 +183,13 @@ foot.site: Sitio
 foot.home: Inicio
 foot.contact: Contacto
 foot.whatsapp: WhatsApp
-foot.whatsapp.todo: TODO número
+foot.whatsapp.todo: +506 87110401
 foot.email: Correo
-foot.email.todo: TODO dirección
+foot.email.todo: En proceso
 foot.linkedin: LinkedIn
-foot.linkedin.todo: TODO url
-foot.city.todo: TODO ciudad
-foot.country: , Costa Rica
+foot.linkedin.todo: En proceso
+foot.city.todo: Ciudad Quesada, San Carlos
+foot.country: , Alajuela, Costa Rica
 foot.legal: &copy; 2026 kadabra CR. Todos los derechos reservados.
 
 ## Títulos y descripciones para buscadores

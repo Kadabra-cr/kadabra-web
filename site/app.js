@@ -721,7 +721,7 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['Por su cuenta, tarde o temprano se paga.', 'La fuga, el dato inventado, el mensaje que nadie vio venir: no es si pasa, es cuándo. Medio día con nosotros y su equipo los ve venir.'] }
+          dead: ['Por su cuenta, tarde o temprano se paga.', 'La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es que vaya a pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
@@ -729,7 +729,7 @@ document.querySelectorAll('.closefield').forEach(function (svg) {
     text: [].slice.call(sec.querySelectorAll('.wrap > *')),
     quiet: { x0: 450, x1: 1150, y0: 130, y1: 510 },
     copy: { els: [sec.querySelector('h2'), sec.querySelector('.fine')],
-            dead: ['Se pagó la factura. Cuando ustedes quieran.', 'Medio día, con sus archivos, y su equipo lo ve venir.'] } });
+            dead: ['Es peligroso sin ayuda.', 'Medio día, con sus archivos, y sus herramientas.'] } });
 });
 
 /* ==========================================================================
@@ -867,20 +867,20 @@ makeGraph({ id: 'viz',
      you keep it. Neither is wrong. Both come with a catch. */
   var CARDS = [
     { q: "Responderle a un cliente que pregunta por qué su factura salió más alta este mes.", pip: "classic-spade",
-      r: "Escribe una respuesta convincente en segundos. Si no tiene los números, se inventa una razón. Déle la factura y lea antes de enviar.",
-      l: "Bien pensado. Entonces esa respuesta la escribe usted. Igual puede pedirle un borrador: déle la factura y quédese con la decisión y con el botón de enviar." },
+      r: "La IA puede escribir una respuesta convincente en segundos, pero si no tiene los números, se inventa una razón. Déle la factura y léala antes de enviar.",
+      l: "El toque humano es importante, pero la IA puede repetir la forma en la que usted se comunica con sus clientes, es cuestión de saber darle esa información." },
     { q: "Resumir el contrato de 40 páginas del proveedor.", pip: "classic-heart",
-      r: "Hace un buen resumen y se salta la cláusula que importa. Pídale primero la lista de cláusulas y lea esas páginas usted.",
-      l: "Cuarenta páginas son una tarde entera. Déjela listar las cláusulas y dónde están, y lea solo esas páginas. La lectura que cuenta sigue siendo suya." },
+      r: "La IA hace un buen resumen, pero puede que se salte la cláusula que importa. Pídale primero lo que necesita su atención y lea esas páginas usted antes que la IA.",
+      l: "Cuarenta páginas son una tarde entera. Déjela listar las cláusulas y dónde están, y lea solo páginas que sean importantes revisar a mano." },
     { q: "Digitar este montón de facturas en el sistema.", pip: "classic-diamond",
-      r: "Lee bien las facturas. No ve los duplicados ni las fechas equivocadas. Revise una de cada diez.",
-      l: "Esta es la que más equipos entregan de primero. Lee bien las facturas. Mantenga la revisión: una de cada diez y todo lo que parezca duplicado." },
+      r: "La IA lee bien las facturas, pero es probable que no vea los duplicados ni las fechas equivocadas por sí sola, hay que mantenerla supervisada.",
+      l: "Esta es la que más equipos entregan de primero. La IA lee bien las facturas, aunque sí se debe mantener una revisión, al menos una de cada diez." },
     { q: "Escribir el informe mensual para la gerencia.", pip: "classic-club",
-      r: "La estructura en un minuto. Cada número necesita revisión de una persona: en los números es donde suena más segura y más se equivoca.",
-      l: "La estructura la arma en un minuto. Los números son la parte que hay que cuidar: revíselos todos, porque ahí es donde suena más segura y más se equivoca." },
+      r: "La IA arma la estructura en un minuto, pero cada número necesita revisión de una persona, pues en los números es donde suena más confiada y más se equivoca.",
+      l: "La IA puede hacerle la estructura en un minuto, no hay que perder tiempo en eso ya, pero los números son la parte que hay que cuidar, porque ahí es donde suena más segura y más se equivoca." },
     { q: "Decidir si al cliente nuevo se le dan 60 días de plazo de pago.", pip: "classic-spade",
-      r: "Puede listar los pros y los contras. La decisión, y el riesgo, quedan en manos de una persona. Si dice que sí, el sí sigue siendo suyo.",
-      l: "Bien hecho en no soltarla. Igual puede armar los pros y los contras en un minuto. La decisión, y el riesgo, quedan en manos de una persona." }
+      r: "La IA puede listar los pros y los contras, pero la decisión, y el riesgo, deben quedar en manos de una persona. Una IA no se hace responsable.",
+      l: "Bien hecho en no dejarla decidir. Igual puede armar los pros y los contras en un minuto, puede ayudar solo que la decisión y el riesgo debe tomarla una persona informada." }
   ];
   var hint = document.getElementById('hint'),
       table = document.getElementById('table'),
@@ -1042,7 +1042,7 @@ makeGraph({ id: 'viz',
         slot.style.width = SLOT.w + 'px'; slot.style.height = SLOT.h + 'px';
         var note = document.createElement('div');
         note.className = 'note'; note.dataset.fn = el.dataset.fn; note.tabIndex = 0;
-        note.innerHTML = '<p class="said">Usted dijo: <b>' + (right ? 'La IA puede' : 'Mejor no') + '</b></p>' +
+        note.innerHTML = '<p class="said">Usted dijo: <b>' + (right ? 'La IA puede' : 'Mejor una persona') + '</b></p>' +
           '<p class="q">' + cd.q + '</p><p class="a">' + (right ? cd.r : cd.l) + '</p>';
         if (flip) { row.appendChild(note); row.appendChild(slot); } else { row.appendChild(slot); row.appendChild(note); }
         rows.appendChild(row);
