@@ -32,31 +32,29 @@ breaks.a.text: de las empresas tecnológicas costarricenses ahorran tiempo en ta
 breaks.b.fig: 9%
 breaks.b.text: de ellas tienen una política formal de IA.
 breaks.src: PROCOMER, 2025
-policy.aria: Dos barras de cien marcas cada una. Noventa y tres encendidas en la primera: empresas que ahorran tiempo con IA. Nueve en la segunda: empresas con alguna política de IA.
+policy.aria: Dos barras. En la primera, 93 de cada 100 empresas ahorran tiempo con IA. La segunda son esas mismas 93, con 84 en rojo que la usan sin reglas y 9 en dorado que tienen una política de IA.
 policy.capA.fig: 93%
 policy.capA.label: Ahorran tiempo con IA
-policy.capB.fig: 9%
-policy.capB.label: Tienen política de IA
-policy.beat1.fig: 100
-policy.beat1: empresas tecnológicas costarricenses.
-policy.beat2.fig: 93
-policy.beat2: ya ahorran tiempo con IA.
-policy.beat3.fig: 9
-policy.beat3: tienen alguna regla al respecto.
-policy.aside.fig: 84
-policy.aside: están tentando la suerte.
+policy.capB.fig: 84%
+policy.capB.label: La usan sin reglas
+policy.capB.gold: 9% con política de IA
+policy.beat1.fig: 93%
+policy.beat1: de las empresas tecnológicas del país ya ahorran tiempo con IA.
+policy.beat2.fig: 84%
+policy.beat2: la usan sin ninguna regla. Están tentando la suerte.
+policy.beat3.fig: 9%
+policy.beat3: tienen una política de IA. Ahí es donde queremos ver a su empresa.
 policy.cite: 93% ahorran tiempo, 9% tienen política &mdash; PROCOMER, Caracterización del Sector TIC, 2025
 
 ## Los equipos con enseñanza rinden más
 
 viz.h3: Los equipos aprendidos rinden más.
-viz.lede: Los mismos cien trabajadores, en dos situaciones diferentes. Si a un grupo se le enseña primero a usar IA en su propio trabajo, ese grupo llega a lograr hasta un tercio más.
 viz.aria: Dos barras hechas de marcas. Cuadros para quienes lo resuelven solos, espadas para quienes recibieron enseñanza primero. La barra de espadas es treinta y cuatro por ciento más alta.
 viz.capA: Resolviéndolo solos
 viz.capB: Con enseñanza primero
 viz.delta: +34%
-viz.beat1: Las mismas 100 personas, dos veces.
-viz.beat2: A un grupo se le enseña primero a usar IA en su propio trabajo.
+viz.beat1: Dos grupos hacen el mismo trabajo.
+viz.beat2: A uno se le enseña primero a usar IA.
 viz.beat3: Ese grupo aprendido logra 1/3 más de trabajo.
 viz.aside.pre: Y hoy
 viz.aside.fig: menos de la mitad
@@ -179,7 +177,7 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 ## Palabras del juego de la portada
 
-game.words: La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde
+game.words: La IA inventó cifras para el reporte | ChatGPT citó una ley que no existe | Se filtraron las cédulas de clientes | El contrato traía una cláusula inventada | Claude borró nuestros archivos | Hacienda nos está notificando por un excel
 
 game.ask: ¿Jugar?
 game.ask.hover: ¡Jugar!
@@ -198,7 +196,8 @@ foot.whatsapp.value: +506 87110401
 foot.email: Correo
 foot.email.value: contacts@kadabracr.com
 foot.linkedin: LinkedIn
-foot.linkedin.value: En proceso
+foot.linkedin.value: kadabracr
+foot.linkedin.link: https://www.linkedin.com/company/kadabracr
 foot.city.value: Ciudad Quesada, San Carlos
 foot.country: , Alajuela, Costa Rica
 foot.legal: &copy; 2026 kadabra CR. Todos los derechos reservados.

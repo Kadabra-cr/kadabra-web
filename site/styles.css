@@ -225,7 +225,7 @@ section{position:relative}
   font-family:var(--body);font-weight:600;letter-spacing:0;font-size:clamp(1rem,1.25vw,1.15rem);line-height:1.3}
 .ledger .beat-l b{font-family:var(--title);font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums;
   text-align:right;font-size:2.1em;line-height:.9}
-.ledger .beat-l[data-beat=in]{color:var(--ink-dim)}
+.ledger .beat-l.gold{color:var(--gold-ink)}
 .ledger .beat-l.risk{color:var(--red)}
 html.staged .stage-right .ledger .beat-l{font-size:clamp(1rem,1.2vw,1.12rem)}
 .aside{margin-top:calc(var(--cell)*.9);color:var(--ink-dim);font-size:clamp(1.02rem,1.35vw,1.16rem);max-width:52ch}
@@ -517,7 +517,29 @@ html.staged .stage-right .ledger .beat-l{font-size:clamp(1rem,1.2vw,1.12rem)}
 .js .moment.on .vis-rules .rule{clip-path:inset(0 0 0 0)}
 .moment.on .vis-rules .rule:nth-child(2){transition-delay:.2s}
 .moment.on .vis-rules .rule:nth-child(3){transition-delay:.4s}
-.vis-rules{display:grid;gap:clamp(14px,2vw,24px)}
+.vis-rules .sheet{fill:none;stroke:currentColor;stroke-width:3;opacity:.5}
+.vis-rules .ttl,.vis-rules .ln{fill:currentColor;opacity:.8;transform-box:fill-box;transform-origin:0 50%;transition:transform .7s var(--ease)}
+.vis-rules .ttl{opacity:.95}
+.vis-rules .rmark path{fill:currentColor}
+.vis-rules .rmark.red path{fill:#C24A5A}
+.vis-rules .sig{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.6;
+  stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s var(--ease)}
+.vis-rules .seal circle{fill:none;stroke:var(--gold);stroke-width:2.5}
+.vis-rules .seal path{fill:var(--gold)}
+.vis-rules .seal{transform-box:fill-box;transform-origin:50% 50%;opacity:0;transform:scale(1.5) rotate(-14deg);
+  transition:opacity .35s linear 1.9s,transform .6s cubic-bezier(.2,1.5,.4,1) 1.9s}
+.js .vis-rules .ttl,.js .vis-rules .ln{transform:scaleX(0)}
+.js .moment.on .vis-rules .ttl,.js .moment.on .vis-rules .ln{transform:scaleX(1)}
+.moment.on .vis-rules .rrow:nth-of-type(1) .ln{transition-delay:.35s}
+.moment.on .vis-rules .rrow:nth-of-type(2) .ln{transition-delay:.68s}
+.moment.on .vis-rules .rrow:nth-of-type(3) .ln{transition-delay:1.01s}
+.moment.on .vis-rules .sig{stroke-dashoffset:0}
+.moment.on .vis-rules .sig:nth-of-type(1){transition-delay:1.3s}
+.moment.on .vis-rules .sig:nth-of-type(2){transition-delay:1.5s}
+.moment.on .vis-rules .sig:nth-of-type(3){transition-delay:1.7s}
+.moment.on .vis-rules .seal{opacity:1;transform:rotate(-10deg)}
+@media (prefers-reduced-motion:reduce){.vis-rules .ttl,.vis-rules .ln{transform:none!important}.vis-rules .sig{stroke-dashoffset:0!important}
+  .vis-rules .seal{opacity:1!important;transform:rotate(-10deg)!important}}
 
 /* ============================ SOURCES (cream) ============================= */
 .learn{background:var(--cream);color:var(--ink);min-height:70svh}
@@ -625,12 +647,15 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   transition:opacity .35s linear,scale .45s cubic-bezier(.16,1,.3,1),visibility 0s .35s}
 .ask.on{opacity:1;scale:1;pointer-events:auto;visibility:visible;transition-delay:0s}
 .ask .yes{font:inherit;font-size:1rem;font-weight:700;background:var(--gold);color:var(--carbon);border:0;border-radius:999px;
-  min-height:40px;padding:.55em 1.3em;cursor:pointer;display:grid;transition:background .2s var(--ease)}
-/* the two words share one cell, so the pill never changes width */
-.ask .yes span{grid-area:1/1;transition:opacity .18s linear,translate .3s cubic-bezier(.16,1,.3,1)}
-.ask .yes span+span{opacity:0;translate:0 5px}
-.ask .yes:is(:hover,:focus-visible) span:first-child{opacity:0;translate:0 -5px}
-.ask .yes:is(:hover,:focus-visible) span+span{opacity:1;translate:0 0}
+  min-height:40px;padding:.55em 1.3em;cursor:pointer;display:inline-flex;align-items:baseline;justify-content:center;
+  transition:background .2s var(--ease)}
+/* the marks swap at once (no fade) and the new ones jump, then keep growing a touch */
+.ask .yes .pm{display:inline-grid}
+.ask .yes .pm i{grid-area:1/1;font-style:normal;display:inline-block;transform-origin:50% 85%}
+.ask .yes .pm .alt,.ask .yes:is(:hover,:focus-visible) .pm i:first-child{visibility:hidden}
+.ask .yes:is(:hover,:focus-visible) .pm .alt{visibility:visible;animation:markJump .9s cubic-bezier(.2,.9,.3,1) both}
+@keyframes markJump{0%{transform:translateY(0) scale(1)}18%{transform:translateY(-5px) scale(1.16)}100%{transform:translateY(-1px) scale(1.32)}}
+.ask .yes .pm.whole .alt{transform-origin:50% 60%}
 .ask .yes:hover{background:#DDB437}
 .ask .no,.mode button svg{flex:none}
 .ask .no{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:0;background:none;color:var(--on-carbon-dim);cursor:pointer}
@@ -665,13 +690,25 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
 .cue svg{width:38px;height:17px;animation:cue 1.9s var(--ease) infinite}
 @keyframes cue{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(7px);opacity:1}}
 .hero.armed .cue,.hero.condensed .cue{display:none}
+/* the staged hero scrolls a panel in from the right, so the cue says that: the
+   panel's cream edge peeks at the right border, a chevron nudges left */
+.side-cue{display:none}
+html.staged .cue{display:none}
+html.staged .side-cue{position:absolute;right:0;top:50%;z-index:3;display:flex;align-items:center;gap:14px;
+  transform:translateY(-50%);pointer-events:none;opacity:calc(1 - var(--q)*5)}
+html.staged .side-cue svg{width:13px;height:29px;color:var(--gold);transform:scaleX(-1);animation:sideCue 2.4s var(--ease) infinite}
+html.staged .side-cue i{display:block;width:6px;height:clamp(90px,16svh,150px);background:var(--cream);border-radius:3px 0 0 3px;
+  opacity:.9;animation:sidePeek 2.4s var(--ease) infinite}
+@keyframes sideCue{0%,100%{translate:0 0;opacity:.45}50%{translate:-7px 0;opacity:1}}
+@keyframes sidePeek{0%,100%{width:6px}50%{width:11px}}
+html.staged .hero.armed .side-cue,html.staged .hero.condensed .side-cue{display:none}
 .halfday .gorow{margin-top:calc(var(--cell)*.9)}
 .halfday .h2{margin-top:0}
 .split{--q:0;--f:0;position:relative}
 .breaks{background:var(--cream);color:var(--ink);padding:calc(var(--cell)*2.6) 0 0}
 .breaks .h2{color:var(--ink)}
 .policy{margin-top:calc(var(--cell)*1.4)!important;border-top:0!important;padding-top:0!important}
-.policy .bars{position:relative}
+.policy .bars{position:relative;align-items:start}   /* both bars are the same height: they stand level whatever the captions */
 .policy .pair{margin:0;max-width:none;grid-column:1/-1;order:-1;margin-bottom:calc(var(--cell)*1.2)}
 .hcue{display:none}
 html.staged .split{display:grid;grid-template-columns:36% 64%;overflow-x:clip;align-items:start;background:var(--cream)}
@@ -744,11 +781,15 @@ html.staged .hcue svg{width:38px;height:17px;animation:cue 1.9s var(--ease) infi
 
 /* --- the policy graph: ninety-three lit, nine with a rule --- */
 .policy .barcol svg{color:var(--ink)}
-.policy .barcol.rules .mk.lit{color:var(--gold-ink)}
+.policy .bars .mk{transition:opacity .38s linear,color .5s linear}
 .policy .bars .mk path{fill-opacity:.14;transition:transform .5s cubic-bezier(.16,1,.3,1),fill-opacity .45s linear}
-.policy.lit .barcol.base .mk.lit path{fill-opacity:1}
-.policy.rules .barcol.rules .mk.lit path{fill-opacity:1}
-.policy .barcol.rules figcaption b,.policy .barcol.rules figcaption span{color:var(--gold-ink)}
+.policy.lit .bars .mk.lit path{fill-opacity:1}
+.policy.risk .barcol.rules .mk.risk{color:var(--red)}
+.policy.rules .barcol.rules .mk.gold{color:var(--gold-ink)}
+.policy .barcol.rules figcaption b{color:var(--red)}
+.policy .barcol.rules figcaption span:not(.gold){color:var(--red)}
+.policy .barcol.rules figcaption .gold{color:var(--gold-ink);font-weight:700;margin-top:.35em}
+
 /* phones: each bar enters as one layer; the marks inside change without per-mark transitions */
 html.calm .bars .mk,html.calm .bars .mk path{transition:none!important}
 html.calm .barcol svg{opacity:0;transform:translateY(16px);will-change:transform,opacity;
@@ -826,5 +867,5 @@ footer,.pair .b,.halfday{position:relative;isolation:isolate}
 .halfday::before{border-radius:inherit}
 
 @media (prefers-reduced-motion:reduce){
-  .btn .arr,.finale .guide svg,.cue svg,.hcue svg{animation:none!important}
+  .btn .arr,.finale .guide svg,.cue svg,.hcue svg,.side-cue svg,.side-cue i,.ask .yes .pm .alt{animation:none!important}
 }

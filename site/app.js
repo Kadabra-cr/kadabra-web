@@ -399,7 +399,7 @@ function makeField(svg, opt) {
 
   var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0, hits: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = 'La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde'.split(' | ');
+  var WORDS = 'La IA inventó cifras para el reporte | ChatGPT citó una ley que no existe | Se filtraron las cédulas de clientes | El contrato traía una cláusula inventada | Claude borró nuestros archivos | Hacienda nos está notificando por un excel'.split(' | ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -442,7 +442,8 @@ function makeField(svg, opt) {
     var v0 = (W - vw) / 2, v1 = v0 + vw;
     var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
     var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], front: 0, back: lay.letters.length - 1,
-              lastAt: 0, gap: Math.max(260, 460 - game.wave * RAMP * 40), gone: 0, doneAt: 0 };
+              lastAt: 0, gap: Math.max(260, 460 - game.wave * RAMP * 40), gone: 0, doneAt: 0,
+              halfW: lay.halfW, halfH: lay.halfH, v0: v0, v1: v1, vw: vw, port: null, portAt: 0 };
     w.readAt = now + 700 + Math.max(300, 650 - game.wave * RAMP * 90) + 55 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
@@ -453,6 +454,9 @@ function makeField(svg, opt) {
     });
     game.word = w;
   }
+  function sideCx(w, side) {
+    return side > 0 ? Math.min(w.v0 + w.vw * .84, w.v1 - 30 - w.halfW) : Math.max(w.v0 + w.vw * .16, w.v0 + 30 + w.halfW);
+  }
   function endWord() {
     if (!game.word) return;
     game.word.letters.forEach(function (l) { if (l.el.parentNode) ltrG.removeChild(l.el); });
@@ -462,7 +466,15 @@ function makeField(svg, opt) {
      words at once; the cross puts it away for good (until a reload). */
   var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, lx: 0, ly: 0, sc: 1 };
   askEl.className = 'ask';
-  askEl.innerHTML = '<button type="button" class="yes"><span>¿Jugar?</span><span aria-hidden="true">¡Jugar!</span></button>' +
+  /* '¿Jugar?' becomes '¡Jugar!' under the hand: the word stays put, only the
+     marks swap, at once, and jump. Other copy falls back to swapping the whole label. */
+  function askLabel(a, b) {
+    var re = /^([¿¡]*)([\s\S]*?)([?!]*)$/, x = a.match(re), y = b.match(re);
+    function pm(u, v) { return u || v ? '<span class="pm"><i>' + u + '</i><i class="alt" aria-hidden="true">' + v + '</i></span>' : ''; }
+    if (x[2] !== y[2]) return '<span class="pm whole"><i>' + a + '</i><i class="alt" aria-hidden="true">' + b + '</i></span>';
+    return pm(x[1], y[1]) + '<span>' + x[2] + '</span>' + pm(x[3], y[3]);
+  }
+  askEl.innerHTML = '<button type="button" class="yes">' + askLabel('¿Jugar?', '¡Jugar!') + '</button>' +
     '<button type="button" class="no" aria-label="Ahora no"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
   host.appendChild(askEl);
   function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
@@ -682,6 +694,26 @@ function makeField(svg, opt) {
     if (w) {
       var slide = Math.min(1, (now - w.at) / 700);
       w.x = w.cx + w.side * 200 * (1 - easeOut(slide));
+      /* a phrase that has not fired yet never lets the hand sit on it: if the
+         hand (or the heart) comes close, it slips out through its own edge and
+         comes back in through the opposite one, and the firing waits for it */
+      var nextFire = Math.max(w.readAt, w.lastAt + w.gap), waiting = false;
+      for (var wi = 0; wi < w.letters.length; wi++) if (w.letters[wi].st === 'queued') { waiting = true; break; }
+      if (!w.port && !waiting && w.front <= w.back && now < nextFire - 220 && now - w.portAt > 450 && slide >= 1) {
+        var near2 = function (px, py) { return Math.abs(px - w.x) < w.halfW + 110 && Math.abs(py - w.cy) < w.halfH + 110; };
+        if ((ptr.on && near2(ptr.x, ptr.y)) || (heart.mass && near2(heart.x, heart.y))) w.port = { t0: now, from: w.x, side: w.side };
+      }
+      var po = 1;
+      if (w.port) {
+        var pt = now - w.port.t0;
+        if (pt < 170) { var e1 = pt / 170; w.x = w.port.from + w.port.side * 320 * e1 * e1; po = 1 - e1; }
+        else {
+          if (w.side === w.port.side) { w.side = -w.side; w.cx = sideCx(w, w.side); }
+          var e2 = Math.min(1, (pt - 170) / 280); w.x = w.cx + w.side * 320 * (1 - easeOut(e2)); po = e2;
+          if (e2 >= 1) { w.port = null; w.portAt = now; }
+        }
+        w.readAt = Math.max(w.readAt, now + 650); w.lastAt = Math.max(w.lastAt, now + 650 - w.gap);
+      }
       /* never more than three pairs in the air: the rest wait their turn */
       var flying = 0;
       for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly' || w.letters[fi].st === 'queued') flying++;
@@ -715,7 +747,7 @@ function makeField(svg, opt) {
           L2.x = w.x + L2.tx; L2.y = w.cy + L2.ty;
           if (now - w.at > 60 * L2.i) L2.o = Math.min(1, L2.o + dt / .5);
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ')');
-          L2.el.setAttribute('opacity', L2.o.toFixed(3));
+          L2.el.setAttribute('opacity', (L2.o * po).toFixed(3));
         } else if (L2.st === 'fly') {
           /* homing for a moment only (longer each word), then it keeps its
              line and speeds up until it leaves the field: dodge at the right
@@ -1006,23 +1038,25 @@ function makeGraph(cfg) {
   }, { threshold: .35 }).observe(root);
 }
 
-/* it works, until it doesn't: 93 of 100 save time with AI, 9 of 100 have a rule */
+/* it works, until it doesn't: 93% save time with AI. The second bar is those
+   same 93: 84% use it without a rule (red), and at the bottom, the 9% with one (gold) */
 var policyG = makeGraph({ id: 'policy', drive: true,
-  a: { svg: document.getElementById('polA'), count: 100 }, b: { svg: document.getElementById('polB'), count: 100 },
+  a: { svg: document.getElementById('polA'), count: 100 }, b: { svg: document.getElementById('polB'), count: 93 },
   setup: function (A, B) {
     A.forEach(function (c) { c.fo = .14; if (c.n < 93) { c.g.classList.add('lit'); c.fo = 1; } });
-    B.forEach(function (c) { c.fo = .14; if (c.n < 9) { c.g.classList.add('lit'); c.strong = true; } });
+    B.forEach(function (c) { c.fo = 1; c.g.classList.add('lit', c.n < 9 ? 'gold' : 'risk'); if (c.n < 9) c.strong = true; });
   },
   still: function (A, B) { B.slice(0, 9).forEach(function (c) { c.p.setAttribute('d', mix('smooth-diamond', 1)); }); },
   beats: [
     { at: 150, cls: 'in', fn: function (A, B) { A.concat(B).forEach(function (c) { c.g.style.transitionDelay = (c.row * 9) + 'ms'; }); } },
-    { at: 400, cls: 'lit', fn: function (A) { A.forEach(function (c) { if (c.n < 93) c.p.style.transitionDelay = (c.row * 9 + c.col * 3) + 'ms'; }); } },
-    { at: 750, cls: 'rules', fn: function (A, B) {
-      B.slice(0, 9).forEach(function (c, i) { c.p.style.transitionDelay = (i * 35) + 'ms'; morphPath(c.p, 'smooth-diamond', 420, i * 35); });
+    { at: 400, cls: 'lit', fn: function (A, B) { A.concat(B).forEach(function (c) { if (c.n < 93) c.p.style.transitionDelay = (c.row * 9 + c.col * 3) + 'ms'; }); } },
+    { at: 900, cls: 'risk', fn: function (A, B) { B.slice(9).forEach(function (c) { c.g.style.transitionDelay = ((c.row - 1) * 30 + c.col * 4) + 'ms'; }); } },
+    { at: 1450, cls: 'rules', fn: function (A, B) {
+      B.slice(0, 9).forEach(function (c, i) { morphPath(c.p, 'smooth-diamond', 420, i * 40); });
     } }
   ] });
 
-/* taught first: the same hundred people, twice. Taught, they do 34% more */
+/* two groups: the one taught first does 34% more */
 var vizG = makeGraph({ id: 'viz', drive: true,
   a: { svg: document.getElementById('barA'), count: 100 }, b: { svg: document.getElementById('barB'), count: 134 },
   setup: function (A, B) {
@@ -1634,15 +1668,11 @@ document.querySelectorAll('.whyband').forEach(function (band) {
          slow ghost hand passes through, so phones see it too. */
       /* touch screens: no hand to part it, so it parts itself when the
          moment comes into view, and the blur (costly to repaint) is dropped */
-      var defs = document.createElementNS(NS, 'defs');
-      if (!CALM) defs.innerHTML = '<filter id="smokeblur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>';
-      svg.appendChild(defs);
       var symG = document.createElementNS(NS, 'g'), symP = document.createElementNS(NS, 'path');
       symP.setAttribute('fill', '#C9A227'); symP.setAttribute('d', PATHS.square);
       symG.setAttribute('transform', 'translate(160 110) scale(1.15) translate(-50 -50)');
       symG.setAttribute('opacity', '0'); symG.appendChild(symP); svg.appendChild(symG);
       var cloud = document.createElementNS(NS, 'g');
-      if (!CALM) cloud.setAttribute('filter', 'url(#smokeblur)');
       svg.appendChild(cloud);
       var puffs = [], onAt = 0, inMid = false;
       /* 'the middle of the screen': the whole drawing inside the central band */
@@ -1654,9 +1684,9 @@ document.querySelectorAll('.whyband').forEach(function (band) {
         g.appendChild(p); cloud.appendChild(g);
         var a = Math.random() * Math.PI * 2, rr = Math.pow(Math.random(), .7);
         puffs.push({ g: g, hx: 160 + Math.cos(a) * rr * 120, hy: 30 + Math.random() * 170, s: rnd(26, 62),
-          o: CALM ? rnd(.08, .2) : rnd(.16, .34), rot: rnd(0, 90), vr: rnd(-9, 9), rise: rnd(5, 12), ph: rnd(0, 6.3), ox: 0, oy: 0 });
+          o: CALM ? rnd(.08, .2) : rnd(.1, .26), rot: rnd(0, 90), vr: rnd(-9, 9), rise: rnd(5, 12), ph: rnd(0, 6.3), ox: 0, oy: 0 });
       }
-      var hand = { x: -1e3, y: -1e3, at: -1e4 }, clear = 0, smokeOn = false, last = 0;
+      var hand = { x: -1e3, y: -1e3, at: -1e4 }, clear = 0, smokeOn = false, last = 0, glowAt = 0;
       function toLocal(e) {
         var b = svg.getBoundingClientRect(), k = 320 / b.width;
         hand.x = (e.clientX - b.left) * k; hand.y = (e.clientY - b.top) * k; hand.at = performance.now();
@@ -1666,10 +1696,10 @@ document.querySelectorAll('.whyband').forEach(function (band) {
       svg.addEventListener('pointerleave', function () { hand.x = hand.y = -1e3; }, { passive: true });
       function draw(now) {
         var dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
-        var hx = hand.x, hy = hand.y, push = 520;
+        var hx = hand.x, hy = hand.y, push = 3400, reach = 118;
         if (CALM) hx = hy = -1e3;
         else if (now - hand.at > 3200) {
-          push = 240;                 /* the ghost hand */
+          push = 380; reach = 80;     /* the ghost hand */
           var u = now / 1000;
           hx = 160 + Math.sin(u * .55) * 70; hy = 110 + Math.sin(u * 1.1) * 38;
         }
@@ -1685,25 +1715,34 @@ document.querySelectorAll('.whyband').forEach(function (band) {
           q.rot += q.vr * dt;
           var x = q.hx + Math.sin(now / 1900 + q.ph) * 9 + q.ox, y = q.hy + q.oy;
           var dx = x - hx, dy = y - hy, d = Math.hypot(dx, dy) || 1;
-          if (d < 78) { var f = (1 - d / 78) * push * dt; q.ox += dx / d * f; q.oy += dy / d * f; }
-          q.ox -= q.ox * Math.min(1, .9 * dt); q.oy -= q.oy * Math.min(1, .9 * dt);   /* closes back, slowly */
+          /* the hand throws the smoke well out of its way; it drifts back only slowly */
+          if (d < reach) { var f = (1 - d / reach) * push * dt; q.ox += dx / d * f; q.oy += dy / d * f; }
+          q.ox -= q.ox * Math.min(1, .12 * dt); q.oy -= q.oy * Math.min(1, .12 * dt);
           x = q.hx + Math.sin(now / 1900 + q.ph) * 9 + q.ox; y = q.hy + q.oy;
           if (rad) {
             var cdx = x - 160, cdy = y - 110, cd = Math.hypot(cdx, cdy) || 1, lim = rad * 1.3;
             if (cd < lim) { var nd = cd + (lim - cd) * .77; x = 160 + cdx / cd * nd; y = 110 + cdy / cd * nd; }
           }
           if (Math.hypot(x - 160, y - 110) < 62) near += q.s / 40;
-          var edge = Math.min(1, (q.hy - 18) / 40, (205 - q.hy) / 30);
+          /* every puff fades out before it could touch the drawing's border */
+          var half = q.s * .72;
+          var edge = Math.min(1, (q.hy - 18) / 40, (205 - q.hy) / 30,
+            (x - half) / 34, (320 - half - x) / 34, (y - half) / 30, (220 - half - y) / 30);
           q.g.setAttribute('opacity', (q.o * Math.max(0, edge)).toFixed(3));
           q.g.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + q.rot.toFixed(1) +
             ') scale(' + (q.s / 100).toFixed(3) + ') translate(-50 -50)');
         }
         /* the fewer (and smaller) puffs over the middle, the clearer it is */
         var want = Math.max(0, Math.min(1, 1 - (near - 2.5) / 8));
-        clear += (want - clear) * Math.min(1, 2.4 * dt);
+        clear += (want - clear) * Math.min(1, 5 * dt);
         symG.setAttribute('opacity', (.12 + clear * .88).toFixed(3));
-        symP.setAttribute('d', mix('smooth-spade', easeOut(clear)));
-        if (clear > .85) symG.classList.add('glow'); else symG.classList.remove('glow');
+        /* the spade is whole early; its glow comes up gradually, never at once */
+        symP.setAttribute('d', mix('smooth-spade', easeOut(Math.min(1, clear * 1.7))));
+        var gl = Math.max(0, Math.min(1, (clear - .45) / .55)); gl = gl * gl * (3 - 2 * gl);
+        if (Math.abs(gl - glowAt) > .01 || (gl === 0) !== (glowAt === 0)) {
+          glowAt = gl;
+          symG.style.filter = gl ? 'drop-shadow(0 0 ' + (11 * gl).toFixed(1) + 'px rgba(201,162,39,' + (.6 * gl).toFixed(3) + '))' : '';
+        }
       }
       if (reduce) { draw(0); symG.setAttribute('opacity', '1'); symP.setAttribute('d', mix('smooth-spade', 1)); }
       else {
@@ -1739,6 +1778,16 @@ document.querySelectorAll('.whyband').forEach(function (band) {
         if (!on) return;
         morphPath(p2, 'smooth-spade', 950, 150);
         setTimeout(function () { g2.classList.add('glow'); }, 1000);
+      });
+    } else if (kind === 'rules') {
+      var rk = ['smooth-spade', 'smooth-heart', 'smooth-diamond'];
+      var rps = [].map.call(svg.querySelectorAll('.rmark path'), function (rp) { rp.setAttribute('d', PATHS.square); return rp; });
+      var seal = svg.querySelector('.seal path');
+      if (seal) seal.setAttribute('d', PATHS.square);
+      once(m, function (on) {
+        if (!on) return;
+        rps.forEach(function (rp, i) { morphPath(rp, rk[i], 620, 250 + i * 330); });
+        if (seal) morphPath(seal, 'smooth-club', 700, 1900);
       });
     } else if (kind === 'break') {
       var hps = svg.querySelectorAll('.host path');

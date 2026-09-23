@@ -281,7 +281,8 @@ function makeField(svg, opt) {
     var v0 = (W - vw) / 2, v1 = v0 + vw;
     var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
     var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], front: 0, back: lay.letters.length - 1,
-              lastAt: 0, gap: Math.max(260, 460 - game.wave * RAMP * 40), gone: 0, doneAt: 0 };
+              lastAt: 0, gap: Math.max(260, 460 - game.wave * RAMP * 40), gone: 0, doneAt: 0,
+              halfW: lay.halfW, halfH: lay.halfH, v0: v0, v1: v1, vw: vw, port: null, portAt: 0 };
     w.readAt = now + 700 + Math.max(300, 650 - game.wave * RAMP * 90) + 55 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
@@ -292,6 +293,9 @@ function makeField(svg, opt) {
     });
     game.word = w;
   }
+  function sideCx(w, side) {
+    return side > 0 ? Math.min(w.v0 + w.vw * .84, w.v1 - 30 - w.halfW) : Math.max(w.v0 + w.vw * .16, w.v0 + 30 + w.halfW);
+  }
   function endWord() {
     if (!game.word) return;
     game.word.letters.forEach(function (l) { if (l.el.parentNode) ltrG.removeChild(l.el); });
@@ -301,7 +305,15 @@ function makeField(svg, opt) {
      words at once; the cross puts it away for good (until a reload). */
   var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, lx: 0, ly: 0, sc: 1 };
   askEl.className = 'ask';
-  askEl.innerHTML = '<button type="button" class="yes"><span>@@t.game.ask@@</span><span aria-hidden="true">@@t.game.ask.hover@@</span></button>' +
+  /* '¿Jugar?' becomes '¡Jugar!' under the hand: the word stays put, only the
+     marks swap, at once, and jump. Other copy falls back to swapping the whole label. */
+  function askLabel(a, b) {
+    var re = /^([¿¡]*)([\s\S]*?)([?!]*)$/, x = a.match(re), y = b.match(re);
+    function pm(u, v) { return u || v ? '<span class="pm"><i>' + u + '</i><i class="alt" aria-hidden="true">' + v + '</i></span>' : ''; }
+    if (x[2] !== y[2]) return '<span class="pm whole"><i>' + a + '</i><i class="alt" aria-hidden="true">' + b + '</i></span>';
+    return pm(x[1], y[1]) + '<span>' + x[2] + '</span>' + pm(x[3], y[3]);
+  }
+  askEl.innerHTML = '<button type="button" class="yes">' + askLabel('@@t.game.ask@@', '@@t.game.ask.hover@@') + '</button>' +
     '<button type="button" class="no" aria-label="@@t.game.ask.no@@"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
   host.appendChild(askEl);
   function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
@@ -521,6 +533,26 @@ function makeField(svg, opt) {
     if (w) {
       var slide = Math.min(1, (now - w.at) / 700);
       w.x = w.cx + w.side * 200 * (1 - easeOut(slide));
+      /* a phrase that has not fired yet never lets the hand sit on it: if the
+         hand (or the heart) comes close, it slips out through its own edge and
+         comes back in through the opposite one, and the firing waits for it */
+      var nextFire = Math.max(w.readAt, w.lastAt + w.gap), waiting = false;
+      for (var wi = 0; wi < w.letters.length; wi++) if (w.letters[wi].st === 'queued') { waiting = true; break; }
+      if (!w.port && !waiting && w.front <= w.back && now < nextFire - 220 && now - w.portAt > 450 && slide >= 1) {
+        var near2 = function (px, py) { return Math.abs(px - w.x) < w.halfW + 110 && Math.abs(py - w.cy) < w.halfH + 110; };
+        if ((ptr.on && near2(ptr.x, ptr.y)) || (heart.mass && near2(heart.x, heart.y))) w.port = { t0: now, from: w.x, side: w.side };
+      }
+      var po = 1;
+      if (w.port) {
+        var pt = now - w.port.t0;
+        if (pt < 170) { var e1 = pt / 170; w.x = w.port.from + w.port.side * 320 * e1 * e1; po = 1 - e1; }
+        else {
+          if (w.side === w.port.side) { w.side = -w.side; w.cx = sideCx(w, w.side); }
+          var e2 = Math.min(1, (pt - 170) / 280); w.x = w.cx + w.side * 320 * (1 - easeOut(e2)); po = e2;
+          if (e2 >= 1) { w.port = null; w.portAt = now; }
+        }
+        w.readAt = Math.max(w.readAt, now + 650); w.lastAt = Math.max(w.lastAt, now + 650 - w.gap);
+      }
       /* never more than three pairs in the air: the rest wait their turn */
       var flying = 0;
       for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly' || w.letters[fi].st === 'queued') flying++;
@@ -554,7 +586,7 @@ function makeField(svg, opt) {
           L2.x = w.x + L2.tx; L2.y = w.cy + L2.ty;
           if (now - w.at > 60 * L2.i) L2.o = Math.min(1, L2.o + dt / .5);
           L2.el.setAttribute('transform', 'translate(' + L2.x.toFixed(1) + ' ' + L2.y.toFixed(1) + ')');
-          L2.el.setAttribute('opacity', L2.o.toFixed(3));
+          L2.el.setAttribute('opacity', (L2.o * po).toFixed(3));
         } else if (L2.st === 'fly') {
           /* homing for a moment only (longer each word), then it keeps its
              line and speeds up until it leaves the field: dodge at the right
