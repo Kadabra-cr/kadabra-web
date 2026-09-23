@@ -30,7 +30,8 @@ svg{display:block}
 /* ---- the copy column: right of the photo, generous margins ---- */
 .copy{position:absolute;display:grid;align-content:center;z-index:3}
 .perfil .copy{left:452px;top:0;bottom:0;width:640px;gap:18px}
-.empresa .copy{left:236px;top:0;bottom:0;width:520px;gap:8px}
+/* the company logo covers about the first 262px of the cover, from 68px down */
+.empresa .copy{left:312px;top:0;bottom:0;width:500px;gap:8px}
 .perfil h1{font-size:62px}
 .empresa h1{font-size:34px}
 .remate{font-weight:500}
@@ -92,6 +93,9 @@ svg{display:block}
 .datos h1{color:var(--ink)}
 .perfil.datos h1{font-size:54px}
 .perfil.datos .copy{width:560px}
+.empresa.datos h1{font-size:29px}
+.empresa.datos .copy{width:320px;gap:6px}
+.empresa.datos .offer{line-height:1.25}
 .datos h1 em{color:var(--gold-ink)}
 .datos .remate{color:var(--ink-dim);font-size:17px!important;font-weight:500}
 .datos .offer{color:var(--ink)}
@@ -100,11 +104,11 @@ svg{display:block}
 .datos .sig .lock{color:var(--ink)}
 .grids{position:absolute;z-index:2;display:flex}
 .perfil .grids{right:88px;top:50%;transform:translateY(-50%);gap:40px}
-.empresa .grids{right:48px;top:50%;transform:translateY(-50%);gap:22px}
+.empresa .grids{right:40px;top:50%;transform:translateY(-50%);gap:18px}
 .gcol{display:grid;gap:12px;justify-items:start}
 .empresa .gcol{grid-template-columns:auto auto;align-items:end;gap:0 10px}
 .gcol svg{height:212px;width:auto}
-.empresa .gcol svg{height:132px}
+.empresa .gcol svg{height:118px}
 .gcap{display:grid;line-height:1.1}
 .gcap b{font-family:var(--title);font-weight:800;letter-spacing:-.04em;font-size:40px;color:var(--ink)}
 .gcap span{font-size:15px;font-weight:600;color:var(--ink)}
