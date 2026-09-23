@@ -576,7 +576,7 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   .rise,.pair .b,.m-body,.m-vis,.whyband .t,.mini,.card{opacity:1!important;
     transform:none!important}
   .ruledraw,.whyband .rule,.vis-rules .rule{clip-path:none!important}
-  .cable .flow,.whyband .suit path,.pointing .cta .point{animation:none!important}
+  .cable .flow,.whyband .suit path,.pointing .cta .point,.mode .dot,.mode.shake{animation:none!important}
   #sweep{display:none}
   .whyband .rule{opacity:.6}
 }
@@ -599,6 +599,35 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   paint-order:stroke;stroke:rgba(18,38,31,.55);stroke-width:6px;stroke-linejoin:round}
 .hero h1,.hero .sub,.close h2,.close .fine{transition:opacity .35s linear}
 .swapping{opacity:0!important}
+/* the ask: a small pill by the heart */
+.ask{position:absolute;left:0;top:0;z-index:4;display:flex;align-items:center;gap:8px;padding:5px 5px 5px 15px;
+  border-radius:999px;background:rgba(28,26,23,.94);border:1px solid var(--carbon-line);color:var(--on-carbon);
+  font-size:.88rem;line-height:1.2;white-space:nowrap;box-shadow:0 16px 32px -16px rgba(0,0,0,.95);
+  opacity:0;scale:.9;pointer-events:none;transition:opacity .35s linear,scale .45s cubic-bezier(.16,1,.3,1)}
+.ask.on{opacity:1;scale:1;pointer-events:auto}
+.ask .yes{font:inherit;font-weight:600;background:var(--gold);color:var(--carbon);border:0;border-radius:999px;
+  padding:.5em 1.05em;cursor:pointer;transition:background .2s var(--ease)}
+.ask .yes:hover{background:#DDB437}
+.ask .no,.mode button svg{flex:none}
+.ask .no{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:0;background:none;color:var(--on-carbon-dim);cursor:pointer}
+.ask .no:hover{background:var(--carbon-2);color:var(--white)}
+.ask svg,.mode svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;fill:none}
+/* interactive mode: a toast that drops in and settles into a chip */
+.mode{position:fixed;top:calc(var(--hdr) + 14px);left:50%;z-index:58;display:flex;align-items:center;gap:10px;
+  padding:5px 5px 5px 14px;border-radius:999px;background:var(--carbon);border:1px solid var(--carbon-line);
+  color:var(--on-carbon);font-size:.86rem;line-height:1.2;white-space:nowrap;box-shadow:0 16px 32px -16px rgba(0,0,0,.95);
+  opacity:0;transform:translate(-50%,-18px);pointer-events:none;
+  transition:opacity .35s linear,transform .6s cubic-bezier(.16,1,.3,1),border-color .8s linear,box-shadow .8s linear,padding .6s var(--ease)}
+.mode.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.mode.fresh{padding:9px 7px 9px 18px;border-color:var(--gold);box-shadow:0 0 0 5px rgba(201,162,39,.16),0 16px 32px -16px rgba(0,0,0,.95)}
+.mode .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:modeDot 1.6s ease-in-out infinite}
+@keyframes modeDot{0%,100%{opacity:1}50%{opacity:.35}}
+.mode button{display:flex;align-items:center;gap:7px;font:inherit;font-weight:600;color:var(--white);background:var(--carbon-2);
+  border:1px solid var(--carbon-line);border-radius:999px;padding:.45em .9em;cursor:pointer;transition:background .2s var(--ease)}
+.mode button:hover{background:var(--red)}
+.mode.shake{animation:modeShake .45s cubic-bezier(.36,.07,.19,.97)}
+@keyframes modeShake{15%{translate:-8px 0}35%{translate:7px 0}55%{translate:-5px 0}75%{translate:3px 0}90%{translate:-1px 0}}
+.hero.armed .wrap,.close.armed .wrap{pointer-events:none}
 .cta{position:relative}
 .cta .point{position:absolute;right:calc(100% + 14px);top:50%;width:30px;height:30px;margin-top:-15px;color:var(--gold);
   opacity:0;transform:rotate(90deg);transition:opacity .35s linear;pointer-events:none}

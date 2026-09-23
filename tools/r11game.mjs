@@ -35,6 +35,14 @@ while (Date.now() - t0 < 120000) {
   maxFly = Math.max(maxFly, s.fly.length); maxTexts = Math.max(maxTexts, s.texts);
   if (s.fly.length >= 2 && shot < 2) { await p.screenshot({ path: `shots/r11/game-${where}-${shot++}.png` }); }
   if (s.hits > lastHits) { lastHits = s.hits; console.log('hit', s.hits, ((Date.now() - armedAt) / 1000).toFixed(2), 's heart', s.hx.toFixed(0), s.hy.toFixed(0), 'mouse-target', mx.toFixed(0), my.toFixed(0), 'fly', s.fly.length); }
+  if (s.phase === 'asking') {
+    if (!s.askShot) { await sleep(900); await p.screenshot({ path: `shots/r11/ask-${where}.png` }); s.askShot = 1; }
+    await p.click((where === 'close' ? '#close-home' : '#hero') + ' .ask .yes'); await sleep(900);
+    await p.screenshot({ path: `shots/r11/mode-${where}.png` });
+    await p.mouse.wheel(0, 600); await sleep(120);
+    console.log('scrollY after wheel', await p.evaluate(() => scrollY), 'chip shaking', await p.evaluate(() => document.querySelector('.mode').classList.contains('shake')));
+    continue;
+  }
   if (s.phase === 'dead') break;
   if (s.phase !== 'armed') { const a = Date.now() / 900; mx = 520 + Math.cos(a) * 60; my = 450 + Math.sin(a) * 45; }
   else if (mode === 'dodge') {

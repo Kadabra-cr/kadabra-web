@@ -180,6 +180,12 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 game.words: La IA nos hizo una factura mal | Claude nos dio datos falsos | ChatGPT se inventó la cifra | Así lo hizo ChatGPT | Nadie revisó los números | El resumen se saltó la cláusula | Subimos datos de clientes a un chat | La IA le prometió un descuento al cliente | El contrato se filtró | Nos llegó una demanda
 
+game.ask: Pruebe usar IA sin saber cómo.
+game.ask.btn: Interactuar
+game.ask.no: Ahora no
+game.mode: Modo interactivo
+game.exit: Salir
+
 ## Pie de página
 
 foot.tag: Talleres de IA prácticos para equipos en Costa Rica.

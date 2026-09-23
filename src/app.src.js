@@ -158,6 +158,41 @@ document.querySelectorAll('[data-count]').forEach(function (el) {
    heart made of them. Grow it and the words come for it. Used by the hero
    and the closing CTA: one engine, same rules, top and bottom.
    ========================================================================== */
+/* Interactive mode: while a field is being played the page holds still (the
+   wheel, touch and scroll keys shake the chip instead), and the chip under
+   the header is the way out. */
+var Mode = (function () {
+  var owner = null, chip = null;
+  function build() {
+    chip = document.createElement('div');
+    chip.className = 'mode'; chip.setAttribute('role', 'status');
+    chip.innerHTML = '<i class="dot" aria-hidden="true"></i><span>@@t.game.mode@@</span>' +
+      '<button type="button">@@t.game.exit@@<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
+    chip.querySelector('button').addEventListener('click', function () { if (owner) owner.exit(); });
+    document.body.appendChild(chip);
+  }
+  function shake() {
+    if (!chip) return;
+    chip.classList.remove('shake'); void chip.offsetWidth; chip.classList.add('shake');
+  }
+  function block(e) { if (owner) { e.preventDefault(); shake(); } }
+  addEventListener('wheel', block, { passive: false });
+  addEventListener('touchmove', block, { passive: false });
+  addEventListener('keydown', function (e) {
+    if (owner && /^( |PageUp|PageDown|ArrowUp|ArrowDown|Home|End)$/.test(e.key)) block(e);
+  });
+  return {
+    on: function (who) {
+      if (!chip) build();
+      owner = who;
+      chip.classList.add('on', 'fresh');
+      setTimeout(function () { chip.classList.remove('fresh'); }, 1600);
+    },
+    off: function (who) { if (owner !== who) return; owner = null; if (chip) chip.classList.remove('on', 'fresh'); },
+    shake: shake
+  };
+})();
+
 function makeField(svg, opt) {
   var W = opt.w, H = opt.h;
   var wide = innerWidth > 860;
@@ -335,11 +370,36 @@ function makeField(svg, opt) {
     game.word.letters.forEach(function (l) { if (l.el.parentNode) ltrG.removeChild(l.el); });
     game.word = null;
   }
+  /* never without asking: a small pill floats by the heart. Yes starts the
+     words at once; the cross puts it away for good (until a reload). */
+  var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, hover: false };
+  askEl.className = 'ask';
+  askEl.innerHTML = '<span>@@t.game.ask@@</span><button type="button" class="yes">@@t.game.ask.btn@@</button>' +
+    '<button type="button" class="no" aria-label="@@t.game.ask.no@@"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
+  host.appendChild(askEl);
+  askEl.addEventListener('pointerenter', function () { askP.hover = true; });
+  askEl.addEventListener('pointerleave', function () { askP.hover = false; });
+  function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
+  function unask() { askEl.classList.remove('on'); askP.hover = false; if (game.phase === 'asking') game.phase = 'calm'; }
+  askEl.querySelector('.yes').addEventListener('click', function () { unask(); arm(performance.now()); });
+  askEl.querySelector('.no').addEventListener('click', function () { unask(); game.noAsk = true; });
+  var ctl = { exit: exit };
   function arm(now) {
-    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 5000; game.wave = 0; game.hits = 0;
+    game.phase = 'armed'; game.armedAt = now; game.nextWord = now + 900; game.wave = 0; game.hits = 0;
     host.classList.add('armed');
+    Mode.on(ctl);
   }
-  function disarm() { game.phase = 'calm'; host.classList.remove('armed'); endWord(); }
+  function disarm() { game.phase = 'calm'; host.classList.remove('armed'); endWord(); Mode.off(ctl); }
+  /* out of interactive mode by choice: nothing lost, the heart just lets go,
+     and this field does not gather again until the page is reloaded */
+  function exit() {
+    game.off = true;
+    disarm();
+    while (heart.held.length) release(performance.now(), 60, 180);
+  }
+  host.addEventListener('pointerdown', function (e) {
+    if (game.phase === 'armed' && !e.target.closest('.ask')) Mode.shake();
+  });
   var LIVE = opt.copy ? opt.copy.els.map(function (el) { return el.textContent; }) : null;
   function setCopy(lines) {
     if (!opt.copy) return;
@@ -353,6 +413,7 @@ function makeField(svg, opt) {
   var pointT = 0;
   function die(now) {
     game.phase = 'dead'; game.deadAt = now;
+    Mode.off(ctl);
     clearTimeout(pointT);
     pointT = setTimeout(function () { if (game.phase === 'dead') host.classList.add('pointing'); }, 3000);
     host.classList.remove('armed'); host.classList.add('dead');
@@ -481,7 +542,7 @@ function makeField(svg, opt) {
       heart.x = Math.max(hr, Math.min(W - hr, heart.x)); heart.y = Math.max(hr, Math.min(H - hr, heart.y));
     }
     var far = Math.hypot(ptr.x - heart.x, ptr.y - heart.y);
-    var feeding = ptr.on && !dead && (heart.mass === 0 ? (heart.o < .02 || far < 120) : (armed || far < 300));
+    var feeding = ptr.on && !dead && !game.off && (heart.mass === 0 ? (heart.o < .02 || far < 120) : (armed || far < 300));
     /* a hand that leaves (or, before it is armed, runs off) lets it come apart */
     if (!ptr.on) { if (!game.offAt) game.offAt = now; } else game.offAt = 0;
     var letGo = heart.mass > 0 && !dead && (armed ? (!ptr.on && now - game.offAt > 1500) : !feeding);
@@ -496,6 +557,20 @@ function makeField(svg, opt) {
     var wantO = heart.mass && !heart.burst ? .94 : 0;
     heart.o += (wantO - heart.o) * Math.min(1, (wantO ? 2.2 : 3.2) * dt);   /* never a flash */
     if (heart.burst && heart.o < .02) heart.burst = 0;
+    if (game.phase === 'asking') {
+      if (!heart.mass || host.classList.contains('condensed')) unask();
+      else if (!askP.hover) {
+        var sb = svg.getBoundingClientRect(), hb = host.getBoundingClientRect();
+        var ks = Math.max(sb.width / W, sb.height / H);
+        var hx = sb.left - hb.left + (sb.width - W * ks) / 2 + heart.x * ks, hy = sb.top - hb.top + (sb.height - H * ks) / 2 + heart.y * ks;
+        var aw = askEl.offsetWidth, ah = askEl.offsetHeight, rr = hr * ks;
+        var ax = Math.max(12, Math.min(hb.width - aw - 12, hx + rr * .7 + 14));
+        var ay = Math.max(12, Math.min(hb.height - ah - 12, hy - rr * .7 - ah - 10));
+        if (!askP.placed) { askP.x = ax; askP.y = ay; askP.placed = true; }
+        askP.x += (ax - askP.x) * Math.min(1, 4.5 * dt); askP.y += (ay - askP.y) * Math.min(1, 4.5 * dt);
+        askEl.style.transform = 'translate(' + askP.x.toFixed(1) + 'px,' + askP.y.toFixed(1) + 'px)';
+      }
+    }
     heart.g.setAttribute('opacity', heart.o.toFixed(3));
     heart.g.setAttribute('transform', 'translate(' + heart.x.toFixed(1) + ' ' + heart.y.toFixed(1) +
       ') scale(' + (heart.sc / 100).toFixed(4) + ') translate(-50 -50)');
@@ -686,7 +761,7 @@ function makeField(svg, opt) {
         if (dh < eat && m.o * m.hs * ent < .06 && now - heart.eatAt > (armed ? 70 + game.wave * 25 : 110)) {
           m.live = false; m.held = true; m.o = 0; m.g.setAttribute('opacity', '0');
           heart.held.push(m); heart.mass++; heart.eatAt = now; heart.pulse = 1;
-          if (!armed && heart.mass >= CAP * .5 && !host.classList.contains('condensed')) arm(now);
+          if (game.phase === 'calm' && !game.noAsk && heart.mass >= CAP * .5 && !host.classList.contains('condensed')) ask();
           continue;
         }
       }
