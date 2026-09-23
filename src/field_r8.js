@@ -39,59 +39,62 @@ var Mode = (function () {
 })();
 
 /* Phones and touch screens get a calm felt instead of the game: the suits lie
-   scattered where a hand would have woken them, clear of the copy, and only
-   drift. CSS does the floating; now and then one folds back into a square
-   and comes up a new suit. No loop runs while nothing turns. */
+   scattered on the open felt, well clear of every block of copy, and only
+   drift. Each suit is its own small layer moved by CSS, so the browser can
+   float them without repainting the section; now and then one folds back
+   into a square and comes up a new suit. */
 var CALM = matchMedia('(hover: none), (max-width: 760px)').matches;
+if (CALM) document.documentElement.classList.add('calm');
 function calmField(svg, opt) {
   var host = svg.parentNode, marks = [], lastW = 0;
-  svg.classList.add('calm');
+  var felt = document.createElement('div');
+  felt.className = 'felt'; felt.setAttribute('aria-hidden', 'true');
+  svg.style.display = 'none';
+  host.insertBefore(felt, svg);
   function lay() {
-    var b = svg.getBoundingClientRect(), W = Math.round(b.width), H = Math.round(b.height);
+    var b = host.getBoundingClientRect(), W = Math.round(b.width), H = Math.round(b.height);
     if (!W || !H || W === lastW) return;
     lastW = W;
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    var zones = [];
+    /* every block of copy, whole (not line by line), measured at rest */
+    var blocks = [];
     (opt.text || []).concat([].slice.call(host.querySelectorAll('.cue'))).forEach(function (el) {
-      /* measured where the copy will rest, not mid-entrance */
       var tf = el.style.transform; el.style.transform = 'none';
-      [].forEach.call(el.getClientRects(), function (r) {
-        if (r.width) zones.push({ x0: r.left - b.left, x1: r.right - b.left, y0: r.top - b.top, y1: r.bottom - b.top });
-      });
+      var r = el.getBoundingClientRect();
       el.style.transform = tf;
+      if (r.width) blocks.push({ x0: r.left - b.left, x1: r.right - b.left, y0: r.top - b.top, y1: r.bottom - b.top });
     });
-    var want = Math.max(10, Math.min(24, Math.round(W * H / 12000))), got = [];
-    for (var k = 0; k < 900 && got.length < want; k++) {
-      var sz = rnd(16, 40), x = rnd(sz, W - sz), y = rnd(sz, H - sz), m = sz * .7 + 10, ok = true;
-      zones.forEach(function (z) { if (x > z.x0 - m && x < z.x1 + m && y > z.y0 - m && y < z.y1 + m) ok = false; });
+    var want = Math.max(8, Math.min(18, Math.round(W * H / 14000))), got = [];
+    for (var k = 0; k < 1200 && got.length < want; k++) {
+      var sz = rnd(16, 38), x = rnd(sz * .7, W - sz * .7), y = rnd(sz * .7, H - sz * .7);
+      var m = sz / 2 + 34, ok = true;        /* half the suit, its drift, and a wide berth */
+      blocks.forEach(function (z) { if (x > z.x0 - m && x < z.x1 + m && y > z.y0 - m && y < z.y1 + m) ok = false; });
       got.forEach(function (o) { if (Math.hypot(o.x - x, o.y - y) < (o.s + sz) * .8 + 22) ok = false; });
       if (ok) got.push({ x: x, y: y, s: sz });
     }
-    svg.innerHTML = ''; marks = [];
+    felt.innerHTML = ''; marks = [];
     var reach = Math.hypot(W / 2, H / 2);
     got.forEach(function (q, i) {
-      var g = document.createElementNS(NS, 'g'), inner = document.createElementNS(NS, 'g'), path = document.createElementNS(NS, 'path');
-      var key = suit(), depth = (q.s - 16) / 24;
-      path.setAttribute('d', mix(key, 1)); path.setAttribute('fill', 'currentColor');
-      if (i % 6 === 4) inner.setAttribute('fill', '#A81A2C');
-      inner.setAttribute('transform', 'translate(' + q.x.toFixed(1) + ' ' + q.y.toFixed(1) + ') rotate(' + rnd(-24, 24).toFixed(1) +
-        ') scale(' + (q.s / 100).toFixed(4) + ') translate(-50 -50)');
-      inner.appendChild(path); g.appendChild(inner);
-      g.setAttribute('class', 'm');
-      /* bigger ones sit nearer: brighter, and they travel further */
-      g.style.cssText = '--o:' + (.3 + depth * .45).toFixed(2) + ';--in:' + Math.round(Math.hypot(q.x - W / 2, q.y - H / 2) / reach * 900 + rnd(0, 250)) +
-        'ms;--d:' + rnd(6, 11).toFixed(1) + 's;--dl:-' + rnd(0, 10).toFixed(1) + 's;--dx:' + rnd(-7, 7).toFixed(1) + 'px;--dy:' +
-        (-(5 + depth * 7)).toFixed(1) + 'px;--dr:' + rnd(-9, 9).toFixed(1) + 'deg';
-      svg.appendChild(g);
+      var el = document.createElement('i'), key = suit(), depth = (q.s - 16) / 22;
+      el.className = 'm' + (i % 6 === 4 ? ' red' : '');
+      el.innerHTML = '<svg viewBox="0 0 100 100" style="transform:rotate(' + rnd(-24, 24).toFixed(1) + 'deg)"><path fill="currentColor"/></svg>';
+      el.style.cssText = 'left:' + (q.x - q.s / 2).toFixed(1) + 'px;top:' + (q.y - q.s / 2).toFixed(1) + 'px;width:' + q.s.toFixed(1) +
+        'px;height:' + q.s.toFixed(1) + 'px;--o:' + (.3 + depth * .45).toFixed(2) +
+        ';--in:' + Math.round(Math.hypot(q.x - W / 2, q.y - H / 2) / reach * 900 + rnd(0, 250)) +
+        'ms;--d:' + rnd(6, 11).toFixed(1) + 's;--dl:-' + rnd(0, 10).toFixed(1) + 's;--dx:' + rnd(-6, 6).toFixed(1) + 'px;--dy:' +
+        (-(4 + depth * 6)).toFixed(1) + 'px;--dr:' + rnd(-9, 9).toFixed(1) + 'deg';
+      var path = el.querySelector('path');
+      path.setAttribute('d', mix(key, 1));
+      felt.appendChild(el);
       marks.push({ p: path, key: key });
     });
   }
   lay();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lastW = 0; lay(); });
+  function again() { lastW = 0; lay(); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+  addEventListener('load', again);
   var rz = 0;
   addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(lay, 200); });
-  if (reduce) { svg.classList.add('lit'); return; }
-  /* one turn: the suit folds into its square and opens as another */
+  if (reduce) { felt.classList.add('lit'); return; }
   function turn() {
     var m = marks[(Math.random() * marks.length) | 0], t0 = 0;
     if (!m) return;
@@ -106,8 +109,10 @@ function calmField(svg, opt) {
   var timer = 0;
   new IntersectionObserver(function (es) {
     clearInterval(timer);
-    if (!es[0].isIntersecting) return;
-    svg.classList.add('lit');
+    var on = es[0].isIntersecting;
+    felt.classList.toggle('run', on);
+    if (!on) return;
+    felt.classList.add('lit');
     timer = setInterval(function () { if (!document.hidden) turn(); }, 2600);
   }, { threshold: .15 }).observe(host);
 }

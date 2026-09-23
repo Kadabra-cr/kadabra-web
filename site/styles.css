@@ -146,11 +146,15 @@ section{position:relative}
   min-height:calc(100svh - var(--hdr));display:grid;align-items:center}
 #field{position:absolute;inset:0;width:100%;height:100%;display:block;
   color:var(--white);pointer-events:none}
-/* the calm felt (phones): scattered suits that drift, lit outward from the copy */
-.calm .m{opacity:0;transform-box:fill-box;transform-origin:50% 50%;transition:opacity 1.4s linear var(--in);
-  animation:drift var(--d) ease-in-out var(--dl) infinite}
-.calm.lit .m{opacity:var(--o)}
-@keyframes drift{50%{transform:translate(var(--dx),var(--dy)) rotate(var(--dr))}}
+/* the calm felt (phones): scattered suits, each its own layer, drifting on the compositor */
+.felt{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;color:var(--white);contain:strict}
+.felt .m{position:absolute;display:block;opacity:0;will-change:transform,opacity;
+  transition:opacity 1.4s linear var(--in);animation:drift var(--d) ease-in-out var(--dl) infinite paused}
+.felt .m.red{color:#A81A2C}
+.felt .m svg{display:block;width:100%;height:100%}
+.felt.run .m{animation-play-state:running}
+.felt.lit .m{opacity:var(--o)}
+@keyframes drift{50%{transform:translate3d(var(--dx),var(--dy),0) rotate(var(--dr))}}
 .hero .wrap{position:relative;z-index:2;text-align:center;
   padding:calc(var(--cell)*2.2) 0 calc(var(--cell)*2.6)}
 .hero h1{font-size:clamp(2.55rem,7.2vw,6.6rem);line-height:.94;color:var(--white);
@@ -461,8 +465,10 @@ html.staged .stage-right .ledger .beat-l{font-size:clamp(1rem,1.2vw,1.12rem)}
 .spineline{position:absolute;top:0;left:calc(clamp(14px,1.7vw,18px)/2 - 1.5px);width:3px;
   background:var(--on-carbon);opacity:.28;pointer-events:none}
 .spineline.dotted{bottom:0;background:repeating-linear-gradient(to bottom,var(--gold) 0 6px,transparent 6px 14px);opacity:.7}
-.spinemark{position:absolute;top:0;left:calc(clamp(14px,1.7vw,18px)/2 - 12px);width:24px;height:11px;
-  color:var(--cream);filter:drop-shadow(0 0 8px rgba(243,238,228,.55));will-change:transform;
+/* the chevron rides the middle of the screen by itself (sticky), clamped to the route */
+.spinetrack{position:absolute;top:0;bottom:0;left:calc(clamp(14px,1.7vw,18px)/2 - 12px);width:24px;pointer-events:none}
+.spinemark{position:sticky;top:50svh;display:block;width:24px;height:11px;
+  color:var(--cream);filter:drop-shadow(0 0 8px rgba(243,238,228,.55));
   transition:color .5s linear}
 .spinemark.gold{color:var(--gold)}
 .moment .spine{position:relative;height:100%}
@@ -588,7 +594,7 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   .rise,.pair .b,.m-body,.m-vis,.whyband .t,.mini,.card{opacity:1!important;
     transform:none!important}
   .ruledraw,.whyband .rule,.vis-rules .rule{clip-path:none!important}
-  .cable .flow,.whyband .suit path,.pointing .cta .point,.mode .dot,.mode.shake,.calm .m{animation:none!important}
+  .cable .flow,.whyband .suit path,.pointing .cta .point,.mode .dot,.mode.shake,.felt .m{animation:none!important}
   #sweep{display:none}
   .whyband .rule{opacity:.6}
 }
@@ -743,6 +749,13 @@ html.staged .hcue svg{width:38px;height:17px;animation:cue 1.9s var(--ease) infi
 .policy.lit .barcol.base .mk.lit path{fill-opacity:1}
 .policy.rules .barcol.rules .mk.lit path{fill-opacity:1}
 .policy .barcol.rules figcaption b,.policy .barcol.rules figcaption span{color:var(--gold-ink)}
+/* phones: each bar enters as one layer; the marks inside change without per-mark transitions */
+html.calm .bars .mk,html.calm .bars .mk path{transition:none!important}
+html.calm .barcol svg{opacity:0;transform:translateY(16px);will-change:transform,opacity;
+  transition:opacity .45s linear,transform .7s cubic-bezier(.16,1,.3,1)}
+html.calm .barcol+.barcol svg{transition-delay:.12s}
+html.calm .viz.in .barcol svg{opacity:1;transform:none}
+html.calm .hdr::before{display:none}
 
 /* --- the desk's last card: tilted, large, the eye led to it --- */
 .finale{margin-top:calc(var(--cell)*4.2);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;

@@ -30,13 +30,19 @@ var NUM = {};
 Object.keys(PATHS).forEach(function (k) {
   NUM[k] = PATHS[k].match(/-?[\d.]+/g).map(Number);
 });
+/* the strings are cached at 1/64 steps of t: a hundred marks morphing at once
+   then cost a lookup each, not a rebuilt path each, per frame */
+var MIXED = {};
 function mix(key, t) {
+  var ck = key + (t * 64 | 0);
+  if (MIXED[ck]) return MIXED[ck];
+  t = (t * 64 | 0) / 64;
   var n = NUM[key], s = '';
   for (var i = 0; i < TMPL.length; i++) {
     s += TMPL[i];
     if (i < SQ.length) s += (SQ[i] + (n[i] - SQ[i]) * t).toFixed(2);
   }
-  return s;
+  return (MIXED[ck] = s);
 }
 var easeOut = function (t) { return 1 - Math.pow(1 - t, 3); };
 var easeIO = function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
@@ -194,59 +200,62 @@ var Mode = (function () {
 })();
 
 /* Phones and touch screens get a calm felt instead of the game: the suits lie
-   scattered where a hand would have woken them, clear of the copy, and only
-   drift. CSS does the floating; now and then one folds back into a square
-   and comes up a new suit. No loop runs while nothing turns. */
+   scattered on the open felt, well clear of every block of copy, and only
+   drift. Each suit is its own small layer moved by CSS, so the browser can
+   float them without repainting the section; now and then one folds back
+   into a square and comes up a new suit. */
 var CALM = matchMedia('(hover: none), (max-width: 760px)').matches;
+if (CALM) document.documentElement.classList.add('calm');
 function calmField(svg, opt) {
   var host = svg.parentNode, marks = [], lastW = 0;
-  svg.classList.add('calm');
+  var felt = document.createElement('div');
+  felt.className = 'felt'; felt.setAttribute('aria-hidden', 'true');
+  svg.style.display = 'none';
+  host.insertBefore(felt, svg);
   function lay() {
-    var b = svg.getBoundingClientRect(), W = Math.round(b.width), H = Math.round(b.height);
+    var b = host.getBoundingClientRect(), W = Math.round(b.width), H = Math.round(b.height);
     if (!W || !H || W === lastW) return;
     lastW = W;
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    var zones = [];
+    /* every block of copy, whole (not line by line), measured at rest */
+    var blocks = [];
     (opt.text || []).concat([].slice.call(host.querySelectorAll('.cue'))).forEach(function (el) {
-      /* measured where the copy will rest, not mid-entrance */
       var tf = el.style.transform; el.style.transform = 'none';
-      [].forEach.call(el.getClientRects(), function (r) {
-        if (r.width) zones.push({ x0: r.left - b.left, x1: r.right - b.left, y0: r.top - b.top, y1: r.bottom - b.top });
-      });
+      var r = el.getBoundingClientRect();
       el.style.transform = tf;
+      if (r.width) blocks.push({ x0: r.left - b.left, x1: r.right - b.left, y0: r.top - b.top, y1: r.bottom - b.top });
     });
-    var want = Math.max(10, Math.min(24, Math.round(W * H / 12000))), got = [];
-    for (var k = 0; k < 900 && got.length < want; k++) {
-      var sz = rnd(16, 40), x = rnd(sz, W - sz), y = rnd(sz, H - sz), m = sz * .7 + 10, ok = true;
-      zones.forEach(function (z) { if (x > z.x0 - m && x < z.x1 + m && y > z.y0 - m && y < z.y1 + m) ok = false; });
+    var want = Math.max(8, Math.min(18, Math.round(W * H / 14000))), got = [];
+    for (var k = 0; k < 1200 && got.length < want; k++) {
+      var sz = rnd(16, 38), x = rnd(sz * .7, W - sz * .7), y = rnd(sz * .7, H - sz * .7);
+      var m = sz / 2 + 34, ok = true;        /* half the suit, its drift, and a wide berth */
+      blocks.forEach(function (z) { if (x > z.x0 - m && x < z.x1 + m && y > z.y0 - m && y < z.y1 + m) ok = false; });
       got.forEach(function (o) { if (Math.hypot(o.x - x, o.y - y) < (o.s + sz) * .8 + 22) ok = false; });
       if (ok) got.push({ x: x, y: y, s: sz });
     }
-    svg.innerHTML = ''; marks = [];
+    felt.innerHTML = ''; marks = [];
     var reach = Math.hypot(W / 2, H / 2);
     got.forEach(function (q, i) {
-      var g = document.createElementNS(NS, 'g'), inner = document.createElementNS(NS, 'g'), path = document.createElementNS(NS, 'path');
-      var key = suit(), depth = (q.s - 16) / 24;
-      path.setAttribute('d', mix(key, 1)); path.setAttribute('fill', 'currentColor');
-      if (i % 6 === 4) inner.setAttribute('fill', '#A81A2C');
-      inner.setAttribute('transform', 'translate(' + q.x.toFixed(1) + ' ' + q.y.toFixed(1) + ') rotate(' + rnd(-24, 24).toFixed(1) +
-        ') scale(' + (q.s / 100).toFixed(4) + ') translate(-50 -50)');
-      inner.appendChild(path); g.appendChild(inner);
-      g.setAttribute('class', 'm');
-      /* bigger ones sit nearer: brighter, and they travel further */
-      g.style.cssText = '--o:' + (.3 + depth * .45).toFixed(2) + ';--in:' + Math.round(Math.hypot(q.x - W / 2, q.y - H / 2) / reach * 900 + rnd(0, 250)) +
-        'ms;--d:' + rnd(6, 11).toFixed(1) + 's;--dl:-' + rnd(0, 10).toFixed(1) + 's;--dx:' + rnd(-7, 7).toFixed(1) + 'px;--dy:' +
-        (-(5 + depth * 7)).toFixed(1) + 'px;--dr:' + rnd(-9, 9).toFixed(1) + 'deg';
-      svg.appendChild(g);
+      var el = document.createElement('i'), key = suit(), depth = (q.s - 16) / 22;
+      el.className = 'm' + (i % 6 === 4 ? ' red' : '');
+      el.innerHTML = '<svg viewBox="0 0 100 100" style="transform:rotate(' + rnd(-24, 24).toFixed(1) + 'deg)"><path fill="currentColor"/></svg>';
+      el.style.cssText = 'left:' + (q.x - q.s / 2).toFixed(1) + 'px;top:' + (q.y - q.s / 2).toFixed(1) + 'px;width:' + q.s.toFixed(1) +
+        'px;height:' + q.s.toFixed(1) + 'px;--o:' + (.3 + depth * .45).toFixed(2) +
+        ';--in:' + Math.round(Math.hypot(q.x - W / 2, q.y - H / 2) / reach * 900 + rnd(0, 250)) +
+        'ms;--d:' + rnd(6, 11).toFixed(1) + 's;--dl:-' + rnd(0, 10).toFixed(1) + 's;--dx:' + rnd(-6, 6).toFixed(1) + 'px;--dy:' +
+        (-(4 + depth * 6)).toFixed(1) + 'px;--dr:' + rnd(-9, 9).toFixed(1) + 'deg';
+      var path = el.querySelector('path');
+      path.setAttribute('d', mix(key, 1));
+      felt.appendChild(el);
       marks.push({ p: path, key: key });
     });
   }
   lay();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lastW = 0; lay(); });
+  function again() { lastW = 0; lay(); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+  addEventListener('load', again);
   var rz = 0;
   addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(lay, 200); });
-  if (reduce) { svg.classList.add('lit'); return; }
-  /* one turn: the suit folds into its square and opens as another */
+  if (reduce) { felt.classList.add('lit'); return; }
   function turn() {
     var m = marks[(Math.random() * marks.length) | 0], t0 = 0;
     if (!m) return;
@@ -261,8 +270,10 @@ function calmField(svg, opt) {
   var timer = 0;
   new IntersectionObserver(function (es) {
     clearInterval(timer);
-    if (!es[0].isIntersecting) return;
-    svg.classList.add('lit');
+    var on = es[0].isIntersecting;
+    felt.classList.toggle('run', on);
+    if (!on) return;
+    felt.classList.add('lit');
     timer = setInterval(function () { if (!document.hidden) turn(); }, 2600);
   }, { threshold: .15 }).observe(host);
 }
@@ -1529,23 +1540,24 @@ var vizG = makeGraph({ id: 'viz', drive: true,
     if (done || idx >= CARDS.length) return;
     stopNudge();
     var el = els[idx];
-    drag = { id: e.pointerId, x: e.clientX, el: el, dx: 0 };
+    drag = { id: e.pointerId, x: e.clientX, el: el, dx: 0, vx: 0, t: e.timeStamp };
     el.style.transition = 'none';
     deck.setPointerCapture(e.pointerId);
   });
   deck.addEventListener('pointermove', function (e) {
     if (!drag || e.pointerId !== drag.id) return;
-    var dx = e.clientX - drag.x;
-    drag.dx = dx;
+    var dx = e.clientX - drag.x, dt = e.timeStamp - drag.t;
+    if (dt > 0) drag.vx = drag.vx * .5 + (dx - drag.dx) / dt * .5;   /* px per ms, smoothed */
+    drag.dx = dx; drag.t = e.timeStamp;
     drag.el.style.transform = 'translate(' + dx + 'px,0) rotate(' + (dx * 0.045) + 'deg)';
     pileOf(dx > 0 ? 1 : -1).classList.toggle('hot', Math.abs(dx) > 30);
     pileOf(dx > 0 ? -1 : 1).classList.remove('hot');
   });
   function endDrag(e) {
     if (!drag || (e && e.pointerId !== drag.id)) return;
-    var dx = drag.dx || 0, el = drag.el;
+    var dx = drag.dx || 0, el = drag.el, flick = Math.abs(drag.vx) > .4 && drag.vx * dx > 0;
     drag = null;
-    if (Math.abs(dx) > 90) { el.style.transition = 'none'; send(dx > 0 ? 1 : -1); }
+    if (Math.abs(dx) > 45 || (flick && Math.abs(dx) > 20)) { el.style.transition = 'none'; send(dx > 0 ? 1 : -1); }
     else {
       el.style.transition = 'transform .45s var(--ease)';
       el.style.transform = el.dataset.rest;
@@ -1603,11 +1615,8 @@ document.querySelectorAll('.whyband').forEach(function (band) {
     var raf = 0;
     var run = function () {
       raf = 0;
-      var r = list.getBoundingClientRect(), vh = innerHeight;
-      var p = (vh * .5 - r.top) / r.height;
-      p = p < 0 ? 0 : p > 1 ? 1 : p;
-      mark.style.transform = 'translateY(' + (p * (r.height - 40)).toFixed(1) + 'px)';
-      mark.classList.toggle('gold', opt && p * r.height > parseFloat(line.style.height));
+      var at = mark.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      mark.classList.toggle('gold', !!opt && at > parseFloat(line.style.height));
     };
     addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(run); }, { passive: true });
     addEventListener('resize', function () { if (!raf) raf = requestAnimationFrame(run); }, { passive: true });
@@ -1623,23 +1632,29 @@ document.querySelectorAll('.whyband').forEach(function (band) {
          parts it; behind it a square that turns into a spade the clearer the
          middle gets. Left alone, it closes again. With no hand for a while, a
          slow ghost hand passes through, so phones see it too. */
+      /* touch screens: no hand to part it, so it parts itself when the
+         moment comes into view, and the blur (costly to repaint) is dropped */
       var defs = document.createElementNS(NS, 'defs');
-      defs.innerHTML = '<filter id="smokeblur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>';
+      if (!CALM) defs.innerHTML = '<filter id="smokeblur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.6"/></filter>';
       svg.appendChild(defs);
       var symG = document.createElementNS(NS, 'g'), symP = document.createElementNS(NS, 'path');
       symP.setAttribute('fill', '#C9A227'); symP.setAttribute('d', PATHS.square);
       symG.setAttribute('transform', 'translate(160 110) scale(1.15) translate(-50 -50)');
       symG.setAttribute('opacity', '0'); symG.appendChild(symP); svg.appendChild(symG);
       var cloud = document.createElementNS(NS, 'g');
-      cloud.setAttribute('filter', 'url(#smokeblur)'); svg.appendChild(cloud);
-      var puffs = [];
-      for (var i = 0; i < 76; i++) {
+      if (!CALM) cloud.setAttribute('filter', 'url(#smokeblur)');
+      svg.appendChild(cloud);
+      var puffs = [], onAt = 0, inMid = false;
+      /* 'the middle of the screen': the whole drawing inside the central band */
+      if (CALM) new IntersectionObserver(function (es) { inMid = es[0].intersectionRatio > .98; },
+        { threshold: [0, .98, 1], rootMargin: '-18% 0px -18% 0px' }).observe(svg);
+      for (var i = 0; i < (CALM ? 44 : 76); i++) {
         var g = document.createElementNS(NS, 'g'), p = document.createElementNS(NS, 'path');
         p.setAttribute('fill', 'currentColor'); p.setAttribute('d', PATHS.square);
         g.appendChild(p); cloud.appendChild(g);
         var a = Math.random() * Math.PI * 2, rr = Math.pow(Math.random(), .7);
         puffs.push({ g: g, hx: 160 + Math.cos(a) * rr * 120, hy: 30 + Math.random() * 170, s: rnd(26, 62),
-          o: rnd(.16, .34), rot: rnd(0, 90), vr: rnd(-9, 9), rise: rnd(5, 12), ph: rnd(0, 6.3), ox: 0, oy: 0 });
+          o: CALM ? rnd(.08, .2) : rnd(.16, .34), rot: rnd(0, 90), vr: rnd(-9, 9), rise: rnd(5, 12), ph: rnd(0, 6.3), ox: 0, oy: 0 });
       }
       var hand = { x: -1e3, y: -1e3, at: -1e4 }, clear = 0, smokeOn = false, last = 0;
       function toLocal(e) {
@@ -1652,11 +1667,16 @@ document.querySelectorAll('.whyband').forEach(function (band) {
       function draw(now) {
         var dt = last ? Math.min(.05, (now - last) / 1000) : 0; last = now;
         var hx = hand.x, hy = hand.y, push = 520;
-        if (now - hand.at > 3200) {
+        if (CALM) hx = hy = -1e3;
+        else if (now - hand.at > 3200) {
           push = 240;                 /* the ghost hand */
           var u = now / 1000;
           hx = 160 + Math.sin(u * .55) * 70; hy = 110 + Math.sin(u * 1.1) * 38;
         }
+        /* the self-clearing (touch): once the moment holds the middle of the
+           screen, the middle opens over a second and a half */
+        if (CALM) { if (!inMid) onAt = 0; else if (!onAt) onAt = now; }
+        var auto = CALM && onAt ? easeIO(Math.min(1, Math.max(0, (now - onAt - 500) / 1500))) : 0, rad = 88 * auto;
         var near = 0;
         for (var i = 0; i < puffs.length; i++) {
           var q = puffs[i];
@@ -1668,6 +1688,10 @@ document.querySelectorAll('.whyband').forEach(function (band) {
           if (d < 78) { var f = (1 - d / 78) * push * dt; q.ox += dx / d * f; q.oy += dy / d * f; }
           q.ox -= q.ox * Math.min(1, .9 * dt); q.oy -= q.oy * Math.min(1, .9 * dt);   /* closes back, slowly */
           x = q.hx + Math.sin(now / 1900 + q.ph) * 9 + q.ox; y = q.hy + q.oy;
+          if (rad) {
+            var cdx = x - 160, cdy = y - 110, cd = Math.hypot(cdx, cdy) || 1, lim = rad * 1.3;
+            if (cd < lim) { var nd = cd + (lim - cd) * .77; x = 160 + cdx / cd * nd; y = 110 + cdy / cd * nd; }
+          }
           if (Math.hypot(x - 160, y - 110) < 62) near += q.s / 40;
           var edge = Math.min(1, (q.hy - 18) / 40, (205 - q.hy) / 30);
           q.g.setAttribute('opacity', (q.o * Math.max(0, edge)).toFixed(3));
