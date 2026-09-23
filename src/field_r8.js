@@ -121,7 +121,7 @@ function makeField(svg, opt) {
 
   var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0, hits: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = '@@t.game.words@@'.split(', ');
+  var WORDS = '@@t.game.words@@'.split(' | ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -129,9 +129,14 @@ function makeField(svg, opt) {
   /* a word laid out letter by letter, from real glyph widths, so it reads as
      one word before it comes apart */
   function layout(text) {
-    var lines = text.indexOf(' ') > 0 && text.length > 9 ? text.split(' ') : [text];
-    var fs = lines.length > 1 ? 50 : (text.length <= 8 ? 62 : Math.max(46, 62 * 8 / text.length));
-    var maxW = W * .2, widest = 0;
+    /* a phrase wraps into short lines, about fifteen characters each */
+    var lines = [], cur = '';
+    text.split(' ').forEach(function (wd) {
+      if (cur && (cur + ' ' + wd).length > 15) { lines.push(cur); cur = wd; } else cur = cur ? cur + ' ' + wd : wd;
+    });
+    if (cur) lines.push(cur);
+    var fs = lines.length > 2 ? 42 : lines.length > 1 ? 48 : 58;
+    var maxW = W * .24, widest = 0;
     cv.font = '800 ' + fs + 'px Gabarito, sans-serif';
     lines.forEach(function (ln) { widest = Math.max(widest, cv.measureText(ln).width); });
     if (widest > maxW) fs *= maxW / widest;
@@ -147,7 +152,7 @@ function makeField(svg, opt) {
       }
     });
     /* box half-extents, for placing the word clear of the copy */
-    return { letters: out, fs: fs, halfW: maxTx + fs * .6, halfH: fs * (lines.length > 1 ? 1.1 : .6) };
+    return { letters: out, fs: fs, halfW: maxTx + fs * .6, halfH: fs * (lines.length * .5 + .1) };
   }
   function newWord(now) {
     var text = WORDS[game.wave % WORDS.length];
@@ -158,9 +163,9 @@ function makeField(svg, opt) {
     var bb = svg.getBoundingClientRect(), vw = bb.width / Math.max(bb.width / W, bb.height / H);
     var v0 = (W - vw) / 2, v1 = v0 + vw;
     var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
-    var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], launched: 0, lastAt: 0,
-              gap: Math.max(200, 380 - game.wave * 40), gone: 0, doneAt: 0 };
-    w.readAt = now + 700 + Math.max(300, 650 - game.wave * 90) + 40 * lay.letters.length;
+    var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], front: 0, back: lay.letters.length - 1,
+              lastAt: 0, gap: Math.max(260, 460 - game.wave * 40), gone: 0, doneAt: 0 };
+    w.readAt = now + 700 + Math.max(300, 650 - game.wave * 90) + 55 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
       t.setAttribute('font-size', lay.fs.toFixed(1)); t.setAttribute('text-anchor', 'middle');
@@ -355,14 +360,19 @@ function makeField(svg, opt) {
       /* never more than three pairs in the air: the rest wait their turn */
       var flying = 0;
       for (var fi = 0; fi < w.letters.length; fi++) if (w.letters[fi].st === 'fly' || w.letters[fi].st === 'queued') flying++;
-      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.launched < w.letters.length && flying <= 4;
+      var canLaunch = now >= w.readAt && now - w.lastAt >= w.gap && w.front <= w.back && flying <= 4;
       if (canLaunch) {
-        var n = Math.min(2, w.letters.length - w.launched);
+        /* two threads: from the front of the phrase a pair fires, from the
+           back two letters just dissolve. Half the phrase ever flies. */
         var arc0 = Math.random() < .5 ? 1 : -1;
-        for (var q = 0; q < n; q++) {
-          var L = w.letters[w.launched++];
+        for (var q = 0; q < 2 && w.front <= w.back; q++) {
+          var L = w.letters[w.front++];
           /* the two of a pair take opposite arcs, the second a beat later */
           L.st = 'queued'; L.go = now + q * rnd(340, 480); L.arc = q ? -arc0 : arc0;
+        }
+        for (var q2 = 0; q2 < 2 && w.front <= w.back; q2++) {
+          var Lf = w.letters[w.back--];
+          Lf.st = 'gone'; Lf.t0 = now + q2 * 140; Lf.fadeMs = 900; w.gone++;
         }
         w.lastAt = now;
       }
@@ -421,7 +431,7 @@ function makeField(svg, opt) {
           }
         } else if (L2.st === 'gone') {
           if (!L2.el.parentNode) continue;
-          L2.o = Math.max(0, 1 - (now - L2.t0) / 350);
+          L2.o = Math.max(0, Math.min(1, 1 - (now - L2.t0) / (L2.fadeMs || 350)));
           L2.el.setAttribute('opacity', L2.o.toFixed(3));
           if (!L2.o) ltrG.removeChild(L2.el);
         }

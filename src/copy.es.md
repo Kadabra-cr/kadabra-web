@@ -37,10 +37,14 @@ policy.capA.fig: 93%
 policy.capA.label: Ahorran tiempo con IA
 policy.capB.fig: 9%
 policy.capB.label: Tienen política de IA
-policy.beat1: Si tomamos cien empresas tecnológicas costarricenses
-policy.beat2: Noventa y tres empresas ya ahorran tiempo con IA.
-policy.beat3: Sólo nueve tienen alguna regla al respecto.
-policy.aside: Las otras ochenta y cuatro están tentando la suerte.
+policy.beat1.fig: 100
+policy.beat1: empresas tecnológicas costarricenses.
+policy.beat2.fig: 93
+policy.beat2: ya ahorran tiempo con IA.
+policy.beat3.fig: 9
+policy.beat3: tienen alguna regla al respecto.
+policy.aside.fig: 84
+policy.aside: están tentando la suerte.
 policy.cite: 93% ahorran tiempo, 9% tienen política &mdash; PROCOMER, Caracterización del Sector TIC, 2025
 
 ## Los equipos con enseñanza rinden más
@@ -51,7 +55,7 @@ viz.aria: Dos barras hechas de marcas. Cuadros para quienes lo resuelven solos, 
 viz.capA: Resolviéndolo solos
 viz.capB: Con enseñanza primero
 viz.delta: +34%
-viz.beat1: Las mismas cien personas, dos veces.
+viz.beat1: Las mismas 100 personas, dos veces.
 viz.beat2: A un grupo se le enseña primero a usar IA en su propio trabajo.
 viz.beat3: Ese grupo aprendido logra 1/3 más de trabajo.
 viz.aside.pre: Y hoy solo al
@@ -174,7 +178,7 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 ## Palabras del juego de la portada
 
-game.words: factura equivocada, números inventados, mal consejo, fuga de datos, precio equivocado, cita inventada, datos del cliente, contrato filtrado, demanda, sin política
+game.words: La IA nos hizo una factura mal | Claude nos dio datos falsos | ChatGPT se inventó la cifra | Así lo hizo ChatGPT | Nadie revisó los números | El resumen se saltó la cláusula | Subimos datos de clientes a un chat | La IA le prometió un descuento al cliente | El contrato se filtró | Nos llegó una demanda
 
 ## Pie de página
 
