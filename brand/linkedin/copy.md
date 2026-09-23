@@ -9,7 +9,7 @@ Tratamiento: ustedeo. Nunca voseo ni tuteo.
 ## Común a los tres
 
 web: kadabracr.com
-oferta: Talleres de IA prácticos para equipos en Costa Rica.
+oferta: Capacitación en IA rápida, interactiva y segura en Costa Rica.
 
 ## Diseño 1 · La carta
 

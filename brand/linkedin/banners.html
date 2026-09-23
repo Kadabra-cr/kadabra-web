@@ -113,9 +113,10 @@ svg{display:block}
 .empresa .gcap span{font-size:11.5px;max-width:13ch}
 .empresa.datos .remate{display:block;font-size:11.5px!important}
 
-/* ============ the profile picture: the icon, alone, clear ============ */
-.avatar{background:radial-gradient(70% 70% at 50% 42%,#1D3E32 0%,var(--felt-deep) 72%);display:grid;place-items:center}
-.avatar .mark{width:46%;height:auto;color:var(--white);transform:translate(-2%,-1%)}
+/* ============ the profile picture: the icon alone, on the carbon of 'Sin humo' ============ */
+.avatar{background:radial-gradient(62% 62% at 50% 46%,#2B2721 0%,var(--carbon) 70%);display:grid;place-items:center}
+.avatar .mark{width:44%;height:auto;color:var(--white);transform:translate(-4%,-1%);
+  filter:drop-shadow(0 26px 36px rgba(0,0,0,.55))}
 </style>
 </head>
 <body>
@@ -157,7 +158,7 @@ function copyCol(k) {
 }
 
 if (S === 'avatar') {
-  root.innerHTML = '<div class="art avatar"><svg class="mark" viewBox="94.06 284.20 366.28 435.60" role="img" aria-label="kadabra"><use href="#logo-mark" x="94.06" y="284.20" width="366.28" height="435.60"/></svg></div>';
+  root.innerHTML = '<div class="art avatar"><svg class="mark" viewBox="94.06 284.20 366.28 435.60" role="img" aria-label="kadabra"><rect x="228" y="377" width="213" height="324" fill="#C9A227"/><use href="#logo-mark" x="94.06" y="284.20" width="366.28" height="435.60"/></svg></div>';
 } else if (D === 'carta') {
   /* a few suits lie on the felt, dim, mostly where the photo will sit */
   var tb = '';

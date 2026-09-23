@@ -22,8 +22,8 @@ const only = process.argv[2];
 const jobs = [];
 for (const [d, name] of [['carta', '1-carta'], ['humo', '2-sin-humo'], ['datos', '3-93-9']])
   for (const [s, w, h] of [['perfil', 1584, 396], ['empresa', 1128, 191]]) jobs.push({ d, s, w, h, scale: 2, file: `${name}_${s}_${w}x${h}@2x.png` });
-jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 1, file: 'perfil-icono_1080.png' });
-jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 400 / 1080, file: 'perfil-icono_400.png' });
+jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 1, file: 'perfil-icono-carbon_1080.png' });
+jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 400 / 1080, file: 'perfil-icono-carbon_400.png' });
 const b = await chromium.launch();
 for (const j of jobs) {
   if (only && !j.file.includes(only)) continue;
@@ -32,8 +32,8 @@ for (const j of jobs) {
   await p.goto(pathToFileURL(page).href + `?d=${j.d}&s=${j.s}`);
   await p.waitForSelector('body[data-ready="1"]', { timeout: 20000 });
   await p.waitForTimeout(250);
-  await p.locator('.art').screenshot({ path: join(OUT, j.file) });
-  console.log(errs.length ? 'ERR ' + errs : 'ok', j.file);
+  try { await p.locator('.art').screenshot({ path: join(OUT, j.file) }); console.log(errs.length ? 'ERR ' + errs : 'ok', j.file); }
+  catch (e) { console.log('SKIPPED (file open elsewhere?)', j.file); }
   await p.close();
 }
 await b.close();
