@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>kadabra · LinkedIn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gabarito:wght@800&family=Hanken+Grotesk:wght@400;500;600&display=block">
+<style>
+:root{
+  --carbon:#1C1A17; --carbon-2:#2A2621; --felt:#1B3A2F; --felt-deep:#12261F; --felt-line:#2B5144;
+  --cream:#F6F2EA; --cream-2:#ECE5D8; --cream-line:#D9D2C4; --white:#FFFFFF;
+  --red:#8E1424; --gold:#C9A227; --gold-ink:#8A6812;
+  --on-felt:#DCE8E1; --on-felt-dim:#9FBAAC; --on-carbon:#EAE6DE; --on-carbon-dim:#9C968B;
+  --ink:#1C1A17; --ink-dim:#6B665C;
+  --title:"Gabarito",system-ui,sans-serif; --body:"Hanken Grotesk",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#000}
+body{-webkit-font-smoothing:antialiased;font-family:var(--body)}
+.art{position:relative;overflow:hidden;width:var(--w);height:var(--h)}
+.perfil{--w:1584px;--h:396px}
+.empresa{--w:1128px;--h:191px}
+.avatar{--w:1080px;--h:1080px}
+h1{margin:0;font-family:var(--title);font-weight:800;letter-spacing:-.035em;line-height:.96;text-wrap:balance}
+p{margin:0}
+em{font-style:normal}
+svg{display:block}
+
+/* ---- the copy column: right of the photo, generous margins ---- */
+.copy{position:absolute;display:grid;align-content:center;z-index:3}
+.perfil .copy{left:452px;top:0;bottom:0;width:640px;gap:18px}
+.empresa .copy{left:236px;top:0;bottom:0;width:520px;gap:8px}
+.perfil h1{font-size:62px}
+.empresa h1{font-size:34px}
+.remate{font-weight:500}
+.perfil .remate{font-size:23px;line-height:1.3}
+.empresa .remate{display:none}
+.offer{font-weight:500}
+.perfil .offer{font-size:20px;margin-top:6px}
+.empresa .offer{font-size:14.5px;margin-top:2px}
+.sig{display:flex;align-items:center;gap:18px;font-weight:600;letter-spacing:.01em}
+.perfil .sig{font-size:19px}
+.empresa .sig{font-size:14.5px}
+.sig .lock{height:30px;width:auto;flex:none}
+.empresa .sig .lock,.empresa .sig .bar{display:none}
+.sig .bar{width:1px;height:24px;flex:none;opacity:.3;background:currentColor}
+
+/* ============ 1 · LA CARTA: felt, a dealt card, the site's question ============ */
+.carta{background:radial-gradient(120% 140% at 72% 40%,#173328 0%,var(--felt-deep) 62%)}
+.carta h1{color:var(--white)}
+.carta h1 em{color:var(--white)}
+.carta .remate{color:var(--gold)}
+.carta .offer{color:var(--on-felt)}
+.carta .sig{color:var(--white)}
+.carta .sig .web{color:var(--gold)}
+.carta .sig .lock{color:var(--white)}
+.table{position:absolute;inset:0;z-index:1;pointer-events:none}
+.deal{position:absolute;z-index:2}
+.perfil .deal{right:92px;top:50%;width:430px;height:268px;margin-top:-134px}
+.empresa .deal{right:64px;top:50%;width:212px;height:132px;margin-top:-66px}
+.card{position:absolute;inset:0;background:var(--cream);color:var(--ink);border-radius:8px;overflow:hidden;
+  display:grid;grid-template-rows:1fr auto 1fr;box-shadow:0 30px 50px -24px rgba(0,0,0,.9),0 2px 0 rgba(255,255,255,.35) inset}
+.empresa .card{border-radius:5px}
+.card.back{background:var(--cream-2);transform:rotate(7deg) translate(18px,6px);box-shadow:0 20px 40px -24px rgba(0,0,0,.9)}
+.card.front{transform:rotate(-4.5deg);will-change:transform}
+.card .pip{position:absolute;top:50%;left:50%;width:30%;transform:translate(-50%,-50%) rotate(90deg);opacity:.07;color:var(--ink)}
+.card .band{grid-row:2;background:var(--red);color:var(--white);font-weight:600;position:relative;z-index:1}
+.perfil .card .band{font-size:22px;line-height:1.28;padding:22px 28px}
+.empresa .card .band{font-size:11.5px;line-height:1.28;padding:10px 14px}
+.card .ix{position:absolute;display:grid;justify-items:center;gap:4px;font-weight:600;line-height:1;color:var(--red)}
+.perfil .card .ix{font-size:21px}.perfil .card .ix svg{width:17px;height:17px}
+.empresa .card .ix{font-size:12px;gap:2px}.empresa .card .ix svg{width:10px;height:10px}
+.card .ix.a{top:16px;right:16px;transform-origin:100% 0;transform:rotate(90deg) translateX(100%)}
+.card .ix.b{bottom:16px;left:16px;transform-origin:0 100%;transform:rotate(-90deg) translateY(100%)}
+.empresa .card .ix.a{top:9px;right:9px}.empresa .card .ix.b{bottom:9px;left:9px}
+
+/* ============ 2 · SIN HUMO: carbon, a cloud of squares parting on a gold spade ============ */
+.humo{background:radial-gradient(90% 150% at 80% 50%,#26221D 0%,var(--carbon) 60%)}
+.humo h1{color:var(--white)}
+.humo h1 em{color:var(--gold)}
+.humo .remate{color:var(--on-carbon)}
+.humo .offer{color:var(--on-carbon-dim)}
+.humo .sig .web{color:var(--gold)}
+.humo .sig .lock{color:var(--white)}
+.smoke{position:absolute;top:0;bottom:0;z-index:1;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 38%);mask-image:linear-gradient(90deg,transparent 0,#000 38%)}
+.perfil .smoke{right:0;width:760px}
+.empresa .smoke{right:0;width:480px}
+
+/* ============ 3 · 93 / 9: cream, two hundred marks ============ */
+.datos{background:var(--cream)}
+.datos h1{color:var(--ink)}
+.perfil.datos h1{font-size:54px}
+.perfil.datos .copy{width:560px}
+.datos h1 em{color:var(--gold-ink)}
+.datos .remate{color:var(--ink-dim);font-size:17px!important;font-weight:500}
+.datos .offer{color:var(--ink)}
+.datos .sig{color:var(--ink)}
+.datos .sig .web{color:var(--gold-ink)}
+.datos .sig .lock{color:var(--ink)}
+.grids{position:absolute;z-index:2;display:flex}
+.perfil .grids{right:88px;top:50%;transform:translateY(-50%);gap:40px}
+.empresa .grids{right:48px;top:50%;transform:translateY(-50%);gap:22px}
+.gcol{display:grid;gap:12px;justify-items:start}
+.empresa .gcol{grid-template-columns:auto auto;align-items:end;gap:0 10px}
+.gcol svg{height:212px;width:auto}
+.empresa .gcol svg{height:132px}
+.gcap{display:grid;line-height:1.1}
+.gcap b{font-family:var(--title);font-weight:800;letter-spacing:-.04em;font-size:40px;color:var(--ink)}
+.gcap span{font-size:15px;font-weight:600;color:var(--ink)}
+.gcol.gold .gcap b,.gcol.gold .gcap span{color:var(--gold-ink)}
+.empresa .gcap b{font-size:26px}
+.empresa .gcap span{font-size:11.5px;max-width:13ch}
+.empresa.datos .remate{display:block;font-size:11.5px!important}
+
+/* ============ the profile picture: the icon, alone, clear ============ */
+.avatar{background:radial-gradient(70% 70% at 50% 42%,#1D3E32 0%,var(--felt-deep) 72%);display:grid;place-items:center}
+.avatar .mark{width:46%;height:auto;color:var(--white);transform:translate(-2%,-1%)}
+</style>
+</head>
+<body>
+@@SPRITES@@
+<div id="root"></div>
+<script>
+var T = @@COPY@@, P = @@PATHS@@;
+var q = new URLSearchParams(location.search), D = q.get('d') || 'carta', S = q.get('s') || 'perfil';
+var NS = 'http://www.w3.org/2000/svg';
+/* seeded, so every export is the same picture */
+var seed = 7; function rnd(a, b) { seed = (seed * 16807) % 2147483647; return a + (seed / 2147483647) * (b - a); }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+/* '|' breaks a title line; *text* is the one emphasis */
+function title(s) { return esc(s).split('|').join('<br>').replace(/\*([^*]+)\*/g, '<em>$1</em>'); }
+/* square -> suit, number for number */
+var NUMS = {}; Object.keys(P).forEach(function (k) { NUMS[k] = P[k].match(/-?\d+(\.\d+)?/g).map(Number); });
+var TMPL = P.square.split(/-?\d+(?:\.\d+)?/);
+function mix(key, t) {
+  var a = NUMS.square, b = NUMS[key], s = '';
+  for (var i = 0; i < TMPL.length; i++) { s += TMPL[i]; if (i < a.length) s += (a[i] + (b[i] - a[i]) * t).toFixed(2); }
+  return s;
+}
+function mark(key, t, x, y, size, rot, fill, op, extra) {
+  return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + (rot || 0).toFixed(1) + ') scale(' + (size / 100).toFixed(4) +
+    ') translate(-50 -50)" opacity="' + (op == null ? 1 : op).toFixed(3) + '"' + (extra || '') + '><path fill="' + fill + '" d="' + mix(key, t) + '"/></g>';
+}
+var suits = ['smooth-spade', 'smooth-heart', 'smooth-diamond', 'smooth-club'];
+var W = S === 'perfil' ? 1584 : S === 'empresa' ? 1128 : 1080, H = S === 'perfil' ? 396 : S === 'empresa' ? 191 : 1080;
+var root = document.getElementById('root');
+
+function sig() {
+  return '<p class="offer">' + esc(T['oferta']) + '</p>' +
+    '<p class="sig"><svg class="lock" viewBox="0 0 1703.11 435.6" aria-label="kadabra"><use href="#logo-full" width="1703.11" height="435.6"/></svg>' +
+    '<i class="bar"></i><span class="web">' + esc(T['web']) + '</span></p>';
+}
+function copyCol(k) {
+  return '<div class="copy"><h1>' + title(T[k + '.titulo']) + '</h1>' +
+    (T[k + '.remate'] ? '<p class="remate">' + esc(T[k + '.remate']) + '</p>' : '') + sig() + '</div>';
+}
+
+if (S === 'avatar') {
+  root.innerHTML = '<div class="art avatar"><svg class="mark" viewBox="94.06 284.20 366.28 435.60" role="img" aria-label="kadabra"><use href="#logo-mark" x="94.06" y="284.20" width="366.28" height="435.60"/></svg></div>';
+} else if (D === 'carta') {
+  /* a few suits lie on the felt, dim, mostly where the photo will sit */
+  var tb = '';
+  var n = S === 'perfil' ? 16 : 11;
+  for (var i = 0; i < n; i++) {
+    var x = rnd(20, S === 'perfil' ? 420 : 215), y = rnd(14, H - 14), s = rnd(14, S === 'perfil' ? 34 : 22);
+    tb += mark(suits[i % 4], 1, x, y, s, rnd(-25, 25), i % 5 === 3 ? '#A81A2C' : '#FFFFFF', rnd(.08, .2));
+  }
+  var idx = '<span class="ix %c">' + esc(T['carta.indice']) + '<svg viewBox="0 0 100 100"><use href="#classic-heart"/></svg></span>';
+  root.innerHTML = '<div class="art carta ' + S + '"><svg class="table" viewBox="0 0 ' + W + ' ' + H + '">' + tb + '</svg>' + copyCol('carta') +
+    '<div class="deal"><div class="card back"></div><div class="card front">' +
+    '<svg class="pip" viewBox="0 0 100 100"><path fill="currentColor" d="' + mix('smooth-heart', 1) + '"/></svg>' +
+    idx.replace('%c', 'a') + '<p class="band">' + esc(T['carta.tarea']) + '</p>' + idx.replace('%c', 'b') + '</div></div></div>';
+} else if (D === 'humo') {
+  /* the cloud: soft squares, thick at the edges, parted in the middle, a gold spade in the clearing */
+  var sw = S === 'perfil' ? 760 : 480, cx = sw * .58, cy = H / 2, R = S === 'perfil' ? 104 : 52, sm = '';
+  var cnt = S === 'perfil' ? 230 : 160;
+  for (var j = 0; j < cnt; j++) {
+    /* thickest right at the edge of the clearing, thinning outwards */
+    var a = rnd(0, Math.PI * 2), d = R * 1.02 + Math.pow(rnd(0, 1), 1.9) * (S === 'perfil' ? 330 : 230);
+    var px = cx + Math.cos(a) * d * 1.15, py = cy + Math.sin(a) * d * .8;
+    if (py < -30 || py > H + 30) continue;
+    var sz = rnd(S === 'perfil' ? 22 : 12, S === 'perfil' ? 70 : 38), near = 1 - Math.min(1, (d - R) / 260);
+    sm += mark('square', 0, px, py, sz, rnd(0, 90), '#EAE6DE', rnd(.04, .11) + near * .12);
+  }
+  var sp = S === 'perfil' ? 120 : 64;
+  root.innerHTML = '<div class="art humo ' + S + '">' + copyCol('humo') +
+    '<svg class="smoke" viewBox="0 0 ' + sw + ' ' + H + '"><defs><filter id="blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="' + (S === 'perfil' ? 3.2 : 2) + '"/></filter>' +
+    '<radialGradient id="halo"><stop offset="0" stop-color="#C9A227" stop-opacity=".22"/><stop offset="1" stop-color="#C9A227" stop-opacity="0"/></radialGradient></defs>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R * 1.25) + '" fill="url(#halo)"/>' +
+    '<g filter="url(#blur)">' + sm + '</g>' +
+    mark('smooth-spade', 1, cx, cy + sp * .02, sp, 0, '#C9A227', 1, ' style="filter:drop-shadow(0 8px 18px rgba(0,0,0,.55))"') + '</svg></div>';
+} else {
+  function grid(lit, key, gold) {
+    var cw = 22, ch = 23, sz = 18, out = '';
+    for (var n = 0; n < 100; n++) {
+      var col = n % 10, row = (n / 10) | 0, x = col * cw + cw / 2, y = 10 * ch - row * ch - ch / 2;
+      var on = n < lit;
+      out += mark(on ? key : 'square', on ? 1 : 0, x, y, sz, 0, on ? (gold ? '#8A6812' : '#1C1A17') : '#1C1A17', on ? 1 : .12);
+    }
+    return '<svg viewBox="0 0 ' + 10 * cw + ' ' + 10 * ch + '">' + out + '</svg>';
+  }
+  function cap(k) { return '<p class="gcap"><b>' + esc(T['datos.' + k + '.cifra']) + '</b><span>' + esc(T['datos.' + k + '.texto']) + '</span></p>'; }
+  root.innerHTML = '<div class="art datos ' + S + '">' +
+    '<div class="copy"><h1>' + title(T['datos.titulo']) + '</h1><p class="remate">' + esc(T['datos.fuente']) + '</p>' + sig() + '</div>' +
+    '<div class="grids"><div class="gcol">' + grid(93, 'square', false) + cap('a') + '</div>' +
+    '<div class="gcol gold">' + grid(9, 'smooth-diamond', true) + cap('b') + '</div></div></div>';
+}
+document.fonts.ready.then(function () { document.body.dataset.ready = '1'; });
+</script>
+</body>
+</html>
