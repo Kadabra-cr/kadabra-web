@@ -6,20 +6,17 @@ Capacitación en IA rápida, interactiva y segura en Costa Rica.
 
 ## Descripción
 
-kadabra da capacitación en IA rápida, interactiva y segura para equipos en Costa Rica.
+El truco no es la herramienta, es saber usarla.
 
-El truco no es la herramienta, es saber usarla. La IA ya funciona: el 93% de las empresas tecnológicas costarricenses ahorra tiempo con ella. Pero solo el 9% tiene una política formal de IA (PROCOMER, 2025). En esa distancia aparecen las cifras inventadas, las facturas mal hechas y los datos que nunca debieron salir de la empresa.
+En kadabra damos talleres de IA interactivos para equipos ticos. Con las herramientas que ustedes ya usan, sin vender humo.
 
-Nuestro taller, «Inteligencia Artificial sin humo», se hace con el trabajo real de su equipo:
+Trabajamos con tareas reales de la semana de su equipo. No las nuestras. Las de ustedes. Personalizamos cada taller al cliente, no es una plantilla.
 
-• Aclaramos qué hace y qué no hace la IA, con ejemplos de su área.
-• Trabajamos tareas reales de la semana de ustedes, con las herramientas que ya usan.
-• Hacemos fallar la IA a propósito, para que lo vean ustedes antes que un cliente.
-• Escribimos juntos las reglas de la casa para que la IA se use bien en su negocio.
+También hacemos fallar la IA frente a ustedes, para que vean dónde se rompe antes que un cliente. Y al final escribimos con todo el equipo las reglas para usarla bien en su negocio.
 
-Sin diapositivas aburridas, sin plantillas y sin nada que comprar después. Los equipos a los que se les enseña primero logran hasta un tercio más de trabajo (NBER, 2023).
+Hoy el 93% de las empresas tecnológicas costarricenses ahorran tiempo con IA. Solo el 9% tienen una política formal al respecto (PROCOMER, 2025).
 
-Conozca el taller en kadabracr.com
+Más información en kadabracr.com. Mandarnos un mensaje es gratis, con todo gusto los atendemos.
 
 ## Especialidades
 
