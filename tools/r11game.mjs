@@ -21,20 +21,20 @@ await p.evaluate(s => {
   window.__F = document.querySelector(s).__field;
 }, sel);
 const st = () => p.evaluate(() => { const f = window.__F, w = f.game.word;
-  const fly = w ? w.letters.filter(l => l.st === 'fly').map(l => ({ x: l.x, y: l.y })) : [];
+  const fly = w ? w.letters.filter(l => l.st === 'fly').map(l => ({ x: l.x, y: l.y, vx: l.vx, vy: l.vy })) : [];
   return { mass: f.heart.mass, phase: f.game.phase, wave: f.game.wave, hits: f.game.hits, hx: f.heart.x, hy: f.heart.y, fly,
     word: w ? { cy: w.cy, cx: w.cx, n: w.letters.length, fs: +w.letters[0].el.getAttribute('font-size') } : null,
-    texts: document.querySelectorAll('.war text').length }; });
+    texts: document.querySelectorAll('.war text').length, age: f.game.hitAge }; });
 let mx = 500, my = 450, armedAt = 0, maxFly = 0, maxTexts = 0, words = [], shot = 0;
 const t0 = Date.now();
 let s, lastHits = 0;
-while (Date.now() - t0 < 120000) {
+while (Date.now() - t0 < 240000) {
   s = await st();
   if (!armedAt && s.phase === 'armed') { armedAt = Date.now(); await p.evaluate(() => { window.__ft = []; }); console.log('armed at', ((armedAt - t0) / 1000).toFixed(1), 's, mass', s.mass); }
   if (s.word && !words.find(w => w.cx === s.word.cx && w.wave === s.wave)) { words.push({ ...s.word, wave: s.wave }); }
   maxFly = Math.max(maxFly, s.fly.length); maxTexts = Math.max(maxTexts, s.texts);
   if (s.fly.length >= 2 && shot < 2) { await p.screenshot({ path: `shots/r11/game-${where}-${shot++}.png` }); }
-  if (s.hits > lastHits) { lastHits = s.hits; console.log('hit', s.hits, ((Date.now() - armedAt) / 1000).toFixed(2), 's heart', s.hx.toFixed(0), s.hy.toFixed(0), 'mouse-target', mx.toFixed(0), my.toFixed(0), 'fly', s.fly.length); }
+  if (s.hits > lastHits) { lastHits = s.hits; console.log('hit', s.hits, ((Date.now() - armedAt) / 1000).toFixed(2), 's heart', s.hx.toFixed(0), s.hy.toFixed(0), 'age', s.age, 'fly', s.fly.length); }
   if (s.phase === 'asking') {
     if (!s.askShot) { await sleep(900); await p.screenshot({ path: `shots/r11/ask-${where}.png` }); s.askShot = 1; }
     await p.click((where === 'close' ? '#close-home' : '#hero') + ' .ask .yes'); await sleep(900);
@@ -51,7 +51,14 @@ while (Date.now() - t0 < 120000) {
     const n = Math.hypot(fx, fy) || 1;
     mx = Math.max(200, Math.min(1400, s.hx + fx / n * 380 + (800 - s.hx) * .35)); my = Math.max(160, Math.min(FH - 160, s.hy + fy / n * 380 + (FH / 2 - s.hy) * .35));
     if (!s.fly.length) { const a = Date.now() / 700; mx = 800 + Math.cos(a) * 260; my = FH / 2 + Math.sin(a) * FH * .28; }
-  } else if (mode === 'circle') { const a = Date.now() / 380; mx = 800 + Math.cos(a) * 330; my = FH / 2 + Math.sin(a) * FH * .3;
+  } else if (mode === 'smart') {
+    /* a person: drift near the middle, and sidestep whatever is about to arrive */
+    let dx = (800 - s.hx) * .25, dy = (FH / 2 - s.hy) * .25;
+    s.fly.forEach(l => { const rx = s.hx - l.x, ry = s.hy - l.y, v = Math.hypot(l.vx, l.vy) || 1, t = (rx * l.vx + ry * l.vy) / (v * v);
+      if (t > 0 && t < .7) { const cx = l.x + l.vx * t - s.hx, cy = l.y + l.vy * t - s.hy, miss = Math.hypot(cx, cy);
+        if (miss < 140) { const px = -l.vy / v, py = l.vx / v, side = (px * -cx + py * -cy) >= 0 ? 1 : -1; dx += px * side * 320; dy += py * side * 320; } } });
+    mx = Math.max(200, Math.min(1400, s.hx + dx)); my = Math.max(150, Math.min(FH - 150, s.hy + dy));
+  } else if (mode === 'circle') { const a = Date.now() / 380; mx = 800 + Math.cos(a) * 220; my = FH / 2 + Math.sin(a) * FH * .3;
   } else { const a = Date.now() / 1500; mx = 800 + Math.cos(a) * 150; my = FH / 2 + Math.sin(a) * 90; }
   const q = toPage(mx, my); await p.mouse.move(q.x, q.y); await sleep(16);
 }

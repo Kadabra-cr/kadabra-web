@@ -600,11 +600,12 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
 .hero h1,.hero .sub,.close h2,.close .fine{transition:opacity .35s linear}
 .swapping{opacity:0!important}
 /* the ask: a small pill by the heart */
-.ask{position:absolute;left:0;top:0;z-index:4;display:flex;align-items:center;gap:8px;padding:5px 5px 5px 15px;
+.ask{position:absolute;left:0;top:0;z-index:4;display:flex;align-items:center;gap:4px;padding:5px;transform-origin:50% 50%;
   border-radius:999px;background:rgba(28,26,23,.94);border:1px solid var(--carbon-line);color:var(--on-carbon);
   font-size:.88rem;line-height:1.2;white-space:nowrap;box-shadow:0 16px 32px -16px rgba(0,0,0,.95);
-  opacity:0;scale:.9;pointer-events:none;transition:opacity .35s linear,scale .45s cubic-bezier(.16,1,.3,1)}
-.ask.on{opacity:1;scale:1;pointer-events:auto}
+  opacity:0;scale:.9;pointer-events:none;visibility:hidden;
+  transition:opacity .35s linear,scale .45s cubic-bezier(.16,1,.3,1),visibility 0s .35s}
+.ask.on{opacity:1;scale:1;pointer-events:auto;visibility:visible;transition-delay:0s}
 .ask .yes{font:inherit;font-weight:600;background:var(--gold);color:var(--carbon);border:0;border-radius:999px;
   padding:.5em 1.05em;cursor:pointer;transition:background .2s var(--ease)}
 .ask .yes:hover{background:#DDB437}
@@ -618,7 +619,8 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   color:var(--on-carbon);font-size:.86rem;line-height:1.2;white-space:nowrap;box-shadow:0 16px 32px -16px rgba(0,0,0,.95);
   opacity:0;transform:translate(-50%,-18px);pointer-events:none;
   transition:opacity .35s linear,transform .6s cubic-bezier(.16,1,.3,1),border-color .8s linear,box-shadow .8s linear,padding .6s var(--ease)}
-.mode.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.mode.on{opacity:1;transform:translate(-50%,0);pointer-events:auto;visibility:visible}
+.mode:not(.on){visibility:hidden;transition-property:opacity,transform,visibility;transition-delay:0s,0s,.6s}
 .mode.fresh{padding:9px 7px 9px 18px;border-color:var(--gold);box-shadow:0 0 0 5px rgba(201,162,39,.16),0 16px 32px -16px rgba(0,0,0,.95)}
 .mode .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:modeDot 1.6s ease-in-out infinite}
 @keyframes modeDot{0%,100%{opacity:1}50%{opacity:.35}}

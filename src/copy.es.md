@@ -22,7 +22,7 @@ hero.btn: Ver el taller
 hero.fine: Mandarnos un mensaje es gratis, con todo gusto los atendemos.
 hero.cue: Bajar
 hero.dead.h1: A ciegas, tarde o temprano se paga.
-hero.dead.sub: La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es que vaya a pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.
+hero.dead.sub: La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es qué pueda pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.
 
 ## Funciona. Hasta que deja de funcionar.
 
@@ -58,11 +58,11 @@ viz.delta: +34%
 viz.beat1: Las mismas 100 personas, dos veces.
 viz.beat2: A un grupo se le enseña primero a usar IA en su propio trabajo.
 viz.beat3: Ese grupo aprendido logra 1/3 más de trabajo.
-viz.aside.pre: Y hoy solo al
-viz.aside.fig: 47%
+viz.aside.pre: Y hoy
+viz.aside.fig: menos de la mitad
 viz.aside.post: de las personas en el trabajo se les ha enseñado a usar IA.
 viz.cite1: +34% en principiantes con enseñanza &mdash; Brynjolfsson, Li y Raymond, NBER 31161, 2023
-viz.cite2: 47% con capacitación &mdash; KPMG &times; Melbourne Business School, 2025
+viz.cite2: Menos de la mitad con capacitación &mdash; KPMG &times; Melbourne Business School, 2025
 
 ## ¿Puede la IA encargarse de esto?
 
@@ -178,10 +178,9 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 ## Palabras del juego de la portada
 
-game.words: La IA nos hizo una factura mal | Claude nos dio datos falsos | ChatGPT se inventó la cifra | Así lo hizo ChatGPT | Nadie revisó los números | El resumen se saltó la cláusula | Subimos datos de clientes a un chat | La IA le prometió un descuento al cliente | El contrato se filtró | Nos llegó una demanda
+game.words: La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde
 
-game.ask: Pruebe usar IA sin saber cómo.
-game.ask.btn: Interactuar
+game.ask: ¿Interactuar?
 game.ask.no: Ahora no
 game.mode: Modo interactivo
 game.exit: Salir

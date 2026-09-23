@@ -206,6 +206,7 @@ function makeField(svg, opt) {
   var SPAWN = 620, BORN = 900;
   var CAP = 40;                              /* marks in a full heart: 100% */
   var REBIRTH = 20000;                       /* ms of reading after a defeat */
+  var RAMP = .4;                             /* difficulty per phrase: the sixth plays like the old third */
   var LIVES = 3;                             /* three hits and it is over, whatever the size */
   var marks = [], frag = document.createDocumentFragment();
   var host = svg.parentNode;
@@ -311,7 +312,7 @@ function makeField(svg, opt) {
 
   var game = { phase: 'calm', armedAt: 0, wave: 0, nextWord: 0, word: null, deadAt: 0, offAt: 0, hits: 0 };
   svg.__field = { heart: heart, game: game, marks: marks, opt: opt };   /* for the checks */
-  var WORDS = 'La IA nos hizo una factura mal | Claude nos dio datos falsos | ChatGPT se inventó la cifra | Así lo hizo ChatGPT | Nadie revisó los números | El resumen se saltó la cláusula | Subimos datos de clientes a un chat | La IA le prometió un descuento al cliente | El contrato se filtró | Nos llegó una demanda'.split(' | ');
+  var WORDS = 'La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde'.split(' | ');
   var cv = document.createElement('canvas').getContext('2d');
   function fontReady() { return !document.fonts || document.fonts.check('800 100px Gabarito'); }
   if (document.fonts && document.fonts.load) document.fonts.load('800 100px Gabarito');
@@ -354,8 +355,8 @@ function makeField(svg, opt) {
     var v0 = (W - vw) / 2, v1 = v0 + vw;
     var cx = side > 0 ? Math.min(v0 + vw * .84, v1 - 30 - lay.halfW) : Math.max(v0 + vw * .16, v0 + 30 + lay.halfW);
     var w = { side: side, cx: cx, cy: H / 2, x: cx + side * 200, at: now, letters: [], front: 0, back: lay.letters.length - 1,
-              lastAt: 0, gap: Math.max(260, 460 - game.wave * 40), gone: 0, doneAt: 0 };
-    w.readAt = now + 700 + Math.max(300, 650 - game.wave * 90) + 55 * lay.letters.length;
+              lastAt: 0, gap: Math.max(260, 460 - game.wave * RAMP * 40), gone: 0, doneAt: 0 };
+    w.readAt = now + 700 + Math.max(300, 650 - game.wave * RAMP * 90) + 55 * lay.letters.length;
     lay.letters.forEach(function (l, i) {
       var t = document.createElementNS(NS, 'text');
       t.setAttribute('font-size', lay.fs.toFixed(1)); t.setAttribute('text-anchor', 'middle');
@@ -372,15 +373,13 @@ function makeField(svg, opt) {
   }
   /* never without asking: a small pill floats by the heart. Yes starts the
      words at once; the cross puts it away for good (until a reload). */
-  var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, hover: false };
+  var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, lx: 0, ly: 0, sc: 1 };
   askEl.className = 'ask';
-  askEl.innerHTML = '<span>Pruebe usar IA sin saber cómo.</span><button type="button" class="yes">Interactuar</button>' +
+  askEl.innerHTML = '<button type="button" class="yes">¿Interactuar?</button>' +
     '<button type="button" class="no" aria-label="Ahora no"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
   host.appendChild(askEl);
-  askEl.addEventListener('pointerenter', function () { askP.hover = true; });
-  askEl.addEventListener('pointerleave', function () { askP.hover = false; });
   function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
-  function unask() { askEl.classList.remove('on'); askP.hover = false; if (game.phase === 'asking') game.phase = 'calm'; }
+  function unask() { askEl.classList.remove('on'); if (game.phase === 'asking') game.phase = 'calm'; }
   askEl.querySelector('.yes').addEventListener('click', function () { unask(); arm(performance.now()); });
   askEl.querySelector('.no').addEventListener('click', function () { unask(); game.noAsk = true; });
   var ctl = { exit: exit };
@@ -508,7 +507,7 @@ function makeField(svg, opt) {
     par.x += (tx - par.x) * Math.min(1, 3 * dt); par.y += (ty - par.y) * Math.min(1, 3 * dt);
 
     /* density: wake a spare square into the pointer's neighbourhood, fading in */
-    if (ptr.on && !dead && now - spawnAt > (armed ? 160 + game.wave * 50 : 170)) {
+    if (ptr.on && !dead && now - spawnAt > (armed ? 160 + game.wave * RAMP * 50 : 170)) {
       for (var s = 0; s < marks.length; s++) {
         var sp = marks[s];
         if (sp.spare && !sp.live && !sp.held) {
@@ -559,16 +558,25 @@ function makeField(svg, opt) {
     if (heart.burst && heart.o < .02) heart.burst = 0;
     if (game.phase === 'asking') {
       if (!heart.mass || host.classList.contains('condensed')) unask();
-      else if (!askP.hover) {
+      else {
         var sb = svg.getBoundingClientRect(), hb = host.getBoundingClientRect();
-        var ks = Math.max(sb.width / W, sb.height / H);
-        var hx = sb.left - hb.left + (sb.width - W * ks) / 2 + heart.x * ks, hy = sb.top - hb.top + (sb.height - H * ks) / 2 + heart.y * ks;
-        var aw = askEl.offsetWidth, ah = askEl.offsetHeight, rr = hr * ks;
-        var ax = Math.max(12, Math.min(hb.width - aw - 12, hx + rr * .7 + 14));
-        var ay = Math.max(12, Math.min(hb.height - ah - 12, hy - rr * .7 - ah - 10));
-        if (!askP.placed) { askP.x = ax; askP.y = ay; askP.placed = true; }
-        askP.x += (ax - askP.x) * Math.min(1, 4.5 * dt); askP.y += (ay - askP.y) * Math.min(1, 4.5 * dt);
-        askEl.style.transform = 'translate(' + askP.x.toFixed(1) + 'px,' + askP.y.toFixed(1) + 'px)';
+        var ks = Math.max(sb.width / W, sb.height / H), aw = askEl.offsetWidth, ah = askEl.offsetHeight;
+        if (!askP.placed) {
+          /* it appears up and to the right of the heart, and stays there */
+          var hx = sb.left - hb.left + (sb.width - W * ks) / 2 + heart.x * ks, hy = sb.top - hb.top + (sb.height - H * ks) / 2 + heart.y * ks;
+          var rr = hr * ks;
+          askP.x = Math.max(12, Math.min(hb.width - aw - 12, hx + rr * .7 + 14));
+          askP.y = Math.max(12, Math.min(hb.height - ah - 12, hy - rr * .7 - ah - 10));
+          askP.placed = true;
+        }
+        /* it only leans a few pixels toward the hand and swells as it nears */
+        var pxl = sb.left - hb.left + (sb.width - W * ks) / 2 + ptr.x * ks - (askP.x + aw / 2);
+        var pyl = sb.top - hb.top + (sb.height - H * ks) / 2 + ptr.y * ks - (askP.y + ah / 2);
+        var pd = Math.hypot(pxl, pyl), near1 = ptr.on ? Math.max(0, 1 - pd / 260) : 0;
+        var wl = near1 * 6 / (pd || 1);
+        askP.lx += (pxl * wl - askP.lx) * Math.min(1, 8 * dt); askP.ly += (pyl * wl - askP.ly) * Math.min(1, 8 * dt);
+        askP.sc += (1 + near1 * .06 - askP.sc) * Math.min(1, 8 * dt);
+        askEl.style.transform = 'translate(' + (askP.x + askP.lx).toFixed(1) + 'px,' + (askP.y + askP.ly).toFixed(1) + 'px) scale(' + askP.sc.toFixed(3) + ')';
       }
     }
     heart.g.setAttribute('opacity', heart.o.toFixed(3));
@@ -626,14 +634,14 @@ function makeField(svg, opt) {
              line and speeds up until it leaves the field: dodge at the right
              time and it is gone */
           var age = (now - L2.t0) / 1000;
-          var seek = Math.min(2.4, 1 + game.wave * .3);
-          var vmax = (540 + 280 * Math.min(1, age / .5)) * (1 + game.wave * .2);
+          var seek = Math.min(2.4, 1 + game.wave * RAMP * .3);
+          var vmax = (540 + 280 * Math.min(1, age / .5)) * (1 + game.wave * RAMP * .2);
           if (age < seek) {
             /* early on it aims wide of the heart, on its own side, and the
                offset closes: a curve in, not a straight line */
             var off = Math.max(0, 1 - age / .75) * 240 * L2.arc;
             var adx = target.x - L2.uy * off - L2.x, ady = target.y + L2.ux * off - L2.y, ad = Math.hypot(adx, ady) || 1;
-            var steer = Math.min(1, (2.6 + 4.4 * Math.min(1, age / .4)) * (1 + game.wave * .15) * dt);
+            var steer = Math.min(1, (2.6 + 4.4 * Math.min(1, age / .4)) * (1 + game.wave * RAMP * .15) * dt);
             L2.vx += (adx / ad * vmax - L2.vx) * steer; L2.vy += (ady / ad * vmax - L2.vy) * steer;
           } else {
             var vs0 = Math.hypot(L2.vx, L2.vy) || 1, acc = 1 + 1.4 * dt;
@@ -668,7 +676,7 @@ function makeField(svg, opt) {
       }
       if (game.word === w && w.gone >= w.letters.length) {
         if (!w.doneAt) w.doneAt = now;
-        else if (now - w.doneAt > Math.max(400, 1300 - game.wave * 250)) { endWord(); game.wave++; game.nextWord = now; }
+        else if (now - w.doneAt > Math.max(400, 1300 - game.wave * RAMP * 250)) { endWord(); game.wave++; game.nextWord = now; }
       }
     }
     /* the reading time after a defeat, or the moment the hero steps aside */
@@ -758,7 +766,7 @@ function makeField(svg, opt) {
         var eat = Math.max(34, hr * .7), band = 48;
         if (dh < eat + band) hush *= Math.max(0, Math.min(1, (dh - eat * .35) / (eat * .65 + band)));
         /* swallowed only once it has all but faded: never a flash */
-        if (dh < eat && m.o * m.hs * ent < .06 && now - heart.eatAt > (armed ? 70 + game.wave * 25 : 110)) {
+        if (dh < eat && m.o * m.hs * ent < .06 && now - heart.eatAt > (armed ? 70 + game.wave * RAMP * 25 : 110)) {
           m.live = false; m.held = true; m.o = 0; m.g.setAttribute('opacity', '0');
           heart.held.push(m); heart.mass++; heart.eatAt = now; heart.pulse = 1;
           if (game.phase === 'calm' && !game.noAsk && heart.mass >= CAP * .5 && !host.classList.contains('condensed')) ask();
@@ -810,7 +818,7 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['A ciegas, tarde o temprano se paga.', 'La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es que vaya a pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.'] }
+          dead: ['A ciegas, tarde o temprano se paga.', 'La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es qué pueda pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
