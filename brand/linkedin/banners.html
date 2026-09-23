@@ -121,6 +121,11 @@ svg{display:block}
 .avatar{background:radial-gradient(62% 62% at 50% 46%,#2B2721 0%,var(--carbon) 70%);display:grid;place-items:center}
 .avatar .mark{width:44%;height:auto;color:var(--white);transform:translate(-4%,-1%);
   filter:drop-shadow(0 26px 36px rgba(0,0,0,.55))}
+/* the other options: the whole mark in gold; cream tile with a carbon mark; felt tile with a cream mark */
+.avatar.v-dorado .mark{color:var(--gold)}
+.avatar.v-crema{background:radial-gradient(62% 62% at 50% 46%,#FFFFFF 0%,var(--cream) 72%)}
+.avatar.v-crema .mark{color:var(--carbon);filter:drop-shadow(0 22px 30px rgba(28,26,23,.18))}
+.avatar.v-grande .mark{width:54%}
 </style>
 </head>
 <body>
@@ -162,7 +167,11 @@ function copyCol(k) {
 }
 
 if (S === 'avatar') {
-  root.innerHTML = '<div class="art avatar"><svg class="mark" viewBox="94.06 284.20 366.28 435.60" role="img" aria-label="kadabra"><rect x="228" y="377" width="213" height="324" fill="#C9A227"/><use href="#logo-mark" x="94.06" y="284.20" width="366.28" height="435.60"/></svg></div>';
+  /* v: which profile picture. oro = white card, gold sparkles (the first one) */
+  var V = q.get('v') || 'oro', under = { oro: '#C9A227', fieltro: '#1B3A2F', rojo: '#8E1424' }[V];
+  root.innerHTML = '<div class="art avatar v-' + V + '"><svg class="mark" viewBox="94.06 284.20 366.28 435.60" role="img" aria-label="kadabra">' +
+    (under ? '<rect x="228" y="377" width="213" height="324" fill="' + under + '"/>' : '') +
+    '<use href="#logo-mark" x="94.06" y="284.20" width="366.28" height="435.60"/></svg></div>';
 } else if (D === 'carta') {
   /* a few suits lie on the felt, dim, mostly where the photo will sit */
   var tb = '';

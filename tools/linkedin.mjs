@@ -22,14 +22,18 @@ const only = process.argv[2];
 const jobs = [];
 for (const [d, name] of [['carta', '1-carta'], ['humo', '2-sin-humo'], ['datos', '3-93-9']])
   for (const [s, w, h] of [['perfil', 1584, 396], ['empresa', 1128, 191]]) jobs.push({ d, s, w, h, scale: 2, file: `${name}_${s}_${w}x${h}@2x.png` });
-jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 1, file: 'perfil-icono-carbon_1080.png' });
-jobs.push({ d: 'carta', s: 'avatar', w: 1080, h: 1080, scale: 400 / 1080, file: 'perfil-icono-carbon_400.png' });
+/* profile pictures: the first (gold sparkles) keeps its name; the options are numbered */
+for (const [v, name] of [['oro', 'perfil-icono-carbon'], ['blanco', 'perfil-icono-2-blanco'], ['grande', 'perfil-icono-3-blanco-grande'],
+  ['dorado', 'perfil-icono-4-dorado'], ['crema', 'perfil-icono-5-crema'], ['fieltro', 'perfil-icono-6-destellos-verdes'], ['rojo', 'perfil-icono-7-destellos-rojos']]) {
+  jobs.push({ d: 'carta', s: 'avatar', v, w: 1080, h: 1080, scale: 1, file: `${name}_1080.png` });
+  jobs.push({ d: 'carta', s: 'avatar', v, w: 1080, h: 1080, scale: 400 / 1080, file: `${name}_400.png` });
+}
 const b = await chromium.launch();
 for (const j of jobs) {
   if (only && !j.file.includes(only)) continue;
   const p = await b.newPage({ viewport: { width: j.w, height: j.h }, deviceScaleFactor: j.scale });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto(pathToFileURL(page).href + `?d=${j.d}&s=${j.s}`);
+  await p.goto(pathToFileURL(page).href + `?d=${j.d}&s=${j.s}&v=${j.v || ''}`);
   await p.waitForSelector('body[data-ready="1"]', { timeout: 20000 });
   await p.waitForTimeout(250);
   try { await p.locator('.art').screenshot({ path: join(OUT, j.file) }); console.log(errs.length ? 'ERR ' + errs : 'ok', j.file); }

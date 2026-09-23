@@ -7,6 +7,7 @@ Three cover designs plus the profile picture. Each cover comes in two sizes.
 | `export/*_perfil_1584x396@2x.png` | Cover of a personal profile |
 | `export/*_empresa_1128x191@2x.png` | Cover of the kadabra company page |
 | `export/perfil-icono-carbon_1080.png` (or `_400`) | Profile picture: the white card with gold sparkles on carbon; pairs with the carbon cover |
+| `export/perfil-icono-2…7_*.png` | Other profile-picture options: white card, larger white card, gold mark, cream tile, green sparkles, red sparkles |
 | `descripcion.md` | Company page tagline, description and specialties |
 
 Covers are exported at twice the size LinkedIn asks for, so they stay sharp on high-density screens. LinkedIn scales them down on upload.
