@@ -193,7 +193,82 @@ var Mode = (function () {
   };
 })();
 
+/* Phones and touch screens get a calm felt instead of the game: the suits lie
+   scattered where a hand would have woken them, clear of the copy, and only
+   drift. CSS does the floating; now and then one folds back into a square
+   and comes up a new suit. No loop runs while nothing turns. */
+var CALM = matchMedia('(hover: none), (max-width: 760px)').matches;
+function calmField(svg, opt) {
+  var host = svg.parentNode, marks = [], lastW = 0;
+  svg.classList.add('calm');
+  function lay() {
+    var b = svg.getBoundingClientRect(), W = Math.round(b.width), H = Math.round(b.height);
+    if (!W || !H || W === lastW) return;
+    lastW = W;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var zones = [];
+    (opt.text || []).concat([].slice.call(host.querySelectorAll('.cue'))).forEach(function (el) {
+      /* measured where the copy will rest, not mid-entrance */
+      var tf = el.style.transform; el.style.transform = 'none';
+      [].forEach.call(el.getClientRects(), function (r) {
+        if (r.width) zones.push({ x0: r.left - b.left, x1: r.right - b.left, y0: r.top - b.top, y1: r.bottom - b.top });
+      });
+      el.style.transform = tf;
+    });
+    var want = Math.max(10, Math.min(24, Math.round(W * H / 12000))), got = [];
+    for (var k = 0; k < 900 && got.length < want; k++) {
+      var sz = rnd(16, 40), x = rnd(sz, W - sz), y = rnd(sz, H - sz), m = sz * .7 + 10, ok = true;
+      zones.forEach(function (z) { if (x > z.x0 - m && x < z.x1 + m && y > z.y0 - m && y < z.y1 + m) ok = false; });
+      got.forEach(function (o) { if (Math.hypot(o.x - x, o.y - y) < (o.s + sz) * .8 + 22) ok = false; });
+      if (ok) got.push({ x: x, y: y, s: sz });
+    }
+    svg.innerHTML = ''; marks = [];
+    var reach = Math.hypot(W / 2, H / 2);
+    got.forEach(function (q, i) {
+      var g = document.createElementNS(NS, 'g'), inner = document.createElementNS(NS, 'g'), path = document.createElementNS(NS, 'path');
+      var key = suit(), depth = (q.s - 16) / 24;
+      path.setAttribute('d', mix(key, 1)); path.setAttribute('fill', 'currentColor');
+      if (i % 6 === 4) inner.setAttribute('fill', '#A81A2C');
+      inner.setAttribute('transform', 'translate(' + q.x.toFixed(1) + ' ' + q.y.toFixed(1) + ') rotate(' + rnd(-24, 24).toFixed(1) +
+        ') scale(' + (q.s / 100).toFixed(4) + ') translate(-50 -50)');
+      inner.appendChild(path); g.appendChild(inner);
+      g.setAttribute('class', 'm');
+      /* bigger ones sit nearer: brighter, and they travel further */
+      g.style.cssText = '--o:' + (.3 + depth * .45).toFixed(2) + ';--in:' + Math.round(Math.hypot(q.x - W / 2, q.y - H / 2) / reach * 900 + rnd(0, 250)) +
+        'ms;--d:' + rnd(6, 11).toFixed(1) + 's;--dl:-' + rnd(0, 10).toFixed(1) + 's;--dx:' + rnd(-7, 7).toFixed(1) + 'px;--dy:' +
+        (-(5 + depth * 7)).toFixed(1) + 'px;--dr:' + rnd(-9, 9).toFixed(1) + 'deg';
+      svg.appendChild(g);
+      marks.push({ p: path, key: key });
+    });
+  }
+  lay();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { lastW = 0; lay(); });
+  var rz = 0;
+  addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(lay, 200); });
+  if (reduce) { svg.classList.add('lit'); return; }
+  /* one turn: the suit folds into its square and opens as another */
+  function turn() {
+    var m = marks[(Math.random() * marks.length) | 0], t0 = 0;
+    if (!m) return;
+    requestAnimationFrame(function fold(now) {
+      if (!t0) t0 = now;
+      var u = Math.min(1, (now - t0) / 380);
+      m.p.setAttribute('d', mix(m.key, 1 - easeOut(u)));
+      if (u < 1) return requestAnimationFrame(fold);
+      m.key = suit(); morphPath(m.p, m.key, 700, 160);
+    });
+  }
+  var timer = 0;
+  new IntersectionObserver(function (es) {
+    clearInterval(timer);
+    if (!es[0].isIntersecting) return;
+    svg.classList.add('lit');
+    timer = setInterval(function () { if (!document.hidden) turn(); }, 2600);
+  }, { threshold: .15 }).observe(host);
+}
+
 function makeField(svg, opt) {
+  if (CALM) return calmField(svg, opt);
   var W = opt.w, H = opt.h;
   var wide = innerWidth > 860;
   var COUNT = wide ? opt.n : Math.min(opt.n, opt.nm);
@@ -208,6 +283,7 @@ function makeField(svg, opt) {
   var REBIRTH = 20000;                       /* ms of reading after a defeat */
   var RAMP = .4;                             /* difficulty per phrase: the sixth plays like the old third */
   var LIVES = 3;                             /* three hits and it is over, whatever the size */
+  var ASK_AT = 3;                            /* marks gathered before '¿Jugar?': a few seconds of play */
   var marks = [], frag = document.createDocumentFragment();
   var host = svg.parentNode;
 
@@ -375,7 +451,7 @@ function makeField(svg, opt) {
      words at once; the cross puts it away for good (until a reload). */
   var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, lx: 0, ly: 0, sc: 1 };
   askEl.className = 'ask';
-  askEl.innerHTML = '<button type="button" class="yes">@@t.game.ask@@</button>' +
+  askEl.innerHTML = '<button type="button" class="yes"><span>@@t.game.ask@@</span><span aria-hidden="true">@@t.game.ask.hover@@</span></button>' +
     '<button type="button" class="no" aria-label="@@t.game.ask.no@@"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
   host.appendChild(askEl);
   function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
@@ -565,8 +641,8 @@ function makeField(svg, opt) {
           /* it appears up and to the right of the heart, and stays there */
           var hx = sb.left - hb.left + (sb.width - W * ks) / 2 + heart.x * ks, hy = sb.top - hb.top + (sb.height - H * ks) / 2 + heart.y * ks;
           var rr = hr * ks;
-          askP.x = Math.max(12, Math.min(hb.width - aw - 12, hx + rr * .7 + 14));
-          askP.y = Math.max(12, Math.min(hb.height - ah - 12, hy - rr * .7 - ah - 10));
+          askP.x = Math.max(12, Math.min(hb.width - aw - 12, hx + rr * .6 + 10));
+          askP.y = Math.max(12, Math.min(hb.height - ah - 12, hy - rr * .6 - ah - 6));
           askP.placed = true;
         }
         /* it only leans a few pixels toward the hand and swells as it nears */
@@ -769,7 +845,7 @@ function makeField(svg, opt) {
         if (dh < eat && m.o * m.hs * ent < .06 && now - heart.eatAt > (armed ? 70 + game.wave * RAMP * 25 : 110)) {
           m.live = false; m.held = true; m.o = 0; m.g.setAttribute('opacity', '0');
           heart.held.push(m); heart.mass++; heart.eatAt = now; heart.pulse = 1;
-          if (game.phase === 'calm' && !game.noAsk && heart.mass >= CAP * .5 && !host.classList.contains('condensed')) ask();
+          if (game.phase === 'calm' && !game.noAsk && heart.mass >= ASK_AT && !host.classList.contains('condensed')) ask();
           continue;
         }
       }
@@ -993,11 +1069,11 @@ var vizG = makeGraph({ id: 'viz', drive: true,
   var bL = document.getElementById('bLeft'), bR = document.getElementById('bRight');
   [bL, bR].forEach(function (b) { b.insertAdjacentHTML('beforeend', '<span class="tally" aria-hidden="true"></span>'); });
   function pileOf(dir) { return phone.matches ? (dir > 0 ? bR : bL) : (dir > 0 ? pileR : pileL); }
-  var HINT = '@@t.swipe.hint.mid@@ ';
+  var HINT = '@@t.swipe.hint.mid@@ ', THUMB = matchMedia('(hover: none)').matches;
 
   function setHint() {
-    hint.innerHTML = '@@t.swipe.hint.pre@@ ' + Math.min(idx + 1, 5) + ' ' + HINT +
-      '<span class="kbd"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span>.';
+    hint.innerHTML = '@@t.swipe.hint.pre@@ ' + Math.min(idx + 1, 5) + ' ' + (THUMB ? '@@t.swipe.hint.touch@@' :
+      HINT + '<span class="kbd"><kbd>&larr;</kbd><kbd>&rarr;</kbd></span>.');
   }
 
   function makeCards() {

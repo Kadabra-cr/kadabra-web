@@ -88,7 +88,14 @@ section{position:relative}
 .nav a[aria-current=page]{color:var(--white)}
 .nav a[aria-current=page]::after{background:var(--gold);transform:scaleX(1)}
 .hdr .cta{margin:0;font-size:.9rem;padding:.72em 1.25em}
-@media (max-width:760px){.hdr .cta{display:none}.nav{margin-left:auto}}
+/* phones: the WhatsApp button shrinks to its mark (the label stays for screen readers) */
+@media (max-width:760px){.hdr .cta.wa{font-size:0;gap:0;padding:0;width:44px;height:44px;justify-content:center;border-radius:50%;flex:none}
+  .hdr .cta .wamark{width:22px;height:22px}
+  .hdr .wrap{gap:14px}.brand svg{height:28px}
+  .nav{margin-left:auto;gap:16px;font-size:.86rem;white-space:nowrap}
+  .nav a{padding:12px 0}.nav a::after{bottom:7px}}
+/* the narrowest phones keep the mark and let the word go */
+@media (max-width:374px){.brand svg{width:26px;height:31px;overflow:hidden}body .cta{padding-inline:1em;font-size:.96rem}}
 @media (max-width:420px){.nav{gap:14px;font-size:.88rem}}
 
 /* ---------- shared controls ----------------------------------------------- */
@@ -139,6 +146,11 @@ section{position:relative}
   min-height:calc(100svh - var(--hdr));display:grid;align-items:center}
 #field{position:absolute;inset:0;width:100%;height:100%;display:block;
   color:var(--white);pointer-events:none}
+/* the calm felt (phones): scattered suits that drift, lit outward from the copy */
+.calm .m{opacity:0;transform-box:fill-box;transform-origin:50% 50%;transition:opacity 1.4s linear var(--in);
+  animation:drift var(--d) ease-in-out var(--dl) infinite}
+.calm.lit .m{opacity:var(--o)}
+@keyframes drift{50%{transform:translate(var(--dx),var(--dy)) rotate(var(--dr))}}
 .hero .wrap{position:relative;z-index:2;text-align:center;
   padding:calc(var(--cell)*2.2) 0 calc(var(--cell)*2.6)}
 .hero h1{font-size:clamp(2.55rem,7.2vw,6.6rem);line-height:.94;color:var(--white);
@@ -576,7 +588,7 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   .rise,.pair .b,.m-body,.m-vis,.whyband .t,.mini,.card{opacity:1!important;
     transform:none!important}
   .ruledraw,.whyband .rule,.vis-rules .rule{clip-path:none!important}
-  .cable .flow,.whyband .suit path,.pointing .cta .point,.mode .dot,.mode.shake{animation:none!important}
+  .cable .flow,.whyband .suit path,.pointing .cta .point,.mode .dot,.mode.shake,.calm .m{animation:none!important}
   #sweep{display:none}
   .whyband .rule{opacity:.6}
 }
@@ -606,11 +618,16 @@ footer .rule{color:var(--on-carbon);opacity:.22;margin-bottom:calc(var(--cell)*1
   opacity:0;scale:.9;pointer-events:none;visibility:hidden;
   transition:opacity .35s linear,scale .45s cubic-bezier(.16,1,.3,1),visibility 0s .35s}
 .ask.on{opacity:1;scale:1;pointer-events:auto;visibility:visible;transition-delay:0s}
-.ask .yes{font:inherit;font-weight:600;background:var(--gold);color:var(--carbon);border:0;border-radius:999px;
-  padding:.5em 1.05em;cursor:pointer;transition:background .2s var(--ease)}
+.ask .yes{font:inherit;font-size:1rem;font-weight:700;background:var(--gold);color:var(--carbon);border:0;border-radius:999px;
+  min-height:40px;padding:.55em 1.3em;cursor:pointer;display:grid;transition:background .2s var(--ease)}
+/* the two words share one cell, so the pill never changes width */
+.ask .yes span{grid-area:1/1;transition:opacity .18s linear,translate .3s cubic-bezier(.16,1,.3,1)}
+.ask .yes span+span{opacity:0;translate:0 5px}
+.ask .yes:is(:hover,:focus-visible) span:first-child{opacity:0;translate:0 -5px}
+.ask .yes:is(:hover,:focus-visible) span+span{opacity:1;translate:0 0}
 .ask .yes:hover{background:#DDB437}
 .ask .no,.mode button svg{flex:none}
-.ask .no{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:0;background:none;color:var(--on-carbon-dim);cursor:pointer}
+.ask .no{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:0;background:none;color:var(--on-carbon-dim);cursor:pointer}
 .ask .no:hover{background:var(--carbon-2);color:var(--white)}
 .ask svg,.mode svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;fill:none}
 /* interactive mode: a toast that drops in and settles into a chip */
@@ -751,6 +768,22 @@ html.staged .hcue svg{width:38px;height:17px;animation:cue 1.9s var(--ease) infi
 .workshopline{margin:0;font-family:var(--title);font-weight:800;letter-spacing:-.035em;line-height:1.02;
   font-size:clamp(1.8rem,4.2vw,3.6rem);color:var(--white);padding-bottom:.08em}
 #reveal .ctas{margin-top:calc(var(--cell)*1.5)}
+/* phones: the suit sits beside its title and the words get the full width */
+@media (max-width:600px){
+  .whyband{grid-template-columns:30px minmax(0,1fr);column-gap:14px;row-gap:0;align-items:center;padding:calc(var(--cell)*1.1) 0}
+  .whyband>div{display:contents}
+  .whyband .suit{grid-area:1/1;align-self:center}
+  .whyband .t{grid-area:1/2}
+  .whyband .pf,.whyband .rule{grid-column:1/-1}
+}
+/* touch: a tap must not leave a band stuck in its hover pose */
+@media (hover:none){
+  .whyband:hover{background:none}
+  .whyband:hover>div{transform:none}
+  .whyband:hover .suit,.whyband:nth-child(2n):hover .suit{transform:none;color:var(--ink)}
+  .whyband:hover .suit path{animation:none}
+  .bands:hover .whyband:not(:hover){opacity:1}
+}
 @media (max-width:900px){
   .finale{grid-template-columns:1fr}
   .finale .guide{display:none}

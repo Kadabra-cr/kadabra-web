@@ -76,6 +76,7 @@ swipe.btnR: La IA puede
 swipe.skip: Solo muéstreme el resultado.
 swipe.hint.pre: Carta
 swipe.hint.mid: de 5. Arrastre la carta, use los botones o presione
+swipe.hint.touch: de 5. Deslice la carta o toque un botón.
 swipe.desk.h3: Realmente no es tan sencillo.
 swipe.desk.sub: Cinco decisiones, cinco detalles. Ninguna está mal. Cada una tiene algo que conviene saber antes del lunes.
 swipe.said: Usted dijo:
@@ -181,6 +182,7 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 game.words: La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde
 
 game.ask: ¿Jugar?
+game.ask.hover: ¡Jugar!
 game.ask.no: Ahora no
 game.mode: Modo interactivo
 game.exit: Salir
