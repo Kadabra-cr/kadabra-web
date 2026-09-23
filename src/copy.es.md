@@ -21,7 +21,7 @@ hero.sub: Talleres de IA de medio día, interactivos, para equipos ticos. Con la
 hero.btn: Ver el taller
 hero.fine: Mandarnos un mensaje es gratis, con todo gusto los atendemos.
 hero.cue: Bajar
-hero.dead.h1: A ciegas, tarde o temprano se paga.
+hero.dead.h1: Sin ayuda, tarde o temprano se paga.
 hero.dead.sub: La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es qué pueda pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.
 
 ## Funciona. Hasta que deja de funcionar.
@@ -180,7 +180,7 @@ close.dead.fine: Medio día, con sus archivos, y sus herramientas.
 
 game.words: La IA inventó cifras para la junta | ChatGPT citó una ley que no existe | Pegamos la planilla en un chat | Nadie revisó el pago de la IA | El bot prometió lo que no damos | Se filtraron las cédulas de clientes | Hacienda nos multó por la IA | El contrato traía una cláusula inventada | La PRODHAB abrió una investigación | Nos demandaron y la IA no responde
 
-game.ask: ¿Interactuar?
+game.ask: ¿Jugar?
 game.ask.no: Ahora no
 game.mode: Modo interactivo
 game.exit: Salir

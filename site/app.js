@@ -375,7 +375,7 @@ function makeField(svg, opt) {
      words at once; the cross puts it away for good (until a reload). */
   var askEl = document.createElement('div'), askP = { x: 0, y: 0, placed: false, lx: 0, ly: 0, sc: 1 };
   askEl.className = 'ask';
-  askEl.innerHTML = '<button type="button" class="yes">¿Interactuar?</button>' +
+  askEl.innerHTML = '<button type="button" class="yes">¿Jugar?</button>' +
     '<button type="button" class="no" aria-label="Ahora no"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>';
   host.appendChild(askEl);
   function ask() { game.phase = 'asking'; askP.placed = false; askEl.classList.add('on'); }
@@ -818,7 +818,7 @@ if (heroField) makeField(heroField, {
   text: [].slice.call(document.querySelectorAll('.hero .wrap > *')),
   quiet: { x0: 330, x1: 1270, y0: 215, y1: 700 },
   copy: { els: [document.querySelector('.hero h1'), document.querySelector('.hero .sub')],
-          dead: ['A ciegas, tarde o temprano se paga.', 'La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es qué pueda pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.'] }
+          dead: ['Sin ayuda, tarde o temprano se paga.', 'La tabla de excel con datos falsos, la factura inexistente, la falla oculta. No es qué pueda pasar, sino cuándo. Medio día con nosotros y su equipo deja de adivinar.'] }
 });
 document.querySelectorAll('.closefield').forEach(function (svg) {
   var sec = svg.parentNode;
